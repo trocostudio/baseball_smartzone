@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smartzone World Series - Full Control</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Impact, sans-serif; 
+            background-color: #1a472a; color: white; text-align: center; 
+            margin: 0; padding: 0; overflow: hidden; height: 100vh;
+            display: flex; flex-direction: column; cursor: pointer;
+        }
+        .header-main { 
+            background: #222; border-bottom: 4px solid #f1c40f; 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 5px 20px; z-index: 30; flex-shrink: 0;
+        }
+        .logo-img { height: 45px; width: auto; }
+        h1 { margin: 0; font-size: 1.4rem; color: #f1c40f; text-transform: uppercase; }
+
+        .scoreboard-pro { 
+            background: #333; padding: 5px; 
+            display: flex; justify-content: space-around; align-items: center; 
+            z-index: 25; flex-shrink: 0;
+        }
+        .team-box { padding: 5px; border-radius: 8px; border: 2px solid transparent; width: 110px; }
+        .team-box.active { border-color: #f1c40f; background: #444; box-shadow: 0 0 10px #f1c40f; }
+        .runs { font-size: 2.2rem; font-weight: bold; line-height: 1; }
+        
+        .game-info { font-size: 0.8rem; }
+        select { background: #444; color: #f1c40f; border: 1px solid #666; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+        .main-game-area {
+            position: relative; flex-grow: 1; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .character-container { position: absolute; width: 100%; top: 10px; pointer-events: none; z-index: 5; }
+        .char-img { position: absolute; height: 220px; width: auto; filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.4)); }
+        #hitter-img { left: 2%; }
+        #pitcher-img { right: 2%; }
+
+        .field-container { 
+            position: relative; width: 330px; height: 330px; 
+            background: #2ecc71; border: 8px solid #27ae60; border-radius: 20px; 
+            z-index: 10; margin-bottom: 5px;
+        }
+        .diamond-line { position: absolute; width: 220px; height: 220px; border: 2px dashed white; top: 50px; left: 50px; transform: rotate(45deg); }
+        .base { position: absolute; width: 42px; height: 42px; background: white; border: 2px solid #7f8c8d; z-index: 12; display: flex; align-items: center; justify-content: center; }
+        #home { bottom: 8px; left: 144px; clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%); height: 50px; }
+        #first { top: 144px; right: 8px; transform: rotate(45deg); }
+        #second { top: 8px; left: 144px; transform: rotate(45deg); }
+        #third { top: 144px; left: 8px; transform: rotate(45deg); }
+        .player { font-size: 35px; transform: rotate(-45deg); display: none; }
+
+        #big-announcer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; font-weight: bold; color: #f1c40f; text-shadow: 4px 4px 0px #000; z-index: 100; display: none; width: 100%; pointer-events: none; }
+
+        .controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 480px; width: 95%; margin: 0 auto 10px auto; z-index: 20; flex-shrink: 0; }
+        button { padding: 10px; font-size: 13px; cursor: pointer; border-radius: 8px; border: none; font-weight: bold; box-shadow: 0 3px #999; }
+        button:active { transform: translateY(2px); box-shadow: 0 1px #666; }
+        .btn-hit { background: #f1c40f; }
+        .btn-hr { background: #c0392b; color: white; grid-column: span 3; font-size: 16px; }
+        .btn-out { background: #34495e; color: white; }
+    </style>
+</head>
+<body onclick="startAmbience()">
+
+    <audio id="snd-swing" src="swing.mp3" preload="auto"></audio>
+    <audio id="snd-out" src="out.mp3" preload="auto"></audio>
+    <audio id="snd-inning" src="inning.mp3" preload="auto"></audio>
+    <audio id="snd-score" src="score.mp3" preload="auto"></audio>
+
+    <div class="header-main">
+        <img src="mi_logo.png" class="logo-img" onerror="this.style.opacity='0'">
+        <h1>Smartzone World Series</h1>
+        <img src="logo_academia.png" class="logo-img" onerror="this.style.opacity='0'">
+    </div>
+
+    <div class="scoreboard-pro">
+        <div id="team1-box" class="team-box active">
+            <div style="font-size: 0.6rem; color: #aaa;">VISITORS</div>
+            <div id="runs1" class="runs">0</div>
+        </div>
+        <div class="game-info">
+            Innings: <select id="total-innings" onchange="resetGame()">
+                <option value="1">1</option>
+                <option value="3" selected>3</option>
+                <option value="5">5</option>
+                <option value="9">9</option>
+            </select>
+            <div style="color: #f1c40f; font-weight: bold; margin-top: 2px;">INNING: <span id="current-inning">1</span></div>
+            <div>OUTS: <span id="outs">0</span>/3</div>
+        </div>
+        <div id="team2-box" class="team-box">
+            <div style="font-size: 0.6rem; color: #aaa;">HOME</div>
+            <div id="runs2" class="runs">0</div>
+        </div>
+    </div>
+
+    <div class="main-game-area">
+        <div class="character-container">
+            <img src="hitter.png" id="hitter-img" class="char-img">
+            <img src="pitcher.png" id="pitcher-img" class="char-img">
+        </div>
+        <div class="field-container">
+            <div id="big-announcer">HIT!</div>
+            <div class="diamond-line"></div>
+            <div class="base" id="second"><div class="player" id="p2">🏃</div></div>
+            <div class="base" id="first"><div class="player" id="p1">🏃</div></div>
+            <div class="base" id="third"><div class="player" id="p3">🏃</div></div>
+            <div class="base" id="home">🏠</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-hit" onclick="play(1, 'SINGLE')">SINGLE</button>
+        <button class="btn-hit" onclick="play(2, 'DOUBLE')">DOUBLE</button>
+        <button class="btn-hit" onclick="play(3, 'TRIPLE')">TRIPLE</button>
+        <button class="btn-out" onclick="addOut()">❌ OUT</button>
+        <button class="btn-hr" onclick="play(4, 'HOME RUN! ⚡')">🔥 HOME RUN 🔥</button>
+        <button style="grid-column: span 3; background: #7f8c8d; color: white; font-size: 9px; padding: 2px;" onclick="resetGame()">RESTART WORLD SERIES</button>
+    </div>
+
+    <script>
+        let bases = [false, false, false];
+        let score = [0, 0];
+        let currentTeam = 1; // 1: Visitors, 2: Home
+        let outs = 0;
+        let inning = 1;
+        let hasStarted = false;
+
+        function startAmbience() {
+            if(!hasStarted) { playSound('snd-inning'); hasStarted = true; }
+        }
+
+        function playSound(id) {
+            const s = document.getElementById(id);
+            if(s) { s.currentTime = 0; s.play().catch(e => {}); }
+        }
+
+        function announce(text) {
+            const el = document.getElementById('big-announcer');
+            el.innerText = text;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 1100);
+        }
+
+        function play(num, msg) {
+            announce(msg);
+            playSound('snd-swing');
+            let r = 0;
+            if (num === 4) {
+                r = bases.filter(b => b).length + 1;
+                bases = [false, false, false];
+            } else {
+                for (let i = 0; i < num; i++) {
+                    if (bases[2]) r++;
+                    bases[2] = bases[1]; bases[1] = bases[0];
+                    if (i === 0) bases[0] = true; else bases[0] = false;
+                }
+            }
+            if(r > 0) {
+                score[currentTeam-1] += r;
+                setTimeout(() => { playSound('snd-score'); }, 600);
+            }
+            updateUI();
+        }
+
+        function addOut() {
+            outs++;
+            announce("OUT!");
+            playSound('snd-out');
+            
+            const maxInnings = parseInt(document.getElementById('total-innings').value);
+
+            if (outs >= 3) {
+                setTimeout(() => {
+                    if (currentTeam === 1) { 
+                        // Cambio a bateo de Home (Parte baja del inning)
+                        currentTeam = 2; 
+                        alert("MIDDLE OF THE INNING - HOME TEAM AT BAT");
+                    } else { 
+                        // Termina el turno de Home
+                        if (inning >= maxInnings) {
+                            // FINAL DEL JUEGO
+                            let winner = score[0] > score[1] ? "VISITORS WIN!" : (score[1] > score[0] ? "HOME TEAM WINS!" : "IT'S A TIE!");
+                            alert("GAME OVER! \nFinal Score: " + score[0] + " - " + score[1] + "\n" + winner);
+                            resetGame();
+                            return;
+                        } else {
+                            // Siguiente Inning
+                            currentTeam = 1; 
+                            inning++;
+                            alert("NEW INNING: " + inning);
+                        }
+                    }
+                    bases = [false, false, false];
+                    outs = 0;
+                    playSound('snd-inning');
+                    updateUI();
+                }, 500);
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('p1').style.display = bases[0] ? 'block' : 'none';
+            document.getElementById('p2').style.display = bases[1] ? 'block' : 'none';
+            document.getElementById('p3').style.display = bases[2] ? 'block' : 'none';
+            document.getElementById('runs1').innerText = score[0];
+            document.getElementById('runs2').innerText = score[1];
+            document.getElementById('outs').innerText = outs;
+            document.getElementById('current-inning').innerText = inning;
+            document.getElementById('team1-box').className = currentTeam === 1 ? 'team-box active' : 'team-box';
+            document.getElementById('team2-box').className = currentTeam === 2 ? 'team-box active' : 'team-box';
+        }
+
+        function resetGame() {
+            score = [0, 0]; inning = 1; currentTeam = 1; outs = 0; bases = [false, false, false];
+            updateUI();
+            playSound('snd-inning');
+        }
+    </script>
+</body>
+</html>
