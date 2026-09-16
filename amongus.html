@@ -34,13 +34,12 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
     }
 
     canvas {
-      background: #222;
+      background: #151515;
       border: 2px solid #555;
-      max-width: 100%;
-      max-height: 100%;
     }
 
     /* CONTROLES TÁCTILES MÓVILES */
@@ -82,7 +81,7 @@
     .dpad-left { top: 42px; left: 0; width: 45px; height: 45px; }
     .dpad-right { top: 42px; right: 0; width: 45px; height: 45px; }
 
-    /* Botones de Acción Móviles */
+    /* Botones de Acción */
     .action-buttons {
       display: flex;
       flex-direction: column;
@@ -100,7 +99,7 @@
     #btnKill { background: #d9534f; color: white; }
     #btnReport { background: #f0ad4e; color: black; }
 
-    /* Modal de Reunión (Sin Chat de Texto) */
+    /* Modal Emergency Meeting */
     .overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -133,7 +132,7 @@
 
   <!-- Lienzo de Juego -->
   <div id="game-container">
-    <canvas id="canvas" width="800" height="500"></canvas>
+    <canvas id="canvas" width="400" height="400"></canvas>
   </div>
 
   <!-- Controles Táctiles en Pantalla -->
@@ -151,7 +150,7 @@
     </div>
   </div>
 
-  <!-- Modal Emergency Meeting (Para debate presencial en voz alta) -->
+  <!-- Modal Emergency Meeting -->
   <div id="meetingModal" class="overlay hidden">
     <h1 style="color: #ff4d4d; font-size: 2rem; margin: 10px;">EMERGENCY MEETING!</h1>
     <p style="font-size: 1.1rem; color: #fff; margin: 15px 0;">
@@ -168,6 +167,11 @@
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
+    // Dimensiones del mapa gigante (1600x1200)
+    const MAP_WIDTH = 1600;
+    const MAP_HEIGHT = 1200;
+    const VISION_RADIUS = 220; // Rango de visión de los jugadores vivos
+
     let peer = null;
     let connections = [];
     let hostConn = null;
@@ -183,8 +187,8 @@
     let myData = {
       id: "",
       name: "",
-      x: 100 + Math.random() * 200,
-      y: 100 + Math.random() * 200,
+      x: 200 + Math.random() * (MAP_WIDTH - 400),
+      y: 200 + Math.random() * (MAP_HEIGHT - 400),
       color: colors[0],
       isImpostor: false,
       isDead: false
@@ -364,18 +368,19 @@
       } else if (hostConn) hostConn.send(msg);
     }
 
-    // --- LOOP Y RENDERIZADO ---
+    // --- LOOP Y RENDERIZADO (CON CÁMARA Y NIEBLA) ---
     function update() {
       let moved = false;
-      const speed = 3;
+      const speed = 4;
 
       if (inputState.up) { myData.y -= speed; moved = true; }
       if (inputState.down) { myData.y += speed; moved = true; }
       if (inputState.left) { myData.x -= speed; moved = true; }
       if (inputState.right) { myData.x += speed; moved = true; }
 
-      myData.x = Math.max(15, Math.min(canvas.width - 15, myData.x));
-      myData.y = Math.max(15, Math.min(canvas.height - 15, myData.y));
+      // Limitar al mapa gigante
+      myData.x = Math.max(20, Math.min(MAP_WIDTH - 20, myData.x));
+      myData.y = Math.max(20, Math.min(MAP_HEIGHT - 20, myData.y));
 
       if (moved) {
         if (isHost) {
@@ -392,50 +397,93 @@
 
       btnKill.style.display = (myData.isImpostor && !myData.isDead) ? "block" : "none";
       
-      let nearBody = bodies.some(b => Math.hypot(b.x - myData.x, b.y - myData.y) < 45);
+      let nearBody = bodies.some(b => Math.hypot(b.x - myData.x, b.y - myData.y) < 50);
       btnReport.style.display = nearBody ? "block" : "none";
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Mapa
-      ctx.strokeStyle = "#444";
-      ctx.lineWidth = 4;
-      ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+      // Calcular desplazamiento de cámara (centrar la pantalla en el jugador actual)
+      const cameraX = myData.x - canvas.width / 2;
+      const cameraY = myData.y - canvas.height / 2;
 
-      // Cuerpos
+      ctx.save();
+      // Trasladar origen del lienzo según la cámara
+      ctx.translate(-cameraX, -cameraY);
+
+      // 1. Dibujar Cuadrícula de Fondo del Mapa
+      ctx.strokeStyle = "#252525";
+      ctx.lineWidth = 2;
+      for (let x = 0; x < MAP_WIDTH; x += 100) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT); ctx.stroke();
+      }
+      for (let y = 0; y < MAP_HEIGHT; y += 100) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH, y); ctx.stroke();
+      }
+
+      // 2. Límites Exteriores del Mapa
+      ctx.strokeStyle = "#ff4d4d";
+      ctx.lineWidth = 6;
+      ctx.strokeRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+
+      // 3. Dibujar Cuerpos (Solo si están en el rango de visión o si eres fantasma)
       bodies.forEach(b => {
-        ctx.fillStyle = b.color;
-        ctx.beginPath();
-        ctx.arc(b.x, b.y + 5, 12, 0, Math.PI, false);
-        ctx.fill();
-        ctx.fillStyle = "white";
-        ctx.fillText("X_X", b.x - 8, b.y);
+        let dist = Math.hypot(b.x - myData.x, b.y - myData.y);
+        if (myData.isDead || dist <= VISION_RADIUS) {
+          ctx.fillStyle = b.color;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y + 5, 12, 0, Math.PI, false);
+          ctx.fill();
+          ctx.fillStyle = "white";
+          ctx.fillText("X_X", b.x - 8, b.y);
+        }
       });
 
-      // Jugadores
+      // 4. Dibujar Jugadores (Filtrados por Rango de Visión)
       for (let id in players) {
         let p = players[id];
+        let dist = Math.hypot(p.x - myData.x, p.y - myData.y);
+
+        // Si está fuera de visión y no somos fantasmas, ignorar renderizado
+        if (!myData.isDead && dist > VISION_RADIUS && id !== myId) continue;
 
         ctx.globalAlpha = p.isDead ? 0.4 : 1.0; 
 
+        // Monigote
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, 15, 0, Math.PI * 2);
         ctx.fill();
 
+        // Visor
         ctx.fillStyle = "#aaddff";
         ctx.fillRect(p.x - 4, p.y - 6, 10, 7);
 
         ctx.globalAlpha = 1.0;
 
+        // Nombre
         ctx.fillStyle = "white";
         ctx.font = "12px sans-serif";
         ctx.textAlign = "center";
         let label = p.name + (p.id === myId ? " (You)" : "");
         if (p.id === myId && p.isImpostor) label += " [IMP]";
         ctx.fillText(label, p.x, p.y - 20);
+      }
+
+      ctx.restore(); // Restaurar cámara tras pintar entidades
+
+      // 5. Máscara de Niebla de Guerra (Si el jugador está vivo)
+      if (!myData.isDead) {
+        ctx.save();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.82)";
+        ctx.beginPath();
+        // Rectángulo completo en pantalla
+        ctx.rect(0, 0, canvas.width, canvas.height);
+        // Recortar un círculo en el centro para dar luz
+        ctx.arc(canvas.width / 2, canvas.height / 2, VISION_RADIUS, 0, Math.PI * 2, true);
+        ctx.fill();
+        ctx.restore();
       }
     }
 
