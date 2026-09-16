@@ -6,112 +6,34 @@
   <title>Classroom Impostor Mobile</title>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
-    }
-    body {
-      font-family: sans-serif;
-      background: #121212;
-      color: white;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+    body { font-family: sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 0; overflow: hidden; }
     h1 { margin: 5px 0; font-size: 1.2rem; }
-    
     .controls-panel { margin: 5px; }
     input, button { padding: 8px; font-size: 14px; margin: 3px; border-radius: 5px; border: none; }
     button { background: #007bff; color: white; font-weight: bold; }
-
-    #game-container {
-      position: relative;
-      width: 100vw;
-      height: 55vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    canvas {
-      background: #151515;
-      border: 2px solid #555;
-    }
-
-    /* CONTROLES TÁCTILES MÓVILES */
-    #touch-controls {
-      position: fixed;
-      bottom: 10px;
-      left: 0;
-      width: 100%;
-      height: 35vh;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 15px;
-      box-sizing: border-box;
-      z-index: 5;
-    }
-
-    /* D-PAD Cruceta Móvil */
-    .dpad {
-      position: relative;
-      width: 130px;
-      height: 130px;
-    }
-    .dpad-btn {
-      position: absolute;
-      background: rgba(255, 255, 255, 0.2);
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      color: white;
-      border-radius: 8px;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      touch-action: none;
-    }
+    #game-container { position: relative; width: 100vw; height: 50vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+    canvas { background: #151515; border: 2px solid #555; }
+    #touch-controls { position: fixed; bottom: 10px; left: 0; width: 100%; height: 35vh; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-sizing: border-box; z-index: 5; }
+    .dpad { position: relative; width: 130px; height: 130px; }
+    .dpad-btn { position: absolute; background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.4); color: white; border-radius: 8px; font-size: 18px; display: flex; align-items: center; justify-content: center; touch-action: none; }
     .dpad-btn:active { background: rgba(255, 255, 255, 0.5); }
     .dpad-up { top: 0; left: 42px; width: 45px; height: 45px; }
     .dpad-down { bottom: 0; left: 42px; width: 45px; height: 45px; }
     .dpad-left { top: 42px; left: 0; width: 45px; height: 45px; }
     .dpad-right { top: 42px; right: 0; width: 45px; height: 45px; }
-
-    /* Botones de Acción */
-    .action-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .action-btn {
-      width: 80px;
-      height: 55px;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 12px;
-      display: none;
-      border: 2px solid #fff;
-    }
+    .action-buttons { display: flex; flex-direction: column; gap: 10px; }
+    .action-btn { width: 80px; height: 55px; border-radius: 12px; font-weight: bold; font-size: 12px; display: none; border: 2px solid #fff; }
     #btnKill { background: #d9534f; color: white; }
     #btnReport { background: #f0ad4e; color: black; }
-
-    /* Modal Emergency Meeting */
-    .overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.92);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      padding: 20px;
-    }
+    
+    /* MODALES DE REUNIÓN Y FIN DE JUEGO */
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; padding: 15px; }
     .hidden { display: none !important; }
+    .vote-list { display: flex; flex-direction: column; gap: 8px; width: 90%; max-width: 300px; margin: 10px 0; max-height: 40vh; overflow-y: auto; }
+    .vote-btn { background: #333; color: white; border: 1px solid #777; padding: 10px; border-radius: 6px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .vote-btn:active { background: #555; }
+    .vote-btn-disabled { opacity: 0.5; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -135,7 +57,7 @@
     <canvas id="canvas" width="400" height="400"></canvas>
   </div>
 
-  <!-- Controles Táctiles en Pantalla -->
+  <!-- Controles Táctiles -->
   <div id="touch-controls">
     <div class="dpad">
       <div class="dpad-btn dpad-up" id="btnUp">▲</div>
@@ -143,34 +65,37 @@
       <div class="dpad-btn dpad-left" id="btnLeft">◄</div>
       <div class="dpad-btn dpad-right" id="btnRight">►</div>
     </div>
-
     <div class="action-buttons">
       <button id="btnKill" class="action-btn" onclick="killPlayer()">KILL</button>
       <button id="btnReport" class="action-btn" onclick="reportBody()">REPORT</button>
     </div>
   </div>
 
-  <!-- Modal Emergency Meeting -->
+  <!-- Modal Emergency Meeting & Votación -->
   <div id="meetingModal" class="overlay hidden">
-    <h1 style="color: #ff4d4d; font-size: 2rem; margin: 10px;">EMERGENCY MEETING!</h1>
-    <p style="font-size: 1.1rem; color: #fff; margin: 15px 0;">
-      🗣️ <b>SPEAK OUT LOUD IN ENGLISH!</b><br><br>
-      Discuss with your classmates: <br>
-      <i>"Who is the impostor?"</i> <br>
-      <i>"Where were you?"</i>
-    </p>
-    <br>
-    <button onclick="closeMeeting()" style="background: #28a745; color: white; padding: 12px 24px; font-size: 16px;">End Meeting & Continue</button>
+    <h2 style="color: #ff4d4d; margin: 5px;">EMERGENCY MEETING!</h2>
+    <p style="font-size: 0.9rem; color: #aaa; margin: 0;">🗣️ Discuss in English aloud, then VOTE:</p>
+    
+    <div class="vote-list" id="voteList"></div>
+    <p id="voteStatus" style="font-size: 12px; color: #ffcc00;"></p>
+
+    <button id="btnEndMeeting" onclick="endMeetingHost()" style="background: #28a745; color: white; padding: 10px 20px; font-size: 14px; display: none;">End & Count Votes</button>
+  </div>
+
+  <!-- Modal Pantalla de Resultado (Expulsión / Fin del Juego) -->
+  <div id="resultModal" class="overlay hidden">
+    <h1 id="resultTitle" style="font-size: 2rem; margin: 10px;"></h1>
+    <p id="resultDesc" style="font-size: 1.2rem; margin: 15px 0;"></p>
+    <button onclick="closeResultModal()" style="background: #007bff; color: white; padding: 10px 20px;">OK</button>
   </div>
 
   <script>
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    // Dimensiones del mapa gigante (1600x1200)
     const MAP_WIDTH = 1600;
     const MAP_HEIGHT = 1200;
-    const VISION_RADIUS = 220; // Rango de visión de los jugadores vivos
+    const VISION_RADIUS = 220;
 
     let peer = null;
     let connections = [];
@@ -181,38 +106,29 @@
 
     let players = {}; 
     let bodies = [];
+    let votes = {}; 
+    let hasVoted = false;
 
     const colors = ["#ff4d4d", "#4d79ff", "#4dff88", "#ffff4d", "#ff994d", "#cc66ff"];
 
     let myData = {
-      id: "",
-      name: "",
+      id: "", name: "",
       x: 200 + Math.random() * (MAP_WIDTH - 400),
       y: 200 + Math.random() * (MAP_HEIGHT - 400),
-      color: colors[0],
-      isImpostor: false,
-      isDead: false
+      color: colors[0], isImpostor: false, isDead: false
     };
 
     const inputState = { up: false, down: false, left: false, right: false };
 
-    // --- CONTROLES TÁCTILES MÓVILES ---
     function bindTouch(elementId, direction) {
       const btn = document.getElementById(elementId);
-      
       const start = (e) => { e.preventDefault(); inputState[direction] = true; };
       const end = (e) => { e.preventDefault(); inputState[direction] = false; };
-
-      btn.addEventListener("touchstart", start);
-      btn.addEventListener("touchend", end);
-      btn.addEventListener("mousedown", start);
-      btn.addEventListener("mouseup", end);
+      btn.addEventListener("touchstart", start); btn.addEventListener("touchend", end);
+      btn.addEventListener("mousedown", start); btn.addEventListener("mouseup", end);
     }
-
-    bindTouch("btnUp", "up");
-    bindTouch("btnDown", "down");
-    bindTouch("btnLeft", "left");
-    bindTouch("btnRight", "right");
+    bindTouch("btnUp", "up"); bindTouch("btnDown", "down");
+    bindTouch("btnLeft", "left"); bindTouch("btnRight", "right");
 
     window.addEventListener("keydown", e => {
       if(e.key === "ArrowUp" || e.key === "w") inputState.up = true;
@@ -227,37 +143,22 @@
       if(e.key === "ArrowRight" || e.key === "d") inputState.right = false;
     });
 
-    // --- ID CORTO ---
     function generateShortId() {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      let result = "";
-      for (let i = 0; i < 4; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
+      let res = ""; for (let i = 0; i < 4; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+      return res;
     }
 
-    // --- RED PEERJS ---
     function createRoom() {
       isHost = true;
       myData.name = document.getElementById("playerName").value;
-      
       const shortCode = generateShortId();
       peer = new Peer(shortCode);
 
       peer.on("open", id => {
-        myId = id;
-        myData.id = id;
-        players[id] = myData;
+        myId = id; myData.id = id; players[id] = myData;
         document.getElementById("roomStatus").innerText = "SALA: " + id;
-        setupHostLogic();
-        gameLoop();
-      });
-
-      peer.on("error", err => {
-        if (err.type === "unavailable-id") {
-          alert("El código coincidió con otra sala, presiona Crear Sala de nuevo.");
-        }
+        setupHostLogic(); gameLoop();
       });
     }
 
@@ -265,86 +166,204 @@
       peer.on("connection", conn => {
         connections.push(conn);
         conn.on("data", data => handleIncomingData(data, conn));
-        conn.on("close", () => {
-          delete players[conn.peer];
-          broadcastGameState();
-        });
+        conn.on("close", () => { delete players[conn.peer]; broadcastGameState(); });
       });
     }
 
     function joinRoom() {
       const roomCode = document.getElementById("joinId").value.trim().toUpperCase();
-      if (!roomCode) return alert("Ingresa un código válido");
-
+      if (!roomCode) return alert("Ingresa un código");
       myData.name = document.getElementById("playerName").value;
       peer = new Peer();
 
       peer.on("open", id => {
-        myId = id;
-        myData.id = id;
-        hostConn = peer.connect(roomCode);
-
+        myId = id; myData.id = id; hostConn = peer.connect(roomCode);
         hostConn.on("open", () => {
           document.getElementById("roomStatus").innerText = "¡Conectado!";
           hostConn.send({ type: "JOIN", player: myData });
           gameLoop();
         });
-
         hostConn.on("data", handleClientIncomingData);
       });
     }
 
-    // --- LÓGICA DE JUEGO ---
     function handleIncomingData(data, conn) {
       if (data.type === "JOIN") {
         data.player.color = colors[Object.keys(players).length % colors.length];
         players[data.player.id] = data.player;
-
         if (isHost && !gameStarted && Object.keys(players).length >= 2) {
           document.getElementById("btnStartGame").style.display = "inline-block";
         }
         broadcastGameState();
-      } 
-      else if (data.type === "UPDATE_POS") {
-        if (players[data.id]) {
-          players[data.id].x = data.x;
-          players[data.id].y = data.y;
-        }
+      } else if (data.type === "UPDATE_POS") {
+        if (players[data.id]) { players[data.id].x = data.x; players[data.id].y = data.y; }
         broadcastGameState();
-      }
-      else if (data.type === "KILL") {
+      } else if (data.type === "KILL") {
         if (players[data.targetId]) {
-          players[data.targetId].isDead = true;
+          players[data.targetId].isDead = true; // Se convierte en fantasma
           bodies.push({ x: players[data.targetId].x, y: players[data.targetId].y, color: players[data.targetId].color });
+          checkWinCondition();
         }
         broadcastGameState();
+      } else if (data.type === "MEETING") {
+        votes = {};
+        broadcast({ type: "START_MEETING" });
+      } else if (data.type === "CAST_VOTE") {
+        votes[data.voterId] = data.targetId;
       }
-      else if (data.type === "MEETING") broadcast({ type: "START_MEETING" });
-      else if (data.type === "END_MEETING") broadcast({ type: "CLOSE_MEETING" });
     }
 
     function handleClientIncomingData(data) {
       if (data.type === "STATE") {
-        players = data.players;
-        bodies = data.bodies;
+        players = data.players; bodies = data.bodies;
         if (players[myId]) {
           myData.isImpostor = players[myId].isImpostor;
           myData.isDead = players[myId].isDead;
         }
       } else if (data.type === "START_MEETING") {
+        hasVoted = false;
+        renderVoteList();
         document.getElementById("meetingModal").classList.remove("hidden");
-      } else if (data.type === "CLOSE_MEETING") {
+        if(isHost) document.getElementById("btnEndMeeting").style.display = "block";
+      } else if (data.type === "SHOW_RESULT") {
         document.getElementById("meetingModal").classList.add("hidden");
+        document.getElementById("resultTitle").innerText = data.title;
+        document.getElementById("resultTitle").style.color = data.color;
+        document.getElementById("resultDesc").innerText = data.desc;
+        document.getElementById("resultModal").classList.remove("hidden");
       }
+    }
+
+    function renderVoteList() {
+      const list = document.getElementById("voteList");
+      list.innerHTML = "";
+      document.getElementById("voteStatus").innerText = myData.isDead ? "👻 You are a ghost (Cannot vote)" : "";
+
+      for (let id in players) {
+        if (!players[id].isDead) {
+          const btn = document.createElement("div");
+          btn.className = "vote-btn" + (myData.isDead ? " vote-btn-disabled" : "");
+          btn.innerHTML = `<span>${players[id].name}</span>`;
+          if (!myData.isDead) btn.onclick = () => castVote(id);
+          list.appendChild(btn);
+        }
+      }
+
+      // Botón de saltar voto
+      const skipBtn = document.createElement("div");
+      skipBtn.className = "vote-btn" + (myData.isDead ? " vote-btn-disabled" : "");
+      skipBtn.style.borderColor = "#aaa";
+      skipBtn.innerHTML = `<span>SKIP VOTE</span>`;
+      if (!myData.isDead) skipBtn.onclick = () => castVote("SKIP");
+      list.appendChild(skipBtn);
+    }
+
+    function castVote(targetId) {
+      if (hasVoted || myData.isDead) return;
+      hasVoted = true;
+      document.getElementById("voteStatus").innerText = "Vote submitted! Waiting for host...";
+      if (isHost) votes[myId] = targetId;
+      else hostConn.send({ type: "CAST_VOTE", voterId: myId, targetId: targetId });
+    }
+
+    function endMeetingHost() {
+      if (!isHost) return;
+      
+      let voteCounts = {};
+      for (let v in votes) {
+        let t = votes[v];
+        voteCounts[t] = (voteCounts[t] || 0) + 1;
+      }
+
+      let maxVotes = 0;
+      let ejectedId = null;
+      let tie = false;
+
+      for (let target in voteCounts) {
+        if (voteCounts[target] > maxVotes) {
+          maxVotes = voteCounts[target];
+          ejectedId = target;
+          tie = false;
+        } else if (voteCounts[target] === maxVotes) {
+          tie = true;
+        }
+      }
+
+      let resultTitle = "";
+      let resultDesc = "";
+      let color = "#fff";
+
+      if (tie || !ejectedId || ejectedId === "SKIP") {
+        resultTitle = "No one was ejected";
+        resultDesc = "Skipped / Tied vote.";
+      } else {
+        let p = players[ejectedId];
+        p.isDead = true; // <-- El jugador expulsado se convierte en fantasma
+
+        if (p.isImpostor) {
+          resultTitle = "VICTORY!";
+          resultDesc = `${p.name} was ejected. They were The Impostor!`;
+          color = "#4dff88";
+        } else {
+          resultTitle = `${p.name} was ejected`;
+          resultDesc = `${p.name} was NOT The Impostor.`;
+          color = "#ff4d4d";
+        }
+      }
+
+      broadcastGameState();
+
+      let impostorDefeated = (ejectedId && players[ejectedId] && players[ejectedId].isImpostor);
+      
+      if (impostorDefeated) {
+        broadcast({ type: "SHOW_RESULT", title: "CREWMATES WIN!", desc: `${players[ejectedId].name} was the Impostor!`, color: "#4dff88" });
+        resetGame();
+      } else {
+        if (!checkWinCondition()) {
+          broadcast({ type: "SHOW_RESULT", title: resultTitle, desc: resultDesc, color: color });
+        }
+      }
+    }
+
+    function checkWinCondition() {
+      if (!isHost) return false;
+      let aliveCrew = 0;
+      let aliveImp = 0;
+
+      for (let id in players) {
+        if (!players[id].isDead) {
+          if (players[id].isImpostor) aliveImp++;
+          else aliveCrew++;
+        }
+      }
+
+      if (aliveImp >= aliveCrew) {
+        broadcast({ type: "SHOW_RESULT", title: "IMPOSTOR WINS!", desc: "The Impostor has taken over!", color: "#ff4d4d" });
+        resetGame();
+        return true;
+      }
+      return false;
+    }
+
+    function resetGame() {
+      gameStarted = false;
+      bodies = [];
+      for (let id in players) {
+        players[id].isDead = false;
+        players[id].isImpostor = false;
+      }
+      document.getElementById("btnStartGame").style.display = "inline-block";
+    }
+
+    function closeResultModal() {
+      document.getElementById("resultModal").classList.add("hidden");
     }
 
     function startGame() {
       if (!isHost) return;
       if (Object.keys(players).length < 2) return alert("Mínimo 2 jugadores.");
-
       gameStarted = true;
       document.getElementById("btnStartGame").style.display = "none";
-
       assignImpostor();
       broadcastGameState();
     }
@@ -368,136 +387,87 @@
       } else if (hostConn) hostConn.send(msg);
     }
 
-    // --- LOOP Y RENDERIZADO (CON CÁMARA Y NIEBLA) ---
     function update() {
-      let moved = false;
-      const speed = 4;
-
+      let moved = false; const speed = 4;
       if (inputState.up) { myData.y -= speed; moved = true; }
       if (inputState.down) { myData.y += speed; moved = true; }
       if (inputState.left) { myData.x -= speed; moved = true; }
       if (inputState.right) { myData.x += speed; moved = true; }
 
-      // Limitar al mapa gigante
       myData.x = Math.max(20, Math.min(MAP_WIDTH - 20, myData.x));
       myData.y = Math.max(20, Math.min(MAP_HEIGHT - 20, myData.y));
 
       if (moved) {
-        if (isHost) {
-          players[myId].x = myData.x;
-          players[myId].y = myData.y;
-          broadcastGameState();
-        } else if (hostConn) {
-          hostConn.send({ type: "UPDATE_POS", id: myId, x: myData.x, y: myData.y });
-        }
+        if (isHost) { players[myId].x = myData.x; players[myId].y = myData.y; broadcastGameState(); }
+        else if (hostConn) hostConn.send({ type: "UPDATE_POS", id: myId, x: myData.x, y: myData.y });
       }
 
-      const btnKill = document.getElementById("btnKill");
-      const btnReport = document.getElementById("btnReport");
-
-      btnKill.style.display = (myData.isImpostor && !myData.isDead) ? "block" : "none";
-      
+      document.getElementById("btnKill").style.display = (myData.isImpostor && !myData.isDead) ? "block" : "none";
       let nearBody = bodies.some(b => Math.hypot(b.x - myData.x, b.y - myData.y) < 50);
-      btnReport.style.display = nearBody ? "block" : "none";
+      document.getElementById("btnReport").style.display = (!myData.isDead && nearBody) ? "block" : "none";
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Calcular desplazamiento de cámara (centrar la pantalla en el jugador actual)
       const cameraX = myData.x - canvas.width / 2;
       const cameraY = myData.y - canvas.height / 2;
 
       ctx.save();
-      // Trasladar origen del lienzo según la cámara
       ctx.translate(-cameraX, -cameraY);
 
-      // 1. Dibujar Cuadrícula de Fondo del Mapa
-      ctx.strokeStyle = "#252525";
-      ctx.lineWidth = 2;
-      for (let x = 0; x < MAP_WIDTH; x += 100) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT); ctx.stroke();
-      }
-      for (let y = 0; y < MAP_HEIGHT; y += 100) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH, y); ctx.stroke();
-      }
+      ctx.strokeStyle = "#252525"; ctx.lineWidth = 2;
+      for (let x = 0; x < MAP_WIDTH; x += 100) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT); ctx.stroke(); }
+      for (let y = 0; y < MAP_HEIGHT; y += 100) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH, y); ctx.stroke(); }
 
-      // 2. Límites Exteriores del Mapa
-      ctx.strokeStyle = "#ff4d4d";
-      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#ff4d4d"; ctx.lineWidth = 6;
       ctx.strokeRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
-      // 3. Dibujar Cuerpos (Solo si están en el rango de visión o si eres fantasma)
       bodies.forEach(b => {
         let dist = Math.hypot(b.x - myData.x, b.y - myData.y);
         if (myData.isDead || dist <= VISION_RADIUS) {
-          ctx.fillStyle = b.color;
-          ctx.beginPath();
-          ctx.arc(b.x, b.y + 5, 12, 0, Math.PI, false);
-          ctx.fill();
-          ctx.fillStyle = "white";
-          ctx.fillText("X_X", b.x - 8, b.y);
+          ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y + 5, 12, 0, Math.PI, false); ctx.fill();
+          ctx.fillStyle = "white"; ctx.fillText("X_X", b.x - 8, b.y);
         }
       });
 
-      // 4. Dibujar Jugadores (Filtrados por Rango de Visión)
       for (let id in players) {
         let p = players[id];
         let dist = Math.hypot(p.x - myData.x, p.y - myData.y);
 
-        // Si está fuera de visión y no somos fantasmas, ignorar renderizado
+        // Si el jugador local está vivo, respeta el campo de visión
         if (!myData.isDead && dist > VISION_RADIUS && id !== myId) continue;
 
-        ctx.globalAlpha = p.isDead ? 0.4 : 1.0; 
-
-        // Monigote
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 15, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Visor
-        ctx.fillStyle = "#aaddff";
-        ctx.fillRect(p.x - 4, p.y - 6, 10, 7);
-
+        // Si el jugador dibujado está muerto, renderizar como fantasma (transparente)
+        ctx.globalAlpha = p.isDead ? 0.35 : 1.0; 
+        ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#aaddff"; ctx.fillRect(p.x - 4, p.y - 6, 10, 7);
         ctx.globalAlpha = 1.0;
 
-        // Nombre
-        ctx.fillStyle = "white";
-        ctx.font = "12px sans-serif";
-        ctx.textAlign = "center";
-        let label = p.name + (p.id === myId ? " (You)" : "");
+        ctx.fillStyle = p.isDead ? "#aaa" : "white"; ctx.font = "12px sans-serif"; ctx.textAlign = "center";
+        let label = (p.isDead ? "👻 " : "") + p.name + (p.id === myId ? " (You)" : "");
         if (p.id === myId && p.isImpostor) label += " [IMP]";
         ctx.fillText(label, p.x, p.y - 20);
       }
+      ctx.restore();
 
-      ctx.restore(); // Restaurar cámara tras pintar entidades
-
-      // 5. Máscara de Niebla de Guerra (Si el jugador está vivo)
+      // Niebla de guerra solo para jugadores vivos
       if (!myData.isDead) {
         ctx.save();
         ctx.fillStyle = "rgba(0, 0, 0, 0.82)";
         ctx.beginPath();
-        // Rectángulo completo en pantalla
         ctx.rect(0, 0, canvas.width, canvas.height);
-        // Recortar un círculo en el centro para dar luz
         ctx.arc(canvas.width / 2, canvas.height / 2, VISION_RADIUS, 0, Math.PI * 2, true);
         ctx.fill();
         ctx.restore();
       }
     }
 
-    function gameLoop() {
-      update();
-      draw();
-      requestAnimationFrame(gameLoop);
-    }
+    function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
 
     function killPlayer() {
       for (let id in players) {
         if (id !== myId && !players[id].isDead) {
-          let dist = Math.hypot(players[id].x - myData.x, players[id].y - myData.y);
-          if (dist < 45) {
+          if (Math.hypot(players[id].x - myData.x, players[id].y - myData.y) < 45) {
             broadcast({ type: "KILL", targetId: id });
             break;
           }
@@ -506,8 +476,6 @@
     }
 
     function reportBody() { broadcast({ type: "MEETING" }); }
-
-    function closeMeeting() { broadcast({ type: "END_MEETING" }); }
   </script>
 </body>
 </html>
