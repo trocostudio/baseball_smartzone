@@ -78,7 +78,6 @@ body {
 .backface-hidden { backface-visibility: hidden; }
 .rotate-y-180 { transform: rotateY(180deg); }
 
-/* ANIMACIONES ESPACIALES */
 @keyframes explode {
   0% { transform: scale(0.3); opacity: 1; }
   50% { transform: scale(1.8); opacity: 0.9; }
@@ -99,7 +98,6 @@ body {
   animation: shakeCanvas 0.35s ease-in-out;
 }
 
-/* CONTROLES CLASSROOM IMPOSTOR */
 .dpad { position: relative; width: 120px; height: 120px; }
 .dpad-btn { position: absolute; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); color: white; border-radius: 8px; font-size: 16px; display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; }
 .dpad-btn:active { background: rgba(56, 189, 248, 0.4); border-color: #38bdf8; }
@@ -1461,7 +1459,7 @@ function fireSDRocket(isCorrect) {
   }
 }
 
-/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION WITH MASK MAP & TASK LOCATIONS */
+/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION WITH NATIVE MASK & TASK PROGRESS */
 const MAP_WIDTH = 1600;
 const MAP_HEIGHT = 1200;
 const VISION_RADIUS = 220;
@@ -1471,22 +1469,42 @@ const MAP_IMAGE_URL = "https://drive.google.com/thumbnail?id=1ZVUpyAtSaU3fpkxWvb
 const mapSprite = new Image();
 mapSprite.src = MAP_IMAGE_URL;
 
-// MÁSCARA DE COLISIONES (LÍMITES ROJOS)
-const COLLISION_IMAGE_URL = "https://drive.google.com/thumbnail?id=1oqtBjTqqBDFiXy_IoaGoLmijrdWwXxa-&sz=w1600";
-const collisionSprite = new Image();
-collisionSprite.crossOrigin = "Anonymous";
-collisionSprite.src = COLLISION_IMAGE_URL;
-
+// MÁSCARA DIBUJADA EN MEMORIA LOCAL PARA EVITAR CORS / Canvas Tainted
 const collisionCanvas = document.createElement("canvas");
 collisionCanvas.width = MAP_WIDTH;
 collisionCanvas.height = MAP_HEIGHT;
 const collisionCtx = collisionCanvas.getContext("2d");
 
-collisionSprite.onload = () => {
-  collisionCtx.drawImage(collisionSprite, 0, 0, MAP_WIDTH, MAP_HEIGHT);
-};
+function drawNativeCollisionMask() {
+  collisionCtx.fillStyle = "black";
+  collisionCtx.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+  collisionCtx.strokeStyle = "red";
+  collisionCtx.lineWidth = 25;
 
-// 13 PUNTOS AZULES DE TAREAS MAPEADOS DIRECTAMENTE A TU IMAGEN
+  // Marco Exterior
+  collisionCtx.strokeRect(30, 30, MAP_WIDTH - 60, MAP_HEIGHT - 60);
+
+  // Cuarto Superior Central
+  collisionCtx.strokeRect(700, 30, 200, 200);
+
+  // Fila Superior de Aulas
+  const topRoomsX = [200, 420, 640, 860, 1080, 1300];
+  topRoomsX.forEach(x => collisionCtx.strokeRect(x, 280, 180, 180));
+
+  // Aulas Laterales
+  collisionCtx.strokeRect(180, 500, 180, 180);
+  collisionCtx.strokeRect(1240, 500, 180, 180);
+
+  // Fila Inferior de Aulas
+  const bottomRoomsX = [200, 420, 640, 860, 1080];
+  bottomRoomsX.forEach(x => collisionCtx.strokeRect(x, 720, 180, 180));
+
+  // Esquina Inferior Izquierda
+  collisionCtx.strokeRect(30, 950, 160, 180);
+}
+drawNativeCollisionMask();
+
+// 13 PUNTOS AZULES DE TAREAS MAPEADOS
 const TASK_LOCATIONS = [
   { id: 1, x: 940, y: 130, label: "Top Hallway" },
   { id: 2, x: 1510, y: 140, label: "Top Right Corner" },
@@ -1551,7 +1569,6 @@ let myData = {
 const inputState = { up: false, down: false, left: false, right: false };
 
 function isWalkable(targetX, targetY) {
-  if (!collisionSprite.complete || collisionSprite.naturalWidth === 0) return true;
   try {
     const px = Math.floor(Math.max(0, Math.min(MAP_WIDTH - 1, targetX)));
     const py = Math.floor(Math.max(0, Math.min(MAP_HEIGHT - 1, targetY)));
@@ -1559,7 +1576,7 @@ function isWalkable(targetX, targetY) {
     const r = pixel[0];
     const g = pixel[1];
     const b = pixel[2];
-    // BLOQUEO EN PÍXELES PREDOMINANTEMENTE ROJOS (Rojo > 180, Verde/Azul < 100)
+    // BLOQUEO SI TOCA PARED ROJA
     if (r > 180 && g < 100 && b < 100) {
       return false;
     }
@@ -1872,7 +1889,16 @@ function openTaskModal() {
 function answerTask(isCorrect) {
   document.getElementById("taskModal").classList.add("hidden");
   if (isCorrect) {
-    broadcast({ type: "TASK_COMPLETED" });
+    if (isHost) {
+      globalTasksDone++;
+      broadcastGameState();
+      if (globalTasksDone >= TOTAL_TASKS_REQUIRED) {
+        broadcast({ type: "SHOW_RESULT", title: "CREWMATES WIN! 🎉", desc: "All English vocabulary tasks have been completed!", color: "#4dff88" });
+        resetGame();
+      }
+    } else if (hostConn) {
+      hostConn.send({ type: "TASK_COMPLETED" });
+    }
   } else {
     alert("❌ Incorrect! Try another task spot.");
   }
