@@ -94,27 +94,23 @@
       border-radius: 12px;
       font-weight: bold;
       font-size: 12px;
-      display: none; /* Se activan dinámicamente */
+      display: none;
       border: 2px solid #fff;
     }
     #btnKill { background: #d9534f; color: white; }
     #btnReport { background: #f0ad4e; color: black; }
 
-    /* Modal de Reunión */
+    /* Modal de Reunión (Sin Chat de Texto) */
     .overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
+      background: rgba(0,0,0,0.92);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 20;
-    }
-    #chat-box {
-      width: 85%; height: 140px; background: #222; color: #fff;
-      margin: 10px 0; overflow-y: scroll; text-align: left; padding: 10px;
-      border: 1px solid #444; border-radius: 5px; font-size: 14px;
+      padding: 20px;
     }
     .hidden { display: none !important; }
   </style>
@@ -125,13 +121,15 @@
 
   <!-- Pantalla de Conexión -->
   <div class="controls-panel">
-    <input type="text" id="playerName" value="Player" placeholder="Tu Nombre" style="width: 100px;">
+    <input type="text" id="playerName" value="Player" placeholder="Tu Nombre" style="width: 90px;">
     <button onclick="createRoom()">Crear Sala</button>
     <br>
-    <input type="text" id="joinId" placeholder="ID Sala" style="width: 100px;">
+    <input type="text" id="joinId" placeholder="ID Sala" style="width: 90px; text-transform: uppercase;">
     <button onclick="joinRoom()">Unirse</button>
+    <br>
+    <button id="btnStartGame" onclick="startGame()" style="background: #28a745; color: white; display: none; margin-top: 5px;">START GAME</button>
   </div>
-  <p id="roomStatus" style="font-size: 12px; margin: 2px;">Estado: No conectado</p>
+  <p id="roomStatus" style="font-size: 14px; font-weight: bold; margin: 2px; color: #ffcc00;">Estado: No conectado</p>
 
   <!-- Lienzo de Juego -->
   <div id="game-container">
@@ -153,17 +151,17 @@
     </div>
   </div>
 
-  <!-- Modal Emergency Meeting -->
+  <!-- Modal Emergency Meeting (Para debate presencial en voz alta) -->
   <div id="meetingModal" class="overlay hidden">
-    <h2 style="color: red; margin: 5px;">EMERGENCY MEETING!</h2>
-    <p style="font-size: 12px; margin: 5px;">Discuss who the impostor is in English!</p>
-    <div id="chat-box"></div>
-    <div style="width: 90%;">
-      <input type="text" id="chatInput" placeholder="Write in English..." style="width: 60%;">
-      <button onclick="sendMessage()">Send</button>
-    </div>
+    <h1 style="color: #ff4d4d; font-size: 2rem; margin: 10px;">EMERGENCY MEETING!</h1>
+    <p style="font-size: 1.1rem; color: #fff; margin: 15px 0;">
+      🗣️ <b>SPEAK OUT LOUD IN ENGLISH!</b><br><br>
+      Discuss with your classmates: <br>
+      <i>"Who is the impostor?"</i> <br>
+      <i>"Where were you?"</i>
+    </p>
     <br>
-    <button onclick="closeMeeting()" style="background: green; color: white;">End Meeting</button>
+    <button onclick="closeMeeting()" style="background: #28a745; color: white; padding: 12px 24px; font-size: 16px;">End Meeting & Continue</button>
   </div>
 
   <script>
@@ -174,6 +172,7 @@
     let connections = [];
     let hostConn = null;
     let isHost = false;
+    let gameStarted = false;
     let myId = "";
 
     let players = {}; 
@@ -191,10 +190,9 @@
       isDead: false
     };
 
-    // Estado de las Teclas y Toques Táctiles
     const inputState = { up: false, down: false, left: false, right: false };
 
-    // --- MANEJO DE EVENTOS TÁCTILES PARA MÓVIL ---
+    // --- CONTROLES TÁCTILES MÓVILES ---
     function bindTouch(elementId, direction) {
       const btn = document.getElementById(elementId);
       
@@ -212,7 +210,6 @@
     bindTouch("btnLeft", "left");
     bindTouch("btnRight", "right");
 
-    // Soporte opcional para teclado físico
     window.addEventListener("keydown", e => {
       if(e.key === "ArrowUp" || e.key === "w") inputState.up = true;
       if(e.key === "ArrowDown" || e.key === "s") inputState.down = true;
@@ -226,44 +223,39 @@
       if(e.key === "ArrowRight" || e.key === "d") inputState.right = false;
     });
 
-    // --- RED PEERJS ---
-   // Función para generar un código corto de 4 letras aleatorias (ej. "ABCD")
-function generateShortId() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  let result = "";
-  for (let i = 0; i < 4; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
-function createRoom() {
-  isHost = true;
-  myData.name = document.getElementById("playerName").value;
-  
-  // Generamos un código corto de 4 letras
-  const shortCode = generateShortId();
-
-  // Le pasamos ese código corto a PeerJS
-  peer = new Peer(shortCode);
-
-  peer.on("open", id => {
-    myId = id;
-    myData.id = id;
-    players[id] = myData;
-    // Mostramos solo las 4 letras en pantalla
-    document.getElementById("roomStatus").innerText = "SALA: " + id;
-    setupHostLogic();
-    gameLoop();
-  });
-
-  // Si por rara coincidencia el código ya existe, generará una alerta
-  peer.on("error", err => {
-    if (err.type === "unavailable-id") {
-      alert("El código se duplicó, presiona Crear Sala de nuevo.");
+    // --- ID CORTO ---
+    function generateShortId() {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let result = "";
+      for (let i = 0; i < 4; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
     }
-  });
-}
+
+    // --- RED PEERJS ---
+    function createRoom() {
+      isHost = true;
+      myData.name = document.getElementById("playerName").value;
+      
+      const shortCode = generateShortId();
+      peer = new Peer(shortCode);
+
+      peer.on("open", id => {
+        myId = id;
+        myData.id = id;
+        players[id] = myData;
+        document.getElementById("roomStatus").innerText = "SALA: " + id;
+        setupHostLogic();
+        gameLoop();
+      });
+
+      peer.on("error", err => {
+        if (err.type === "unavailable-id") {
+          alert("El código coincidió con otra sala, presiona Crear Sala de nuevo.");
+        }
+      });
+    }
 
     function setupHostLogic() {
       peer.on("connection", conn => {
@@ -277,8 +269,8 @@ function createRoom() {
     }
 
     function joinRoom() {
-      const roomCode = document.getElementById("joinId").value.trim();
-      if (!roomCode) return alert("Ingresa un ID válido");
+      const roomCode = document.getElementById("joinId").value.trim().toUpperCase();
+      if (!roomCode) return alert("Ingresa un código válido");
 
       myData.name = document.getElementById("playerName").value;
       peer = new Peer();
@@ -298,13 +290,15 @@ function createRoom() {
       });
     }
 
-    // --- LÓGICA DE JUEGO Y RED ---
+    // --- LÓGICA DE JUEGO ---
     function handleIncomingData(data, conn) {
       if (data.type === "JOIN") {
         data.player.color = colors[Object.keys(players).length % colors.length];
         players[data.player.id] = data.player;
 
-        if (Object.keys(players).length === 6) assignImpostor();
+        if (isHost && !gameStarted && Object.keys(players).length >= 2) {
+          document.getElementById("btnStartGame").style.display = "inline-block";
+        }
         broadcastGameState();
       } 
       else if (data.type === "UPDATE_POS") {
@@ -322,7 +316,7 @@ function createRoom() {
         broadcastGameState();
       }
       else if (data.type === "MEETING") broadcast({ type: "START_MEETING" });
-      else if (data.type === "CHAT") broadcast(data);
+      else if (data.type === "END_MEETING") broadcast({ type: "CLOSE_MEETING" });
     }
 
     function handleClientIncomingData(data) {
@@ -335,11 +329,20 @@ function createRoom() {
         }
       } else if (data.type === "START_MEETING") {
         document.getElementById("meetingModal").classList.remove("hidden");
-      } else if (data.type === "CHAT") {
-        const box = document.getElementById("chat-box");
-        box.innerHTML += `<p style="margin:2px;"><b>${data.sender}:</b> ${data.msg}</p>`;
-        box.scrollTop = box.scrollHeight;
+      } else if (data.type === "CLOSE_MEETING") {
+        document.getElementById("meetingModal").classList.add("hidden");
       }
+    }
+
+    function startGame() {
+      if (!isHost) return;
+      if (Object.keys(players).length < 2) return alert("Mínimo 2 jugadores.");
+
+      gameStarted = true;
+      document.getElementById("btnStartGame").style.display = "none";
+
+      assignImpostor();
+      broadcastGameState();
     }
 
     function assignImpostor() {
@@ -361,7 +364,7 @@ function createRoom() {
       } else if (hostConn) hostConn.send(msg);
     }
 
-    // --- LOOP PRINCIPAL Y RENDERIZADO ---
+    // --- LOOP Y RENDERIZADO ---
     function update() {
       let moved = false;
       const speed = 3;
@@ -384,7 +387,6 @@ function createRoom() {
         }
       }
 
-      // Visibilidad de botones en móvil
       const btnKill = document.getElementById("btnKill");
       const btnReport = document.getElementById("btnReport");
 
@@ -397,7 +399,7 @@ function createRoom() {
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Dibujar Mapa
+      // Mapa
       ctx.strokeStyle = "#444";
       ctx.lineWidth = 4;
       ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
@@ -418,19 +420,16 @@ function createRoom() {
 
         ctx.globalAlpha = p.isDead ? 0.4 : 1.0; 
 
-        // Cuerpo del personaje
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, 15, 0, Math.PI * 2);
         ctx.fill();
 
-        // Visor
         ctx.fillStyle = "#aaddff";
         ctx.fillRect(p.x - 4, p.y - 6, 10, 7);
 
         ctx.globalAlpha = 1.0;
 
-        // Nombre
         ctx.fillStyle = "white";
         ctx.font = "12px sans-serif";
         ctx.textAlign = "center";
@@ -460,17 +459,7 @@ function createRoom() {
 
     function reportBody() { broadcast({ type: "MEETING" }); }
 
-    function sendMessage() {
-      const input = document.getElementById("chatInput");
-      if (input.value.trim() !== "") {
-        broadcast({ type: "CHAT", sender: myData.name, msg: input.value });
-        input.value = "";
-      }
-    }
-
-    function closeMeeting() {
-      document.getElementById("meetingModal").classList.add("hidden");
-    }
+    function closeMeeting() { broadcast({ type: "END_MEETING" }); }
   </script>
 </body>
 </html>
