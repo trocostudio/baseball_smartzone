@@ -1,480 +1,1139 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en" class="h-full bg-slate-950">
 <head>
+  <base target="_top">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Classroom Impostor Mobile</title>
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeSpeak - Nexo Games Hub</title>
+  
+  <!-- Estilos y Dependencias Core -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
-    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
-    body { font-family: sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 0; overflow: hidden; }
-    h1 { margin: 5px 0; font-size: 1.2rem; }
-    .controls-panel { margin: 5px; }
-    input, button { padding: 8px; font-size: 14px; margin: 3px; border-radius: 5px; border: none; }
-    button { background: #007bff; color: white; font-weight: bold; }
-    #game-container { position: relative; width: 100vw; height: 50vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-    canvas { background: #151515; border: 2px solid #555; }
-    #touch-controls { position: fixed; bottom: 10px; left: 0; width: 100%; height: 35vh; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-sizing: border-box; z-index: 5; }
-    .dpad { position: relative; width: 130px; height: 130px; }
-    .dpad-btn { position: absolute; background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.4); color: white; border-radius: 8px; font-size: 18px; display: flex; align-items: center; justify-content: center; touch-action: none; }
-    .dpad-btn:active { background: rgba(255, 255, 255, 0.5); }
-    .dpad-up { top: 0; left: 42px; width: 45px; height: 45px; }
-    .dpad-down { bottom: 0; left: 42px; width: 45px; height: 45px; }
-    .dpad-left { top: 42px; left: 0; width: 45px; height: 45px; }
-    .dpad-right { top: 42px; right: 0; width: 45px; height: 45px; }
-    .action-buttons { display: flex; flex-direction: column; gap: 10px; }
-    .action-btn { width: 80px; height: 55px; border-radius: 12px; font-weight: bold; font-size: 12px; display: none; border: 2px solid #fff; }
-    #btnKill { background: #d9534f; color: white; }
-    #btnReport { background: #f0ad4e; color: black; }
-    
-    /* MODALES DE REUNIÓN Y FIN DE JUEGO */
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; padding: 15px; }
-    .hidden { display: none !important; }
-    .vote-list { display: flex; flex-direction: column; gap: 8px; width: 90%; max-width: 300px; margin: 10px 0; max-height: 40vh; overflow-y: auto; }
-    .vote-btn { background: #333; color: white; border: 1px solid #777; padding: 10px; border-radius: 6px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-    .vote-btn:active { background: #555; }
-    .vote-btn-disabled { opacity: 0.5; pointer-events: none; }
+    :root {
+      --nexo-dark: #090d16; 
+      --nexo-navy: #0f172a; 
+      --nexo-cyan: #38bdf8; 
+      --nexo-cyan-hover: #0284c7; 
+      --bg-gray: #f8fafc; 
+      --nexo-highlight: #0f172a;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif;
+      background-color: var(--bg-gray);
+    }
+    .site-header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 12px 4%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+      flex-wrap: wrap; 
+      gap: 12px;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .logo-img {
+      height: 42px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .btn-header-student {
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.05);
+      padding: 6px 18px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+    }
+    .btn-header-student:hover {
+      background-color: var(--nexo-cyan);
+      color: var(--nexo-dark);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+    .perspective-1000 { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+
+    /* Animaciones Espaciales y Efectos */
+    @keyframes explode {
+      0% { transform: scale(0.3); opacity: 1; }
+      50% { transform: scale(1.8); opacity: 0.9; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+    .animate-explosion {
+      animation: explode 0.4s ease-out forwards;
+    }
+    @keyframes shakeCanvas {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(-8px, 6px); }
+      40% { transform: translate(8px, -6px); }
+      60% { transform: translate(-6px, -4px); }
+      80% { transform: translate(6px, 4px); }
+    }
+    .animate-shake {
+      animation: shakeCanvas 0.35s ease-in-out;
+    }
   </style>
 </head>
-<body>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between antialiased selection:bg-sky-500 selection:text-white">
 
-  <h1>Classroom Impostor</h1>
-
-  <!-- Pantalla de Conexión -->
-  <div class="controls-panel">
-    <input type="text" id="playerName" value="Player" placeholder="Tu Nombre" style="width: 90px;">
-    <button onclick="createRoom()">Crear Sala</button>
-    <br>
-    <input type="text" id="joinId" placeholder="ID Sala" style="width: 90px; text-transform: uppercase;">
-    <button onclick="joinRoom()">Unirse</button>
-    <br>
-    <button id="btnStartGame" onclick="startGame()" style="background: #28a745; color: white; display: none; margin-top: 5px;">START GAME</button>
-  </div>
-  <p id="roomStatus" style="font-size: 14px; font-weight: bold; margin: 2px; color: #ffcc00;">Estado: No conectado</p>
-
-  <!-- Lienzo de Juego -->
-  <div id="game-container">
-    <canvas id="canvas" width="400" height="400"></canvas>
-  </div>
-
-  <!-- Controles Táctiles -->
-  <div id="touch-controls">
-    <div class="dpad">
-      <div class="dpad-btn dpad-up" id="btnUp">▲</div>
-      <div class="dpad-btn dpad-down" id="btnDown">▼</div>
-      <div class="dpad-btn dpad-left" id="btnLeft">◄</div>
-      <div class="dpad-btn dpad-right" id="btnRight">►</div>
+  <!-- HEADER INSTITUCIONAL -->
+  <header class="site-header">
+    <a href="#" class="logo-container flex-shrink-0 transition-opacity hover:opacity-90">
+      <img src="https://lh3.googleusercontent.com/d/1sVfKrSCV_fRlJEqF_Oy8pyNOhLKrfVoT" alt="Institutional Logo" class="logo-img h-8 sm:h-10 w-auto object-contain">
+    </a>
+    <div class="header-actions flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+      <a href="#" class="btn-header-student cursor-pointer">← Home</a>
     </div>
-    <div class="action-buttons">
-      <button id="btnKill" class="action-btn" onclick="killPlayer()">KILL</button>
-      <button id="btnReport" class="action-btn" onclick="reportBody()">REPORT</button>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="w-full max-w-6xl mx-auto px-4 my-8 flex-grow flex flex-col justify-center items-center">
+
+    <!-- MENÚ PRINCIPAL DE JUEGOS -->
+    <div id="gamesMenu" class="w-full max-w-5xl space-y-6">
+      <div class="text-center space-y-3">
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+          NEXO <span class="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">Interactive Games</span> 🎮
+        </h1>
+        <p class="text-slate-500 text-sm sm:text-base font-medium max-w-xl mx-auto">
+          Select a difficulty level and challenge yourself with our interactive minigames!
+        </p>
+
+        <!-- Selector de Nivel -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <label for="levelSelect" class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Selected Level:</label>
+          <select id="levelSelect" onchange="cambiarNivel(this.value)" class="p-2.5 px-4 bg-white border border-slate-200 rounded-xl font-extrabold text-sm text-sky-600 shadow-xs focus:outline-none cursor-pointer">
+            <option value="A1" selected>Level A1 (Basic)</option>
+            <option value="A2">Level A2 (Elementary)</option>
+            <option value="B1">Level B1 (Intermediate)</option>
+            <option value="B2">Level B2 (Upper Intermediate)</option>
+            <option value="C1">Level C1 (Advanced)</option>
+          </select>
+          <div id="dbStatus" class="px-3 py-1.5 bg-slate-100 text-slate-500 text-xs rounded-full font-bold">
+            Loading data...
+          </div>
+        </div>
+      </div>
+
+      <!-- TARJETAS DE SELECCIÓN DE JUEGOS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
+        <!-- Word Hangman -->
+        <div onclick="openGame('hangman')" class="bg-white border border-slate-200/80 hover:border-sky-500 p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between group">
+          <div>
+            <span class="w-16 h-16 rounded-2xl bg-sky-500/10 text-sky-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition-all">🔤</span>
+            <h3 class="font-extrabold text-slate-900 text-xl mb-2">Word Hangman</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">Discover the secret word using the provided hint.</p>
+          </div>
+          <button class="w-full py-2.5 bg-sky-50 text-sky-600 font-bold text-xs rounded-xl group-hover:bg-sky-500 group-hover:text-white transition">Play Now!</button>
+        </div>
+
+        <!-- Memory Match -->
+        <div onclick="openGame('memory')" class="bg-white border border-slate-200/80 hover:border-emerald-500 p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between group">
+          <div>
+            <span class="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all">🧠</span>
+            <h3 class="font-extrabold text-slate-900 text-xl mb-2">Memory Match</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">Match each English word with its corresponding picture.</p>
+          </div>
+          <button class="w-full py-2.5 bg-emerald-50 text-emerald-600 font-bold text-xs rounded-xl group-hover:bg-emerald-500 group-hover:text-white transition">Play Now!</button>
+        </div>
+
+        <!-- Word Search -->
+        <div onclick="openGame('wordsearch')" class="bg-white border border-slate-200/80 hover:border-teal-500 p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between group">
+          <div>
+            <span class="w-16 h-16 rounded-2xl bg-teal-500/10 text-teal-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-white transition-all">🔍</span>
+            <h3 class="font-extrabold text-slate-900 text-xl mb-2">Word Search</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">Find the 5 hidden target words inside the grid puzzle.</p>
+          </div>
+          <button class="w-full py-2.5 bg-teal-50 text-teal-600 font-bold text-xs rounded-xl group-hover:bg-teal-500 group-hover:text-white transition">Find Words!</button>
+        </div>
+
+        <!-- Quiz Tic-Tac-Toe -->
+        <div onclick="openGame('tictactoe')" class="bg-white border border-slate-200/80 hover:border-indigo-500 p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between group">
+          <div>
+            <span class="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all">❌⭕</span>
+            <h3 class="font-extrabold text-slate-900 text-xl mb-2">Quiz Tic-Tac-Toe</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">Answer correctly to place your mark on the board.</p>
+          </div>
+          <button class="w-full py-2.5 bg-indigo-50 text-indigo-600 font-bold text-xs rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition">2 Players Duel!</button>
+        </div>
+
+        <!-- Tug of War -->
+        <div onclick="openGame('tugofwar')" class="bg-white border border-slate-200/80 hover:border-purple-500 p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between group">
+          <div>
+            <span class="w-16 h-16 rounded-2xl bg-purple-500/10 text-purple-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all">🪢</span>
+            <h3 class="font-extrabold text-slate-900 text-xl mb-2">Tug of War</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">2-Team battle! Answer quickly to pull the rope in 5 mins.</p>
+          </div>
+          <button class="w-full py-2.5 bg-purple-50 text-purple-600 font-bold text-xs rounded-xl group-hover:bg-purple-600 group-hover:text-white transition">2 Teams Duel!</button>
+        </div>
+
+        <!-- Guess the Word -->
+        <div onclick="openGame('guessword')" class="bg-white border border-slate-200/80 hover:border-amber-500 p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between group">
+          <div>
+            <span class="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all">⏱️</span>
+            <h3 class="font-extrabold text-slate-900 text-xl mb-2">Guess the Word</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">Explain the word to your teammate facing away from the screen.</p>
+          </div>
+          <button class="w-full py-2.5 bg-amber-50 text-amber-600 font-bold text-xs rounded-xl group-hover:bg-amber-500 group-hover:text-white transition">Group Challenge!</button>
+        </div>
+
+        <!-- Penalty Shootout -->
+        <div onclick="openGame('penaltyshoot')" class="bg-white border border-slate-200/80 hover:border-emerald-500 p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between group">
+          <div>
+            <span class="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all">⚽</span>
+            <h3 class="font-extrabold text-slate-900 text-xl mb-2">Penalty Shootout</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">10s to shoot vs 10s to save! Turn-based penalty shootout duel.</p>
+          </div>
+          <button class="w-full py-2.5 bg-emerald-50 text-emerald-600 font-bold text-xs rounded-xl group-hover:bg-emerald-500 group-hover:text-white transition">Start Shootout!</button>
+        </div>
+
+        <!-- Space Defender -->
+        <div onclick="openGame('spacedefender')" class="bg-white border border-slate-200/80 hover:border-violet-500 p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between group">
+          <div>
+            <span class="w-16 h-16 rounded-2xl bg-violet-500/10 text-violet-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-violet-600 group-hover:text-white transition-all">🚀</span>
+            <h3 class="font-extrabold text-slate-900 text-xl mb-2">Space Defender</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">Destroy incoming asteroids by answering the clues before impact!</p>
+          </div>
+          <button class="w-full py-2.5 bg-violet-50 text-violet-600 font-bold text-xs rounded-xl group-hover:bg-violet-600 group-hover:text-white transition">Defend Base!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENEDOR DEL JUEGO ACTIVO -->
+    <div id="gameContainer" class="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-6 sm:p-10 border border-slate-200/80 hidden">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+        <button onclick="backToMenu()" class="text-xs font-bold text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition cursor-pointer flex items-center gap-1">
+          ← Games Menu
+        </button>
+        <div class="text-right">
+          <span id="gameTitle" class="text-lg font-black text-slate-800 uppercase tracking-wider block">GAME TITLE</span>
+          <span id="lblNivelActivo" class="text-xs font-bold text-sky-500 uppercase">LEVEL A1</span>
+        </div>
+      </div>
+
+      <!-- Visualizaciones dinámicas de minijuegos -->
+      <div id="hangmanView" class="hidden space-y-6 text-center">
+        <div class="bg-sky-50 border border-sky-100 p-4 rounded-2xl">
+          <span class="text-xs font-bold uppercase tracking-widest text-sky-600">Hint / Clue</span>
+          <p id="hangmanHint" class="text-slate-700 font-semibold text-base mt-1">Fetching hint...</p>
+        </div>
+        <div id="hangmanWord" class="flex justify-center gap-2 sm:gap-3 my-6 flex-wrap"></div>
+        <div class="text-xs font-bold text-slate-400">Attempts left: <span id="hangmanLives" class="text-rose-500 font-extrabold text-sm">6</span></div>
+        <div id="hangmanKeyboard" class="flex flex-wrap justify-center gap-1.5 max-w-xl mx-auto pt-2"></div>
+        <button onclick="initHangman()" class="mt-4 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer transition">Reset Word</button>
+      </div>
+
+      <div id="memoryView" class="hidden space-y-6 text-center">
+        <div class="flex justify-between items-center text-xs font-bold text-slate-500 px-2">
+          <span>Moves: <strong id="memoryMoves" class="text-slate-800">0</strong></span>
+          <span>Matches: <strong id="memoryMatches" class="text-emerald-600">0 / 0</strong></span>
+        </div>
+        <div id="memoryBoard" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-2xl mx-auto"></div>
+        <button onclick="initMemory()" class="mt-4 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer transition">New Game</button>
+      </div>
+
+      <div id="wordsearchView" class="hidden space-y-6 text-center">
+        <div class="flex flex-col sm:flex-row gap-6 items-center justify-center">
+          <div id="wsGrid" class="grid grid-cols-10 gap-1 bg-slate-100 p-2.5 rounded-2xl border border-slate-200 select-none max-w-xs sm:max-w-md"></div>
+          <div class="bg-teal-50/60 border border-teal-200 p-5 rounded-2xl w-full sm:w-60 text-left space-y-3">
+            <h4 class="text-xs font-extrabold text-teal-800 uppercase tracking-widest border-b border-teal-200 pb-2">Target Words:</h4>
+            <ul id="wsTargetList" class="space-y-2 text-sm font-bold text-slate-700"></ul>
+          </div>
+        </div>
+        <button onclick="initWordSearch()" class="mt-4 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer transition">New Puzzle</button>
+      </div>
+
+      <div id="tictactoeView" class="hidden space-y-6 text-center">
+        <div class="flex justify-between items-center max-w-md mx-auto bg-slate-50 p-3 rounded-2xl border border-slate-200">
+          <span id="tttStatus" class="text-xs font-extrabold text-indigo-600 uppercase tracking-wider">Turn: ❌ Player 1</span>
+          <button onclick="initTicTacToe()" class="text-2xs font-bold bg-slate-200 text-slate-700 px-3 py-1 rounded-lg hover:bg-slate-300">Reset Board</button>
+        </div>
+        <div id="tttBoard" class="grid grid-cols-3 gap-3 max-w-xs mx-auto my-4"></div>
+        <div id="tttQuestionBox" class="bg-indigo-50 border border-indigo-200 p-5 rounded-2xl max-w-md mx-auto text-center hidden space-y-3">
+          <span class="text-2xs font-black text-indigo-500 uppercase tracking-widest">Answer correctly to place mark</span>
+          <p id="tttQuestionText" class="text-sm font-bold text-slate-800">"Hint here..."</p>
+          <div id="tttOptions" class="grid grid-cols-2 gap-2"></div>
+        </div>
+      </div>
+
+      <div id="tugofwarView" class="hidden space-y-6">
+        <div class="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 space-y-3">
+          <div class="flex justify-between items-center px-4 sm:px-6 pt-4 text-xs font-black tracking-widest z-10 relative flex-wrap gap-2">
+            <span class="bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              BLUE TEAM: <span id="blueScore">0</span> PTS
+            </span>
+            <span class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md flex items-center gap-1">
+              ⏱️ <span id="tugTimer">05:00</span>
+            </span>
+            <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              GAP: <span id="tugDiff">0</span> / 5
+            </span>
+            <span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              RED TEAM: <span id="redScore">0</span> PTS
+            </span>
+          </div>
+          <div class="relative w-full max-w-4xl mx-auto rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-900 select-none">
+            <img src="https://drive.google.com/thumbnail?id=15b5unbMmFW0GF8e_D9xrIx9maXu_Xyuz&sz=w1600" alt="Tug of War Field" class="w-full h-auto block object-cover">
+            <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 bg-white/40 border-r border-dashed border-red-500/60 pointer-events-none z-10"></div>
+            <div id="tugRopeIndicator" class="absolute inset-0 w-full h-full transition-transform duration-700 ease-out flex items-center justify-center pointer-events-none">
+              <img src="https://drive.google.com/thumbnail?id=1NHgV18Dzn1dm-spePjpYwdOyoe5fjYTo&sz=w1600" alt="Tug of War Characters" class="w-full h-full object-contain drop-shadow-[0_10px_15px_rgba(0,0,0,0.6)]">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+            <div class="bg-sky-50 border border-sky-200 p-5 rounded-2xl space-y-3">
+              <span class="text-xs font-extrabold text-sky-700 uppercase tracking-widest block text-center">🔵 Blue Team</span>
+              <div id="blueQuestion" class="min-h-[60px] flex items-center justify-center text-center"></div>
+              <div id="blueOptions" class="grid grid-cols-2 gap-2"></div>
+            </div>
+            <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl space-y-3">
+              <span class="text-xs font-extrabold text-rose-700 uppercase tracking-widest block text-center">🔴 Red Team</span>
+              <div id="redQuestion" class="min-h-[60px] flex items-center justify-center text-center"></div>
+              <div id="redOptions" class="grid grid-cols-2 gap-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="guesswordView" class="hidden space-y-6 text-center">
+        <div class="flex justify-between items-center max-w-sm mx-auto text-sm font-bold">
+          <span class="text-slate-500">Time: <strong id="guessTimer" class="text-rose-500 text-base">60</strong>s</span>
+          <span class="text-slate-500">Score: <strong id="guessScore" class="text-emerald-600 text-base">0</strong></span>
+        </div>
+        <div class="bg-amber-50/60 border-2 border-amber-300 p-8 sm:p-12 rounded-3xl shadow-inner my-4 min-h-[200px] flex flex-col items-center justify-center space-y-2">
+          <span class="text-xs font-extrabold text-amber-600 uppercase tracking-widest">Word to Describe</span>
+          <h2 id="guessTargetWord" class="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">READY?</h2>
+          <p id="guessCategory" class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Click Start when ready</p>
+        </div>
+        <div class="flex justify-center gap-4">
+          <button id="btnStartGuess" onclick="startGuessGame()" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm rounded-2xl shadow-lg cursor-pointer transition">Start Timer!</button>
+          <button id="btnPassGuess" onclick="nextGuessWord(false)" class="hidden px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm rounded-2xl cursor-pointer transition">Pass ➔</button>
+          <button id="btnCorrectGuess" onclick="nextGuessWord(true)" class="hidden px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-2xl shadow-md cursor-pointer transition">✓ Correct!</button>
+        </div>
+      </div>
+
+      <div id="penaltyshootView" class="hidden space-y-6">
+        <div class="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 space-y-4 p-4 sm:p-6">
+          <div class="flex justify-between items-center text-xs font-black tracking-widest z-10 relative flex-wrap gap-2">
+            <span class="bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              BLUE TEAM: <span id="penaltyBlueScore">0</span> GOALS
+            </span>
+            <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              ROUND: <span id="penaltyRound">1</span> / 5
+            </span>
+            <span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              RED TEAM: <span id="penaltyRedScore">0</span> GOALS
+            </span>
+          </div>
+          <div class="relative w-full aspect-[1377/768] rounded-2xl overflow-hidden border border-slate-700 select-none shadow-2xl bg-slate-950">
+            <img src="https://drive.google.com/thumbnail?id=1bWad_TGuyLKUz7ScoUVdpYcWrL2Nfsxl&sz=w1600" class="absolute inset-0 w-full h-full object-fill pointer-events-none z-0" alt="Goal Field Background">
+            <div class="absolute top-3 left-3 sm:top-5 sm:left-5 pointer-events-none z-40">
+              <div class="bg-slate-950/80 border border-amber-400/50 backdrop-blur-md rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 shadow-2xl flex items-center gap-2">
+                <span class="text-[10px] sm:text-xs font-black uppercase text-amber-300 tracking-widest leading-none">⏱️ TIME:</span>
+                <span id="penaltyTimer" class="text-xl sm:text-3xl font-black text-amber-400 tracking-tight drop-shadow-[0_2px_8px_rgba(251,191,36,0.5)] leading-none">10</span>s
+              </div>
+            </div>
+            <div id="penaltyFeedback" class="absolute inset-0 flex items-center justify-center pointer-events-none z-50 opacity-0 transition-all duration-300 transform scale-50">
+              <span id="penaltyFeedbackText" class="text-5xl sm:text-7xl font-black tracking-tighter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] uppercase"></span>
+            </div>
+            <img id="penaltyKeeperImg" src="https://drive.google.com/thumbnail?id=14ePNT76YwZIOpCSs4ptlWldonDwvyZ2i&sz=w1600" class="absolute inset-0 w-full h-full object-fill pointer-events-none transition-transform duration-500 z-10" alt="Goalkeeper">
+            <img id="penaltyPlayerImg" src="https://drive.google.com/thumbnail?id=1RMmKNl1OJ_bSZw-z80V1q1PkaD1N3qc8&sz=w1600" class="absolute inset-0 w-full h-full object-fill pointer-events-none transition-all duration-300 z-20" alt="Soccer Player">
+            <img id="penaltyBallImg" src="https://drive.google.com/thumbnail?id=11hrLhw5Sey-otpQQrxE0XjybSjpSy7TL&sz=w1600" class="absolute inset-0 w-full h-full object-fill pointer-events-none transition-all duration-700 ease-out z-30" alt="Soccer Ball">
+          </div>
+          <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl space-y-3 text-center">
+            <div id="penaltyTurnBadge" class="inline-block px-4 py-1 bg-sky-500 text-slate-950 font-black text-xs uppercase rounded-full tracking-wider">
+              🔵 Blue Team — SHOOTING!
+            </div>
+            <p id="penaltyClue" class="text-sm sm:text-base font-bold text-white min-h-[40px] flex items-center justify-center">
+              "Question clue will appear here..."
+            </p>
+            <div id="penaltyOptions" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="spacedefenderView" class="hidden space-y-6">
+        <div class="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 space-y-4 p-4 sm:p-6">
+          <div class="flex justify-between items-center text-xs font-black tracking-widest z-10 relative flex-wrap gap-2">
+            <span class="bg-violet-500/20 text-violet-400 border border-violet-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              SCORE: <span id="sdScore">0</span> PTS
+            </span>
+            <span class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md flex items-center gap-1">
+              ⏱️ <span id="sdTimer" class="text-sm font-black text-amber-400">10</span>s
+            </span>
+            <span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              SHIELD: <span id="sdLives">❤️❤️❤️</span>
+            </span>
+            <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              WAVE: <span id="sdWave">1</span>
+            </span>
+          </div>
+          <div id="sdCanvasContainer" class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden border border-slate-700 select-none shadow-2xl bg-slate-950 flex flex-col justify-between p-4">
+            <img src="https://drive.google.com/thumbnail?id=1tdcR5GyTogalY_khypqYxKSmjcD9qal_&sz=w1600" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-0" alt="Galaxy Background">
+            <div id="sdAsteroid" class="relative mx-auto transition-transform duration-300 ease-linear z-20 max-w-md w-full text-center">
+              <div id="sdAsteroidBox" class="bg-slate-950/85 border-2 border-amber-500/80 backdrop-blur-md rounded-2xl p-4 shadow-[0_0_25px_rgba(245,158,11,0.5)] transition-all duration-200">
+                <span class="text-[10px] font-black uppercase text-amber-400 tracking-widest block mb-1">☄️ INCOMING ASTEROID</span>
+                <p id="sdClueText" class="text-xs sm:text-base font-bold text-white leading-snug">"Clue text..."</p>
+              </div>
+              <div id="sdExplosion" class="absolute inset-0 flex items-center justify-center text-7xl pointer-events-none opacity-0">💥</div>
+            </div>
+            <div class="relative z-20 flex justify-center items-center w-full pb-2">
+              <img id="sdLaser" src="https://drive.google.com/thumbnail?id=1DImCHuzl0D5xEz0JcowolX1TIB1z23HZ&sz=w1600" class="absolute bottom-[70px] w-20 sm:w-24 h-auto object-contain z-10 opacity-0 pointer-events-none filter drop-shadow-[0_0_20px_rgba(239,68,68,0.9)]" alt="Space Missile">
+              <img id="sdShip" src="https://drive.google.com/thumbnail?id=1KVi8WbOUU5qzsPb9xj3yt9Mmu8LghVXL&sz=w1600" class="h-36 sm:h-42 w-auto object-contain filter drop-shadow-[0_0_25px_rgba(56,189,248,0.9)] transition-all duration-200 relative z-20" alt="Spaceship">
+              <div id="sdShipExplosion" class="absolute inset-0 flex items-center justify-center text-8xl pointer-events-none opacity-0 z-30">💥</div>
+            </div>
+          </div>
+          <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-2xl space-y-2 text-center">
+            <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Select Target Word to Fire:</span>
+            <div id="sdOptions" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL DE RESULTADOS -->
+  <div id="gameResultsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[2000] flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 sm:p-8 border border-slate-100 text-center space-y-5 relative">
+      <button onclick="cerrarModalResultadosJuego()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-800 transition font-bold text-sm cursor-pointer" title="Close">✕</button>
+      <a href="https://www.instagram.com/wespeakacademy" target="_blank" rel="noopener noreferrer" class="inline-block group transform hover:scale-105 transition duration-300">
+        <img src="https://drive.google.com/thumbnail?id=1YZjb1miAjuFCTRaa8fZTGDSqYldzO987&sz=w800" class="w-20 h-20 object-contain mx-auto drop-shadow-md rounded-full border-2 border-sky-400 p-1 group-hover:border-amber-400" alt="WeSpeakAcademy Instagram">
+        <span class="block text-xs font-bold text-sky-600 mt-1.5 group-hover:underline">@wespeakacademy</span>
+      </a>
+      <h3 id="gameModalTitle" class="text-2xl font-black text-slate-900 tracking-tight">Game Completed! 🎉</h3>
+      <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+        <p id="gameModalSub" class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Score / Result</p>
+        <p id="gameScoreModalText" class="text-3xl font-black text-sky-600 my-1">0 Points</p>
+        <p id="gameModalDetail" class="text-xs text-slate-400 font-medium">Great effort!</p>
+      </div>
+      <div class="pt-1 space-y-3">
+        <p class="text-xs text-slate-600 font-medium">Keep practicing and don't miss daily English tips on our Instagram page! 👇</p>
+        <a href="https://www.instagram.com/wespeakacademy" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold p-3.5 rounded-xl transition text-xs shadow-md">
+          <span>📸 Follow us @wespeakacademy</span>
+        </a>
+      </div>
+      <button onclick="cerrarModalResultadosJuego()" class="w-full bg-slate-100 text-slate-700 font-bold p-3 rounded-xl hover:bg-slate-200 transition text-xs cursor-pointer">Play Again</button>
     </div>
   </div>
 
-  <!-- Modal Emergency Meeting & Votación -->
-  <div id="meetingModal" class="overlay hidden">
-    <h2 style="color: #ff4d4d; margin: 5px;">EMERGENCY MEETING!</h2>
-    <p style="font-size: 0.9rem; color: #aaa; margin: 0;">🗣️ Discuss in English aloud, then VOTE:</p>
-    
-    <div class="vote-list" id="voteList"></div>
-    <p id="voteStatus" style="font-size: 12px; color: #ffcc00;"></p>
+  <!-- FOOTER INSTITUCIONAL -->
+  <footer class="w-full bg-slate-900 text-slate-400 py-6 px-4 mt-auto border-t-4 border-sky-400 text-center text-xs space-y-1.5">
+    <p class="font-bold text-white text-sm">NEXO AI Teacher — Powered Learning Platform</p>
+    <p>© 2026 All rights reserved. Developed by German Andres Peña Troconis</p>
+  </footer>
 
-    <button id="btnEndMeeting" onclick="endMeetingHost()" style="background: #28a745; color: white; padding: 10px 20px; font-size: 14px; display: none;">End & Count Votes</button>
-  </div>
+  <!-- BOTÓN FLOTANTE WHATSAPP -->
+  <a href="https://wa.me/@TrocoYT?text=Hola,%20quiero%20más%20información%20sobre%20las%20funciones%20PREMIUM%20de%20NEXO" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold px-5 py-3.5 rounded-full shadow-2xl shadow-emerald-500/40 transition-all duration-300 transform hover:scale-105 active:scale-95">
+    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.572-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+    </svg>
+  </a>
 
-  <!-- Modal Pantalla de Resultado (Expulsión / Fin del Juego) -->
-  <div id="resultModal" class="overlay hidden">
-    <h1 id="resultTitle" style="font-size: 2rem; margin: 10px;"></h1>
-    <p id="resultDesc" style="font-size: 1.2rem; margin: 15px 0;"></p>
-    <button onclick="closeResultModal()" style="background: #007bff; color: white; padding: 10px 20px;">OK</button>
-  </div>
-
+  <!-- LÓGICA DE INTERACCIÓN Y CONEXIÓN SUPABASE -->
   <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
+    const SUPABASE_URL = "https://jlcwoukhukrtjbbizwxs.supabase.co"; 
+    const SUPABASE_ANON_KEY = "sb_publishable_oI5J-Q2_dT8NmmAmMxkobQ_fmTNKzLh"; 
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const MAP_WIDTH = 1600;
-    const MAP_HEIGHT = 1200;
-    const VISION_RADIUS = 220;
+    let gamesData = [];
+    let nivelActual = "A1";
+    let juegoActivoActual = null;
 
-    let peer = null;
-    let connections = [];
-    let hostConn = null;
-    let isHost = false;
-    let gameStarted = false;
-    let myId = "";
-
-    let players = {}; 
-    let bodies = [];
-    let votes = {}; 
-    let hasVoted = false;
-
-    const colors = ["#ff4d4d", "#4d79ff", "#4dff88", "#ffff4d", "#ff994d", "#cc66ff"];
-
-    let myData = {
-      id: "", name: "",
-      x: 200 + Math.random() * (MAP_WIDTH - 400),
-      y: 200 + Math.random() * (MAP_HEIGHT - 400),
-      color: colors[0], isImpostor: false, isDead: false
+    window.onload = async function() {
+      await cambiarNivel("A1");
     };
 
-    const inputState = { up: false, down: false, left: false, right: false };
-
-    function bindTouch(elementId, direction) {
-      const btn = document.getElementById(elementId);
-      const start = (e) => { e.preventDefault(); inputState[direction] = true; };
-      const end = (e) => { e.preventDefault(); inputState[direction] = false; };
-      btn.addEventListener("touchstart", start); btn.addEventListener("touchend", end);
-      btn.addEventListener("mousedown", start); btn.addEventListener("mouseup", end);
-    }
-    bindTouch("btnUp", "up"); bindTouch("btnDown", "down");
-    bindTouch("btnLeft", "left"); bindTouch("btnRight", "right");
-
-    window.addEventListener("keydown", e => {
-      if(e.key === "ArrowUp" || e.key === "w") inputState.up = true;
-      if(e.key === "ArrowDown" || e.key === "s") inputState.down = true;
-      if(e.key === "ArrowLeft" || e.key === "a") inputState.left = true;
-      if(e.key === "ArrowRight" || e.key === "d") inputState.right = true;
-    });
-    window.addEventListener("keyup", e => {
-      if(e.key === "ArrowUp" || e.key === "w") inputState.up = false;
-      if(e.key === "ArrowDown" || e.key === "s") inputState.down = false;
-      if(e.key === "ArrowLeft" || e.key === "a") inputState.left = false;
-      if(e.key === "ArrowRight" || e.key === "d") inputState.right = false;
-    });
-
-    function generateShortId() {
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      let res = ""; for (let i = 0; i < 4; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
-      return res;
+    async function cambiarNivel(nuevoNivel) {
+      nivelActual = nuevoNivel;
+      document.getElementById('levelSelect').value = nuevoNivel;
+      document.getElementById('lblNivelActivo').textContent = `LEVEL ${nuevoNivel}`;
+      await fetchGamesData();
     }
 
-    function createRoom() {
-      isHost = true;
-      myData.name = document.getElementById("playerName").value;
-      const shortCode = generateShortId();
-      peer = new Peer(shortCode);
+    async function fetchGamesData() {
+      const statusEl = document.getElementById('dbStatus');
+      statusEl.textContent = `Loading ${nivelActual}...`;
+      statusEl.className = "px-3 py-1.5 bg-slate-100 text-slate-500 text-xs rounded-full font-bold";
 
-      peer.on("open", id => {
-        myId = id; myData.id = id; players[id] = myData;
-        document.getElementById("roomStatus").innerText = "SALA: " + id;
-        setupHostLogic(); gameLoop();
-      });
-    }
+      try {
+        const { data, error } = await supabaseClient
+          .from('games')
+          .select('NIVEL, WORDS, CLUE, PICTURE')
+          .eq('NIVEL', nivelActual);
 
-    function setupHostLogic() {
-      peer.on("connection", conn => {
-        connections.push(conn);
-        conn.on("data", data => handleIncomingData(data, conn));
-        conn.on("close", () => { delete players[conn.peer]; broadcastGameState(); });
-      });
-    }
+        if (error) throw error;
 
-    function joinRoom() {
-      const roomCode = document.getElementById("joinId").value.trim().toUpperCase();
-      if (!roomCode) return alert("Ingresa un código");
-      myData.name = document.getElementById("playerName").value;
-      peer = new Peer();
+        if (data && data.length > 0) {
+          gamesData = data.map(item => ({
+            WORDS: item.WORDS ? item.WORDS.trim() : "",
+            CLUE: item.CLUE ? item.CLUE.trim() : "No clue provided",
+            PICTURE: item.PICTURE ? item.PICTURE.trim() : ""
+          })).filter(i => i.WORDS !== '');
 
-      peer.on("open", id => {
-        myId = id; myData.id = id; hostConn = peer.connect(roomCode);
-        hostConn.on("open", () => {
-          document.getElementById("roomStatus").innerText = "¡Conectado!";
-          hostConn.send({ type: "JOIN", player: myData });
-          gameLoop();
-        });
-        hostConn.on("data", handleClientIncomingData);
-      });
-    }
-
-    function handleIncomingData(data, conn) {
-      if (data.type === "JOIN") {
-        data.player.color = colors[Object.keys(players).length % colors.length];
-        players[data.player.id] = data.player;
-        if (isHost && !gameStarted && Object.keys(players).length >= 2) {
-          document.getElementById("btnStartGame").style.display = "inline-block";
-        }
-        broadcastGameState();
-      } else if (data.type === "UPDATE_POS") {
-        if (players[data.id]) { players[data.id].x = data.x; players[data.id].y = data.y; }
-        broadcastGameState();
-      } else if (data.type === "KILL") {
-        if (players[data.targetId]) {
-          players[data.targetId].isDead = true;
-          bodies.push({ x: players[data.targetId].x, y: players[data.targetId].y, color: players[data.targetId].color });
-          checkWinCondition();
-        }
-        broadcastGameState();
-      } else if (data.type === "MEETING") {
-        votes = {};
-        broadcast({ type: "START_MEETING" });
-      } else if (data.type === "CAST_VOTE") {
-        votes[data.voterId] = data.targetId;
-      }
-    }
-
-    function handleClientIncomingData(data) {
-      if (data.type === "STATE") {
-        players = data.players; bodies = data.bodies;
-        if (players[myId]) {
-          myData.isImpostor = players[myId].isImpostor;
-          myData.isDead = players[myId].isDead;
-        }
-      } else if (data.type === "START_MEETING") {
-        hasVoted = false;
-        renderVoteList();
-        document.getElementById("meetingModal").classList.remove("hidden");
-        if(isHost) document.getElementById("btnEndMeeting").style.display = "block";
-      } else if (data.type === "SHOW_RESULT") {
-        // Cierre forzado del modal de votación para TODOS los jugadores
-        document.getElementById("meetingModal").classList.add("hidden");
-        document.getElementById("resultTitle").innerText = data.title;
-        document.getElementById("resultTitle").style.color = data.color;
-        document.getElementById("resultDesc").innerText = data.desc;
-        document.getElementById("resultModal").classList.remove("hidden");
-      }
-    }
-
-    function renderVoteList() {
-      const list = document.getElementById("voteList");
-      list.innerHTML = "";
-      document.getElementById("voteStatus").innerText = myData.isDead ? "👻 You are a ghost (Cannot vote)" : "";
-
-      for (let id in players) {
-        if (!players[id].isDead) {
-          const btn = document.createElement("div");
-          btn.className = "vote-btn" + (myData.isDead ? " vote-btn-disabled" : "");
-          btn.innerHTML = `<span>${players[id].name}</span>`;
-          if (!myData.isDead) btn.onclick = () => castVote(id);
-          list.appendChild(btn);
-        }
-      }
-
-      const skipBtn = document.createElement("div");
-      skipBtn.className = "vote-btn" + (myData.isDead ? " vote-btn-disabled" : "");
-      skipBtn.style.borderColor = "#aaa";
-      skipBtn.innerHTML = `<span>SKIP VOTE</span>`;
-      if (!myData.isDead) skipBtn.onclick = () => castVote("SKIP");
-      list.appendChild(skipBtn);
-    }
-
-    function castVote(targetId) {
-      if (hasVoted || myData.isDead) return;
-      hasVoted = true;
-      document.getElementById("voteStatus").innerText = "Vote submitted! Waiting for host...";
-      if (isHost) votes[myId] = targetId;
-      else hostConn.send({ type: "CAST_VOTE", voterId: myId, targetId: targetId });
-    }
-
-    function endMeetingHost() {
-      if (!isHost) return;
-      
-      let voteCounts = {};
-      for (let v in votes) {
-        let t = votes[v];
-        voteCounts[t] = (voteCounts[t] || 0) + 1;
-      }
-
-      let maxVotes = 0;
-      let ejectedId = null;
-      let tie = false;
-
-      for (let target in voteCounts) {
-        if (voteCounts[target] > maxVotes) {
-          maxVotes = voteCounts[target];
-          ejectedId = target;
-          tie = false;
-        } else if (voteCounts[target] === maxVotes) {
-          tie = true;
-        }
-      }
-
-      let resultTitle = "";
-      let resultDesc = "";
-      let color = "#fff";
-
-      if (tie || !ejectedId || ejectedId === "SKIP") {
-        resultTitle = "No one was ejected";
-        resultDesc = "Skipped / Tied vote.";
-      } else {
-        let p = players[ejectedId];
-        p.isDead = true; 
-
-        if (p.isImpostor) {
-          resultTitle = "VICTORY!";
-          resultDesc = `${p.name} was ejected. They were The Impostor!`;
-          color = "#4dff88";
+          if (gamesData.length > 0) {
+            statusEl.textContent = `🟢 ${gamesData.length} words ready for ${nivelActual}`;
+            statusEl.className = "px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs rounded-full font-bold";
+          } else {
+            statusEl.textContent = `⚠️ No valid words for ${nivelActual}`;
+            statusEl.className = "px-3 py-1.5 bg-amber-100 text-amber-700 text-xs rounded-full font-bold";
+          }
         } else {
-          resultTitle = `${p.name} was ejected`;
-          resultDesc = `${p.name} was NOT The Impostor.`;
-          color = "#ff4d4d";
+          gamesData = [];
+          statusEl.textContent = `⚠️ No records found for level ${nivelActual}`;
+          statusEl.className = "px-3 py-1.5 bg-amber-100 text-amber-700 text-xs rounded-full font-bold";
         }
-      }
-
-      broadcastGameState();
-
-      let impostorDefeated = (ejectedId && players[ejectedId] && players[ejectedId].isImpostor);
-      
-      if (impostorDefeated) {
-        broadcast({ type: "SHOW_RESULT", title: "CREWMATES WIN!", desc: `${players[ejectedId].name} was the Impostor!`, color: "#4dff88" });
-        resetGame();
-      } else {
-        if (!checkWinCondition()) {
-          broadcast({ type: "SHOW_RESULT", title: resultTitle, desc: resultDesc, color: color });
-        }
+      } catch (err) {
+        console.error("Error loading Supabase:", err);
+        statusEl.textContent = "❌ Connection / RLS Error";
+        statusEl.className = "px-3 py-1.5 bg-rose-100 text-rose-700 text-xs rounded-full font-bold";
       }
     }
 
-    function checkWinCondition() {
-      if (!isHost) return false;
-      let aliveCrew = 0;
-      let aliveImp = 0;
-
-      for (let id in players) {
-        if (!players[id].isDead) {
-          if (players[id].isImpostor) aliveImp++;
-          else aliveCrew++;
-        }
+    function openGame(gameId) {
+      if (gamesData.length === 0) {
+        alert(`No records available for Level ${nivelActual} in the database.`);
+        return;
       }
+      juegoActivoActual = gameId;
+      document.getElementById('gamesMenu').classList.add('hidden');
+      document.getElementById('gameContainer').classList.remove('hidden');
 
-      if (aliveImp >= aliveCrew) {
-        broadcast({ type: "SHOW_RESULT", title: "IMPOSTOR WINS!", desc: "The Impostor has taken over!", color: "#ff4d4d" });
-        resetGame();
-        return true;
-      }
-      return false;
-    }
-
-    function resetGame() {
-      gameStarted = false;
-      bodies = [];
-      for (let id in players) {
-        players[id].isDead = false;
-        players[id].isImpostor = false;
-      }
-      document.getElementById("btnStartGame").style.display = "inline-block";
-    }
-
-    function closeResultModal() {
-      document.getElementById("resultModal").classList.add("hidden");
-      document.getElementById("meetingModal").classList.add("hidden");
-      hasVoted = false;
-    }
-
-    function startGame() {
-      if (!isHost) return;
-      if (Object.keys(players).length < 2) return alert("Mínimo 2 jugadores.");
-      gameStarted = true;
-      document.getElementById("btnStartGame").style.display = "none";
-      assignImpostor();
-      broadcastGameState();
-    }
-
-    function assignImpostor() {
-      const keysArr = Object.keys(players);
-      const randomImpostorId = keysArr[Math.floor(Math.random() * keysArr.length)];
-      for (let id in players) players[id].isImpostor = (id === randomImpostorId);
-    }
-
-    function broadcastGameState() {
-      if (!isHost) return;
-      const state = { type: "STATE", players: players, bodies: bodies };
-      connections.forEach(conn => conn.send(state));
-    }
-
-    function broadcast(msg) {
-      if (isHost) {
-        connections.forEach(conn => conn.send(msg));
-        handleClientIncomingData(msg);
-      } else if (hostConn) hostConn.send(msg);
-    }
-
-    function update() {
-      let moved = false; const speed = 4;
-      if (inputState.up) { myData.y -= speed; moved = true; }
-      if (inputState.down) { myData.y += speed; moved = true; }
-      if (inputState.left) { myData.x -= speed; moved = true; }
-      if (inputState.right) { myData.x += speed; moved = true; }
-
-      myData.x = Math.max(20, Math.min(MAP_WIDTH - 20, myData.x));
-      myData.y = Math.max(20, Math.min(MAP_HEIGHT - 20, myData.y));
-
-      if (moved) {
-        if (isHost) { players[myId].x = myData.x; players[myId].y = myData.y; broadcastGameState(); }
-        else if (hostConn) hostConn.send({ type: "UPDATE_POS", id: myId, x: myData.x, y: myData.y });
-      }
-
-      document.getElementById("btnKill").style.display = (myData.isImpostor && !myData.isDead) ? "block" : "none";
-      let nearBody = bodies.some(b => Math.hypot(b.x - myData.x, b.y - myData.y) < 50);
-      document.getElementById("btnReport").style.display = (!myData.isDead && nearBody) ? "block" : "none";
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const cameraX = myData.x - canvas.width / 2;
-      const cameraY = myData.y - canvas.height / 2;
-
-      ctx.save();
-      ctx.translate(-cameraX, -cameraY);
-
-      ctx.strokeStyle = "#252525"; ctx.lineWidth = 2;
-      for (let x = 0; x < MAP_WIDTH; x += 100) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT); ctx.stroke(); }
-      for (let y = 0; y < MAP_HEIGHT; y += 100) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH, y); ctx.stroke(); }
-
-      ctx.strokeStyle = "#ff4d4d"; ctx.lineWidth = 6;
-      ctx.strokeRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
-
-      bodies.forEach(b => {
-        let dist = Math.hypot(b.x - myData.x, b.y - myData.y);
-        if (myData.isDead || dist <= VISION_RADIUS) {
-          ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y + 5, 12, 0, Math.PI, false); ctx.fill();
-          ctx.fillStyle = "white"; ctx.fillText("X_X", b.x - 8, b.y);
-        }
+      const views = ['hangmanView', 'memoryView', 'wordsearchView', 'tictactoeView', 'tugofwarView', 'guesswordView', 'penaltyshootView', 'spacedefenderView'];
+      views.forEach(v => {
+        const el = document.getElementById(v);
+        if (el) el.classList.add('hidden');
       });
 
-      for (let id in players) {
-        let p = players[id];
-        let dist = Math.hypot(p.x - myData.x, p.y - myData.y);
-
-        if (!myData.isDead && dist > VISION_RADIUS && id !== myId) continue;
-
-        ctx.globalAlpha = p.isDead ? 0.35 : 1.0; 
-        ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "#aaddff"; ctx.fillRect(p.x - 4, p.y - 6, 10, 7);
-        ctx.globalAlpha = 1.0;
-
-        ctx.fillStyle = p.isDead ? "#aaa" : "white"; ctx.font = "12px sans-serif"; ctx.textAlign = "center";
-        let label = (p.isDead ? "👻 " : "") + p.name + (p.id === myId ? " (You)" : "");
-        if (p.id === myId && p.isImpostor) label += " [IMP]";
-        ctx.fillText(label, p.x, p.y - 20);
-      }
-      ctx.restore();
-
-      if (!myData.isDead) {
-        ctx.save();
-        ctx.fillStyle = "rgba(0, 0, 0, 0.82)";
-        ctx.beginPath();
-        ctx.rect(0, 0, canvas.width, canvas.height);
-        ctx.arc(canvas.width / 2, canvas.height / 2, VISION_RADIUS, 0, Math.PI * 2, true);
-        ctx.fill();
-        ctx.restore();
+      if (gameId === 'hangman') {
+        document.getElementById('gameTitle').textContent = 'Word Hangman 🔤';
+        document.getElementById('hangmanView').classList.remove('hidden');
+        initHangman();
+      } else if (gameId === 'memory') {
+        document.getElementById('gameTitle').textContent = 'Memory Match 🧠';
+        document.getElementById('memoryView').classList.remove('hidden');
+        initMemory();
+      } else if (gameId === 'wordsearch') {
+        document.getElementById('gameTitle').textContent = 'Word Search 🔍';
+        document.getElementById('wordsearchView').classList.remove('hidden');
+        initWordSearch();
+      } else if (gameId === 'tictactoe') {
+        document.getElementById('gameTitle').textContent = 'Quiz Tic-Tac-Toe ❌⭕';
+        document.getElementById('tictactoeView').classList.remove('hidden');
+        initTicTacToe();
+      } else if (gameId === 'tugofwar') {
+        document.getElementById('gameTitle').textContent = 'Tug of War 🪢';
+        document.getElementById('tugofwarView').classList.remove('hidden');
+        initTugOfWar();
+      } else if (gameId === 'guessword') {
+        document.getElementById('gameTitle').textContent = 'Guess the Word ⏱️';
+        document.getElementById('guesswordView').classList.remove('hidden');
+        resetGuessUI();
+      } else if (gameId === 'penaltyshoot') {
+        document.getElementById('gameTitle').textContent = 'Penalty Shootout ⚽';
+        document.getElementById('penaltyshootView').classList.remove('hidden');
+        initPenaltyShootout();
+      } else if (gameId === 'spacedefender') {
+        document.getElementById('gameTitle').textContent = 'Space Defender 🚀';
+        document.getElementById('spacedefenderView').classList.remove('hidden');
+        initSpaceDefender();
       }
     }
 
-    function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
+    function backToMenu() {
+      document.getElementById('gameContainer').classList.add('hidden');
+      document.getElementById('gamesMenu').classList.remove('hidden');
+      if (typeof guessInterval !== 'undefined') clearInterval(guessInterval);
+      if (typeof tugInterval !== 'undefined') clearInterval(tugInterval);
+      if (typeof penaltyInterval !== 'undefined') clearInterval(penaltyInterval);
+      if (typeof sdAsteroidTimer !== 'undefined') clearInterval(sdAsteroidTimer);
+    }
 
-    function killPlayer() {
-      for (let id in players) {
-        if (id !== myId && !players[id].isDead) {
-          if (Math.hypot(players[id].x - myData.x, players[id].y - myData.y) < 45) {
-            broadcast({ type: "KILL", targetId: id });
-            break;
+    function mostrarModalResultadosJuego(titulo, scoreText, detailText) {
+      document.getElementById('gameModalTitle').textContent = titulo;
+      document.getElementById('gameScoreModalText').textContent = scoreText;
+      document.getElementById('gameModalDetail').textContent = detailText;
+      document.getElementById('gameResultsModal').classList.remove('hidden');
+    }
+
+    function cerrarModalResultadosJuego() {
+      document.getElementById('gameResultsModal').classList.add('hidden');
+      if (juegoActivoActual === 'hangman') initHangman();
+      else if (juegoActivoActual === 'memory') initMemory();
+      else if (juegoActivoActual === 'wordsearch') initWordSearch();
+      else if (juegoActivoActual === 'tictactoe') initTicTacToe();
+      else if (juegoActivoActual === 'tugofwar') initTugOfWar();
+      else if (juegoActivoActual === 'guessword') resetGuessUI();
+      else if (juegoActivoActual === 'penaltyshoot') initPenaltyShootout();
+      else if (juegoActivoActual === 'spacedefender') initSpaceDefender();
+    }
+
+    /* Lógica Hangman */
+    let currentHangman, guessedLetters, hangmanLives;
+    function initHangman() {
+      const item = gamesData[Math.floor(Math.random() * gamesData.length)];
+      currentHangman = { word: item.WORDS.toUpperCase(), hint: item.CLUE };
+      guessedLetters = []; hangmanLives = 6;
+      document.getElementById('hangmanHint').textContent = currentHangman.hint;
+      document.getElementById('hangmanLives').textContent = hangmanLives;
+      renderHangmanWord(); renderHangmanKeyboard();
+    }
+    function renderHangmanWord() {
+      const container = document.getElementById('hangmanWord');
+      container.innerHTML = '';
+      currentHangman.word.split('').forEach(letter => {
+        const box = document.createElement('div');
+        if (letter === ' ') { box.className = "w-6 h-12 flex items-center justify-center"; }
+        else {
+          box.className = "w-10 h-12 border-b-4 border-slate-800 text-2xl font-black flex items-center justify-center text-slate-900 uppercase";
+          box.textContent = guessedLetters.includes(letter) ? letter : '';
+        }
+        container.appendChild(box);
+      });
+    }
+    function renderHangmanKeyboard() {
+      const kb = document.getElementById('hangmanKeyboard');
+      kb.innerHTML = '';
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').forEach(letter => {
+        const btn = document.createElement('button');
+        btn.textContent = letter;
+        btn.className = "w-9 h-10 bg-slate-100 hover:bg-sky-500 hover:text-white rounded-lg font-bold text-xs transition cursor-pointer disabled:opacity-30 disabled:pointer-events-none";
+        btn.disabled = guessedLetters.includes(letter);
+        btn.onclick = () => pressHangmanLetter(letter, btn);
+        kb.appendChild(btn);
+      });
+    }
+    function pressHangmanLetter(letter, btn) {
+      guessedLetters.push(letter); btn.disabled = true;
+      if (currentHangman.word.includes(letter)) {
+        renderHangmanWord();
+        const isWon = currentHangman.word.split('').every(l => l === ' ' || guessedLetters.includes(l));
+        if (isWon) setTimeout(() => mostrarModalResultadosJuego('Word Guessed! 🎉', currentHangman.word, `Awesome job! You guessed the word in Level ${nivelActual}.`), 200);
+      } else {
+        hangmanLives--;
+        document.getElementById('hangmanLives').textContent = hangmanLives;
+        if (hangmanLives === 0) setTimeout(() => mostrarModalResultadosJuego('Game Over! ❌', currentHangman.word, 'You ran out of lives. Keep practicing!'), 200);
+      }
+    }
+
+    /* Lógica Memory Match */
+    let memoryFlipped = [], memoryMoves = 0, memoryMatches = 0, totalPairs = 0;
+    function initMemory() {
+      memoryMoves = 0; memoryMatches = 0; memoryFlipped = [];
+      document.getElementById('memoryMoves').textContent = memoryMoves;
+      const countToSelect = Math.min(4, gamesData.length);
+      const selected = [...gamesData].sort(() => 0.5 - Math.random()).slice(0, countToSelect);
+      totalPairs = selected.length;
+      document.getElementById('memoryMatches').textContent = `0 / ${totalPairs}`;
+      let cards = [];
+      selected.forEach((item, idx) => {
+        cards.push({ type: 'word', content: item.WORDS, matchId: idx });
+        cards.push({ type: 'img', content: item.PICTURE, fallbackText: item.CLUE, matchId: idx });
+      });
+      cards.sort(() => 0.5 - Math.random());
+      const board = document.getElementById('memoryBoard');
+      board.innerHTML = '';
+      cards.forEach(cardData => {
+        const card = document.createElement('div');
+        card.className = "h-28 perspective-1000 cursor-pointer";
+        let innerContent = cardData.type === 'word' 
+          ? `<span class="font-black text-slate-900 text-sm">${cardData.content}</span>`
+          : (cardData.content && cardData.content.startsWith('http')
+            ? `<img src="${cardData.content}" class="w-full h-full object-cover rounded-xl" alt="Card Picture" onerror="this.outerHTML='<span class=\\'font-medium text-slate-600 text-xs p-1\\'>${cardData.fallbackText}</span>'">`
+            : `<span class="font-medium text-slate-600 text-xs p-1">${cardData.fallbackText}</span>`);
+        card.innerHTML = `
+          <div class="card-inner w-full h-full relative transform-style-3d transition-transform duration-500 rounded-2xl shadow-md bg-slate-900 border border-slate-700 flex items-center justify-center">
+            <div class="absolute inset-0 backface-hidden flex items-center justify-center font-black text-white text-xl">❓</div>
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-white border-2 border-emerald-400 rounded-2xl flex items-center justify-center p-2 text-center overflow-hidden">
+              ${innerContent}
+            </div>
+          </div>
+        `;
+        card.onclick = () => flipMemoryCard(card, cardData);
+        board.appendChild(card);
+      });
+    }
+    function flipMemoryCard(cardEl, cardData) {
+      const inner = cardEl.querySelector('.card-inner');
+      if (inner.classList.contains('rotate-y-180') || memoryFlipped.length >= 2) return;
+      inner.classList.add('rotate-y-180');
+      memoryFlipped.push({ cardEl, cardData });
+      if (memoryFlipped.length === 2) {
+        memoryMoves++;
+        document.getElementById('memoryMoves').textContent = memoryMoves;
+        const [c1, c2] = memoryFlipped;
+        if (c1.cardData.matchId === c2.cardData.matchId) {
+          memoryMatches++;
+          document.getElementById('memoryMatches').textContent = `${memoryMatches} / ${totalPairs}`;
+          memoryFlipped = [];
+          if (memoryMatches === totalPairs) setTimeout(() => mostrarModalResultadosJuego('Memory Completed! 🏆', `${memoryMoves} Moves`, `You matched all cards in Level ${nivelActual}.`), 300);
+        } else {
+          setTimeout(() => {
+            c1.cardEl.querySelector('.card-inner').classList.remove('rotate-y-180');
+            c2.cardEl.querySelector('.card-inner').classList.remove('rotate-y-180');
+            memoryFlipped = [];
+          }, 1000);
+        }
+      }
+    }
+
+    /* Lógica Word Search */
+    let wsWords = [], wsFoundCount = 0, wsGridSize = 10, wsSelectedCells = [];
+    function initWordSearch() {
+      wsFoundCount = 0; wsSelectedCells = [];
+      const valid = gamesData.filter(i => i.WORDS.length >= 3 && i.WORDS.length <= 8 && !i.WORDS.includes(" "));
+      const selected = [...valid].sort(() => 0.5 - Math.random()).slice(0, 5);
+      wsWords = selected.map(i => i.WORDS.toUpperCase());
+      const listEl = document.getElementById('wsTargetList');
+      listEl.innerHTML = '';
+      wsWords.forEach(w => {
+        const li = document.createElement('li');
+        li.id = `ws-word-${w}`;
+        li.className = "flex items-center gap-2 text-slate-700 font-bold text-sm transition";
+        li.innerHTML = `<span>⏳</span> <span>${w}</span>`;
+        listEl.appendChild(li);
+      });
+      let grid = Array(wsGridSize).fill(null).map(() => Array(wsGridSize).fill(''));
+      wsWords.forEach(word => {
+        let placed = false, attempts = 0;
+        while (!placed && attempts < 100) {
+          attempts++;
+          let dir = Math.random() < 0.5 ? 'H' : 'V';
+          let r = Math.floor(Math.random() * (dir === 'H' ? wsGridSize : wsGridSize - word.length));
+          let c = Math.floor(Math.random() * (dir === 'V' ? wsGridSize : wsGridSize - word.length));
+          let canPlace = true;
+          for (let i = 0; i < word.length; i++) {
+            let nr = dir === 'V' ? r + i : r, nc = dir === 'H' ? c + i : c;
+            if (grid[nr][nc] !== '' && grid[nr][nc] !== word[i]) { canPlace = false; break; }
+          }
+          if (canPlace) {
+            for (let i = 0; i < word.length; i++) {
+              let nr = dir === 'V' ? r + i : r, nc = dir === 'H' ? c + i : c;
+              grid[nr][nc] = word[i];
+            }
+            placed = true;
           }
         }
+      });
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const gridContainer = document.getElementById('wsGrid');
+      gridContainer.innerHTML = '';
+      for (let r = 0; r < wsGridSize; r++) {
+        for (let c = 0; c < wsGridSize; c++) {
+          if (grid[r][c] === '') grid[r][c] = letters[Math.floor(Math.random() * letters.length)];
+          const cell = document.createElement('button');
+          cell.textContent = grid[r][c];
+          cell.className = "w-7 h-7 sm:w-9 sm:h-9 bg-white border border-slate-200 rounded-lg font-black text-xs sm:text-sm text-slate-800 flex items-center justify-center cursor-pointer transition-all select-none hover:bg-sky-100";
+          cell.onclick = () => selectWSLetter(cell, grid[r][c]);
+          gridContainer.appendChild(cell);
+        }
       }
     }
+    function selectWSLetter(cell, char) {
+      if (cell.classList.contains('bg-emerald-500')) return;
+      const isSelected = wsSelectedCells.some(c => c.cell === cell);
+      if (isSelected) {
+        cell.className = "w-7 h-7 sm:w-9 sm:h-9 bg-white border border-slate-200 rounded-lg font-black text-xs sm:text-sm text-slate-800 flex items-center justify-center cursor-pointer transition-all select-none hover:bg-sky-100";
+        wsSelectedCells = wsSelectedCells.filter(c => c.cell !== cell);
+      } else {
+        cell.className = "w-7 h-7 sm:w-9 sm:h-9 bg-sky-500 border border-sky-600 rounded-lg font-black text-xs sm:text-sm text-white flex items-center justify-center cursor-pointer transition-all select-none shadow-md transform scale-105";
+        wsSelectedCells.push({ cell, char });
+      }
+      const currentStr = wsSelectedCells.map(c => c.char).join('');
+      const reverseStr = currentStr.split('').reverse().join('');
+      wsWords.forEach(w => {
+        if (currentStr === w || reverseStr === w) {
+          wsSelectedCells.forEach(item => {
+            item.cell.className = "w-7 h-7 sm:w-9 sm:h-9 bg-emerald-500 border border-emerald-600 rounded-lg font-black text-xs sm:text-sm text-white flex items-center justify-center pointer-events-none transition-all shadow-sm";
+          });
+          const targetLi = document.getElementById(`ws-word-${w}`);
+          if (targetLi) {
+            targetLi.className = "flex items-center gap-2 text-emerald-600 font-extrabold text-sm line-through";
+            targetLi.querySelector('span').textContent = '✓';
+          }
+          wsSelectedCells = []; wsFoundCount++;
+          if (wsFoundCount === wsWords.length) setTimeout(() => mostrarModalResultadosJuego('Puzzle Completed! 🔍', `${wsWords.length} Words`, `Sharp eyes! You found all words in Level ${nivelActual}.`), 300);
+        }
+      });
+    }
 
-    function reportBody() { broadcast({ type: "MEETING" }); }
+    /* Lógica Tic-Tac-Toe */
+    let tttBoardState = Array(9).fill(null), tttCurrentTurn = 'X', tttSelectedCellIndex = null;
+    function initTicTacToe() {
+      tttBoardState = Array(9).fill(null); tttCurrentTurn = 'X'; tttSelectedCellIndex = null;
+      document.getElementById('tttStatus').textContent = "Turn: ❌ Player 1";
+      document.getElementById('tttQuestionBox').classList.add('hidden');
+      const board = document.getElementById('tttBoard'); board.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const btn = document.createElement('button');
+        btn.className = "h-20 sm:h-24 bg-slate-100 border-2 border-slate-300 rounded-2xl font-black text-3xl sm:text-4xl text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center justify-center";
+        btn.onclick = () => clickTTTCell(i);
+        board.appendChild(btn);
+      }
+    }
+    function clickTTTCell(index) {
+      if (tttBoardState[index] !== null) return;
+      tttSelectedCellIndex = index;
+      const qItem = gamesData[Math.floor(Math.random() * gamesData.length)];
+      document.getElementById('tttQuestionText').textContent = `"${qItem.CLUE}"`;
+      let options = [qItem.WORDS];
+      while (options.length < 4 && options.length < gamesData.length) {
+        let randWord = gamesData[Math.floor(Math.random() * gamesData.length)].WORDS;
+        if (!options.includes(randWord)) options.push(randWord);
+      }
+      options.sort(() => 0.5 - Math.random());
+      const optContainer = document.getElementById('tttOptions'); optContainer.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = "py-2.5 bg-white border border-indigo-200 hover:bg-indigo-100 rounded-xl font-bold text-xs text-indigo-900 transition cursor-pointer";
+        btn.onclick = () => answerTTTQuestion(opt === qItem.WORDS);
+        optContainer.appendChild(btn);
+      });
+      document.getElementById('tttQuestionBox').classList.remove('hidden');
+    }
+    function answerTTTQuestion(isCorrect) {
+      document.getElementById('tttQuestionBox').classList.add('hidden');
+      const boardButtons = document.getElementById('tttBoard').children;
+      if (isCorrect) {
+        tttBoardState[tttSelectedCellIndex] = tttCurrentTurn;
+        boardButtons[tttSelectedCellIndex].textContent = tttCurrentTurn === 'X' ? '❌' : '⭕';
+        boardButtons[tttSelectedCellIndex].classList.add(tttCurrentTurn === 'X' ? 'text-indigo-600' : 'text-rose-500');
+        if (checkTTTWinner(tttCurrentTurn)) {
+          setTimeout(() => mostrarModalResultadosJuego(`Winner: ${tttCurrentTurn === 'X' ? '❌ Player 1' : '⭕ Player 2'}! 🏆`, 'Tic-Tac-Toe Master', 'Awesome strategy and vocabulary skills!'), 200);
+          return;
+        }
+        if (tttBoardState.every(c => c !== null)) {
+          setTimeout(() => mostrarModalResultadosJuego('Draw Game! 🤝', 'Board Full', 'Great battle between both players!'), 200);
+          return;
+        }
+        tttCurrentTurn = tttCurrentTurn === 'X' ? 'O' : 'X';
+        document.getElementById('tttStatus').textContent = `Turn: ${tttCurrentTurn === 'X' ? '❌ Player 1' : '⭕ Player 2'}`;
+      } else {
+        alert("❌ Wrong answer! You lose your turn.");
+        tttCurrentTurn = tttCurrentTurn === 'X' ? 'O' : 'X';
+        document.getElementById('tttStatus').textContent = `Turn: ${tttCurrentTurn === 'X' ? '❌ Player 1' : '⭕ Player 2'}`;
+      }
+    }
+    function checkTTTWinner(p) {
+      const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      return wins.some(w => w.every(i => tttBoardState[i] === p));
+    }
+
+    /* Lógica Tug of War */
+    let blueScore = 0, redScore = 0, tugTimer = 300, tugInterval = null;
+    function initTugOfWar() {
+      blueScore = 0; redScore = 0; tugTimer = 300;
+      if (tugInterval) clearInterval(tugInterval);
+      updateTugUI(); loadTugQuestion('blue'); loadTugQuestion('red');
+      tugInterval = setInterval(() => {
+        tugTimer--;
+        const mins = Math.floor(tugTimer / 60), secs = tugTimer % 60;
+        document.getElementById('tugTimer').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        if (tugTimer <= 0) { clearInterval(tugInterval); finalizarTugPorTiempo(); }
+      }, 1000);
+    }
+    function updateTugUI() {
+      document.getElementById('blueScore').textContent = blueScore;
+      document.getElementById('redScore').textContent = redScore;
+      const diff = blueScore - redScore;
+      document.getElementById('tugDiff').textContent = Math.abs(diff);
+      const rope = document.getElementById('tugRopeIndicator');
+      const shiftPercent = Math.max(-25, Math.min(25, diff * -5));
+      rope.style.transform = `translateX(${shiftPercent}%)`;
+      if (diff >= 5) {
+        if (tugInterval) clearInterval(tugInterval);
+        setTimeout(() => mostrarModalResultadosJuego('Blue Team Wins! 🔵', `${blueScore} - ${redScore}`, 'Exceptional speed and English accuracy! Max gap reached.'), 200);
+      } else if (diff <= -5) {
+        if (tugInterval) clearInterval(tugInterval);
+        setTimeout(() => mostrarModalResultadosJuego('Red Team Wins! 🔴', `${redScore} - ${blueScore}`, 'Exceptional speed and English accuracy! Max gap reached.'), 200);
+      }
+    }
+    function finalizarTugPorTiempo() {
+      if (blueScore > redScore) mostrarModalResultadosJuego('Time Up: Blue Team Wins! 🔵', `${blueScore} - ${redScore}`, 'Time is up! Blue Team had the highest score.');
+      else if (redScore > blueScore) mostrarModalResultadosJuego('Time Up: Red Team Wins! 🔴', `${redScore} - ${blueScore}`, 'Time is up! Red Team had the highest score.');
+      else mostrarModalResultadosJuego('Time Up: It\'s a Draw! 🤝', `${blueScore} - ${redScore}`, 'Time is up! Both teams finished with equal points.');
+    }
+    function loadTugQuestion(team) {
+      const correctItem = gamesData[Math.floor(Math.random() * gamesData.length)];
+      const qEl = document.getElementById(team + 'Question'), optEl = document.getElementById(team + 'Options');
+      qEl.innerHTML = `<p class="text-xs sm:text-sm font-bold text-slate-800">"${correctItem.CLUE}"</p>`;
+      let options = [correctItem.WORDS];
+      while (options.length < 4 && options.length < gamesData.length) {
+        let randWord = gamesData[Math.floor(Math.random() * gamesData.length)].WORDS;
+        if (!options.includes(randWord)) options.push(randWord);
+      }
+      options.sort(() => 0.5 - Math.random());
+      optEl.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = "py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 transition cursor-pointer truncate px-1";
+        btn.onclick = () => {
+          if (opt === correctItem.WORDS) { if (team === 'blue') blueScore++; else redScore++; }
+          updateTugUI();
+          if (tugTimer > 0 && Math.abs(blueScore - redScore) < 5) loadTugQuestion(team);
+        };
+        optEl.appendChild(btn);
+      });
+    }
+
+    /* Lógica Guess the Word */
+    let guessIndex = 0, guessScore = 0, guessTimer = 60, guessInterval = null;
+    function resetGuessUI() {
+      if (guessInterval) clearInterval(guessInterval);
+      document.getElementById('guessTargetWord').textContent = "READY?";
+      document.getElementById('guessCategory').textContent = "Click Start when ready";
+      document.getElementById('guessTimer').textContent = "60";
+      document.getElementById('guessScore').textContent = "0";
+      document.getElementById('btnStartGuess').classList.remove('hidden');
+      document.getElementById('btnPassGuess').classList.add('hidden');
+      document.getElementById('btnCorrectGuess').classList.add('hidden');
+    }
+    function startGuessGame() {
+      if (!gamesData || gamesData.length === 0) { alert("No vocabulary available for this level."); return; }
+      guessScore = 0; guessTimer = 60; guessIndex = 0;
+      gamesData.sort(() => 0.5 - Math.random());
+      document.getElementById('guessScore').textContent = guessScore;
+      document.getElementById('btnStartGuess').classList.add('hidden');
+      document.getElementById('btnPassGuess').classList.remove('hidden');
+      document.getElementById('btnCorrectGuess').classList.remove('hidden');
+      displayGuessWord();
+      if (guessInterval) clearInterval(guessInterval);
+      guessInterval = setInterval(() => {
+        guessTimer--;
+        document.getElementById('guessTimer').textContent = guessTimer;
+        if (guessTimer <= 0) {
+          clearInterval(guessInterval);
+          mostrarModalResultadosJuego('Time is Up! ⏱️', `${guessScore} Words`, 'Great teamwork describing English vocabulary!');
+        }
+      }, 1000);
+    }
+    function displayGuessWord() {
+      if (!gamesData || gamesData.length === 0) return;
+      const current = gamesData[guessIndex % gamesData.length];
+      document.getElementById('guessTargetWord').textContent = (current.WORDS || "").toString().trim().toUpperCase() || "WORD";
+      document.getElementById('guessCategory').textContent = `Hint: ${(current.CLUE || "No hint available").toString().trim()}`;
+    }
+    function nextGuessWord(isCorrect) {
+      if (isCorrect) { guessScore++; document.getElementById('guessScore').textContent = guessScore; }
+      guessIndex++; displayGuessWord();
+    }
+
+    /* Lógica Penalty Shootout */
+    let penaltyBlueScore = 0, penaltyRedScore = 0, penaltyCurrentRound = 1, penaltyMaxRounds = 5;
+    let penaltyPhase = 'ATTACK', penaltyAttackingTeam = 'blue', penaltyTimer = 20, penaltyInterval = null, currentPenaltyItem = null;
+    function initPenaltyShootout() {
+      penaltyBlueScore = 0; penaltyRedScore = 0; penaltyCurrentRound = 1;
+      penaltyAttackingTeam = 'blue'; penaltyPhase = 'ATTACK';
+      updatePenaltyUI(); startPenaltyTurn();
+    }
+    function updatePenaltyUI() {
+      document.getElementById('penaltyBlueScore').textContent = penaltyBlueScore;
+      document.getElementById('penaltyRedScore').textContent = penaltyRedScore;
+      document.getElementById('penaltyRound').textContent = `${penaltyCurrentRound} / ${penaltyMaxRounds}`;
+      const ball = document.getElementById('penaltyBallImg'), keeper = document.getElementById('penaltyKeeperImg'), feedback = document.getElementById('penaltyFeedback');
+      ball.style.transform = 'translate(0, 0) scale(1)'; keeper.style.transform = 'translate(0, 0)';
+      if (feedback) { feedback.classList.add('opacity-0', 'scale-50'); feedback.classList.remove('opacity-100', 'scale-100'); }
+    }
+    function showPenaltyFeedback(type, customText = '') {
+      const fbContainer = document.getElementById('penaltyFeedback'), fbText = document.getElementById('penaltyFeedbackText');
+      if (!fbContainer || !fbText) return;
+      if (type === 'GOAL') { fbText.textContent = '⚽ GOAL!'; fbText.className = 'text-5xl sm:text-7xl font-black text-emerald-400 drop-shadow-[0_10px_25px_rgba(52,211,153,0.8)] tracking-tight'; }
+      else if (type === 'MISSED') { fbText.textContent = '❌ MISSED!'; fbText.className = 'text-5xl sm:text-7xl font-black text-rose-500 drop-shadow-[0_10px_25px_rgba(244,63,94,0.8)] tracking-tight'; }
+      else if (type === 'BLOCKED') { fbText.textContent = '🧤 BLOCKED!'; fbText.className = 'text-5xl sm:text-7xl font-black text-amber-400 drop-shadow-[0_10px_25px_rgba(251,191,36,0.8)] tracking-tight'; }
+      else if (type === 'INFO') { fbText.textContent = customText; fbText.className = 'text-2xl sm:text-4xl font-black text-sky-300 drop-shadow-[0_10px_20px_rgba(0,0,0,0.9)] tracking-wider text-center px-4'; }
+      fbContainer.classList.remove('opacity-0', 'scale-50'); fbContainer.classList.add('opacity-100', 'scale-100');
+    }
+    function startPenaltyTurn() {
+      if (penaltyInterval) clearInterval(penaltyInterval);
+      penaltyTimer = 20;
+      const timerEl = document.getElementById('penaltyTimer');
+      if (timerEl) timerEl.textContent = penaltyTimer;
+      currentPenaltyItem = gamesData[Math.floor(Math.random() * gamesData.length)];
+      document.getElementById('penaltyClue').textContent = `"${currentPenaltyItem.CLUE}"`;
+      const badge = document.getElementById('penaltyTurnBadge');
+      if (penaltyPhase === 'ATTACK') {
+        const teamName = penaltyAttackingTeam === 'blue' ? '🔵 Blue Team' : '🔴 Red Team';
+        badge.textContent = `${teamName} — ⚽ SHOOTING (20s)`;
+        badge.className = penaltyAttackingTeam === 'blue' ? "inline-block px-4 py-1 bg-sky-500 text-slate-950 font-black text-xs uppercase rounded-full tracking-wider" : "inline-block px-4 py-1 bg-rose-500 text-white font-black text-xs uppercase rounded-full tracking-wider";
+      } else {
+        const defTeamName = penaltyAttackingTeam === 'blue' ? '🔴 Red Team' : '🔵 Blue Team';
+        badge.textContent = `${defTeamName} — 🧤 BLOCK SHOT! (20s)`;
+        badge.className = penaltyAttackingTeam === 'blue' ? "inline-block px-4 py-1 bg-rose-500 text-white font-black text-xs uppercase rounded-full tracking-wider" : "inline-block px-4 py-1 bg-sky-500 text-slate-950 font-black text-xs uppercase rounded-full tracking-wider";
+      }
+      let options = [currentPenaltyItem.WORDS];
+      while (options.length < 4 && options.length < gamesData.length) {
+        let randWord = gamesData[Math.floor(Math.random() * gamesData.length)].WORDS;
+        if (!options.includes(randWord)) options.push(randWord);
+      }
+      options.sort(() => 0.5 - Math.random());
+      const optContainer = document.getElementById('penaltyOptions'); optContainer.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = "py-2.5 px-3 bg-white hover:bg-slate-100 text-slate-900 rounded-xl font-bold text-xs shadow-md transition cursor-pointer truncate";
+        btn.onclick = () => handlePenaltyAnswer(opt === currentPenaltyItem.WORDS);
+        optContainer.appendChild(btn);
+      });
+      penaltyInterval = setInterval(() => {
+        penaltyTimer--;
+        if (timerEl) timerEl.textContent = penaltyTimer;
+        if (penaltyTimer <= 0) { clearInterval(penaltyInterval); handlePenaltyAnswer(false); }
+      }, 1000);
+    }
+    function handlePenaltyAnswer(isCorrect) {
+      if (penaltyInterval) clearInterval(penaltyInterval);
+      const ball = document.getElementById('penaltyBallImg'), keeper = document.getElementById('penaltyKeeperImg');
+      if (penaltyPhase === 'ATTACK') {
+        if (isCorrect) {
+          ball.style.transform = 'translate(-12%, -25%) scale(0.6)'; penaltyPhase = 'DEFENSE';
+          showPenaltyFeedback('INFO', '🧤 SAVE THE SHOT!'); setTimeout(() => startPenaltyTurn(), 1200);
+        } else {
+          ball.style.transform = 'translate(-55%, -35%) scale(0.3)'; showPenaltyFeedback('MISSED'); setTimeout(() => nextPenaltyTurn(false), 1400);
+        }
+      } else if (penaltyPhase === 'DEFENSE') {
+        if (isCorrect) {
+          keeper.style.transform = 'translate(-12%, 0)'; ball.style.transform = 'translate(-12%, -25%) scale(0.6)';
+          showPenaltyFeedback('BLOCKED'); setTimeout(() => nextPenaltyTurn(false), 1400);
+        } else {
+          ball.style.transform = 'translate(-18%, -28%) scale(0.55)'; keeper.style.transform = 'translate(14%, 0)';
+          showPenaltyFeedback('GOAL'); setTimeout(() => nextPenaltyTurn(true), 1400);
+        }
+      }
+    }
+    function nextPenaltyTurn(isGoal) {
+      if (isGoal) { if (penaltyAttackingTeam === 'blue') penaltyBlueScore++; else penaltyRedScore++; }
+      updatePenaltyUI();
+      if (penaltyAttackingTeam === 'blue') {
+        penaltyAttackingTeam = 'red'; penaltyPhase = 'ATTACK';
+        showPenaltyFeedback('INFO', '🔴 RED TEAM\'S TURN!'); setTimeout(() => startPenaltyTurn(), 1200);
+      } else {
+        penaltyAttackingTeam = 'blue'; penaltyPhase = 'ATTACK'; penaltyCurrentRound++;
+        if (penaltyCurrentRound > penaltyMaxRounds) finalizarPenaltyShootout();
+        else { showPenaltyFeedback('INFO', '🔵 BLUE TEAM\'S TURN!'); setTimeout(() => startPenaltyTurn(), 1200); }
+      }
+    }
+    function finalizarPenaltyShootout() {
+      if (penaltyInterval) clearInterval(penaltyInterval);
+      if (penaltyBlueScore > penaltyRedScore) mostrarModalResultadosJuego('Blue Team Wins! 🏆⚽', `${penaltyBlueScore} - ${penaltyRedScore}`, 'Great shooting & saving performance!');
+      else if (penaltyRedScore > penaltyBlueScore) mostrarModalResultadosJuego('Red Team Wins! 🏆⚽', `${penaltyRedScore} - ${penaltyBlueScore}`, 'Great shooting & saving performance!');
+      else mostrarModalResultadosJuego('Draw Match! 🤝⚽', `${penaltyBlueScore} - ${penaltyRedScore}`, 'Tense duel ended in a tie!');
+    }
+
+    /* Lógica Space Defender */
+    let sdScore = 0, sdLives = 3, sdWave = 1, sdCurrentItem = null, sdAsteroidTimer = null, sdClockTimer = null, sdAsteroidPos = 0, sdTimeLeft = 20;
+    function initSpaceDefender() {
+      sdScore = 0; sdLives = 3; sdWave = 1;
+      updateSDUI(); nextSDAsteroid();
+    }
+    function updateSDUI() {
+      document.getElementById('sdScore').textContent = sdScore;
+      document.getElementById('sdLives').textContent = '❤️'.repeat(sdLives) || '💥';
+      document.getElementById('sdWave').textContent = sdWave;
+      document.getElementById('sdTimer').textContent = sdTimeLeft;
+    }
+    function nextSDAsteroid() {
+      if (sdAsteroidTimer) clearInterval(sdAsteroidTimer);
+      if (sdClockTimer) clearInterval(sdClockTimer);
+      if (sdLives <= 0) return;
+      sdTimeLeft = 20; updateSDUI();
+      sdCurrentItem = gamesData[Math.floor(Math.random() * gamesData.length)];
+      document.getElementById('sdClueText').textContent = `"${sdCurrentItem.CLUE}"`;
+      const asteroid = document.getElementById('sdAsteroid'), asteroidBox = document.getElementById('sdAsteroidBox');
+      const laser = document.getElementById('sdLaser'), ship = document.getElementById('sdShip');
+      const explosion = document.getElementById('sdExplosion'), shipExplosion = document.getElementById('sdShipExplosion');
+      sdAsteroidPos = 0;
+      asteroid.style.transform = `translateY(${sdAsteroidPos}px)`;
+      asteroidBox.style.opacity = '1'; asteroidBox.style.transform = 'scale(1)';
+      ship.style.opacity = '1'; ship.style.transform = 'scale(1)';
+      explosion.classList.remove('animate-explosion'); explosion.style.opacity = '0';
+      shipExplosion.classList.remove('animate-explosion'); shipExplosion.style.opacity = '0';
+      laser.style.transition = 'none'; laser.style.opacity = '0'; laser.style.transform = 'translateY(0px)';
+      let options = [sdCurrentItem.WORDS];
+      while (options.length < 4 && options.length < gamesData.length) {
+        let randWord = gamesData[Math.floor(Math.random() * gamesData.length)].WORDS;
+        if (!options.includes(randWord)) options.push(randWord);
+      }
+      options.sort(() => 0.5 - Math.random());
+      const optContainer = document.getElementById('sdOptions'); optContainer.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = "py-2.5 px-3 bg-slate-700 hover:bg-violet-600 text-white rounded-xl font-bold text-xs shadow-md transition cursor-pointer truncate border border-slate-600";
+        btn.onclick = () => shootSDLaser(opt === sdCurrentItem.WORDS);
+        optContainer.appendChild(btn);
+      });
+      const totalSteps = 200, stepInterval = 100, stepDistance = 220 / totalSteps;
+      sdAsteroidTimer = setInterval(() => {
+        sdAsteroidPos += stepDistance;
+        asteroid.style.transform = `translateY(${sdAsteroidPos}px)`;
+      }, stepInterval);
+      sdClockTimer = setInterval(() => {
+        sdTimeLeft--;
+        document.getElementById('sdTimer').textContent = sdTimeLeft;
+        if (sdTimeLeft <= 0) {
+          clearInterval(sdAsteroidTimer); clearInterval(sdClockTimer);
+          sdAsteroidPos = 220; asteroid.style.transform = `translateY(${sdAsteroidPos}px)`; handleSDImpact();
+        }
+      }, 1000);
+    }
+    function shootSDLaser(isCorrect) {
+      if (sdAsteroidTimer) clearInterval(sdAsteroidTimer);
+      if (sdClockTimer) clearInterval(sdClockTimer);
+      const laser = document.getElementById('sdLaser'), ship = document.getElementById('sdShip');
+      const asteroid = document.getElementById('sdAsteroid'), asteroidBox = document.getElementById('sdAsteroidBox'), explosion = document.getElementById('sdExplosion');
+      const targetDistance = -(210 - sdAsteroidPos);
+      laser.style.transition = 'none'; laser.style.opacity = '1'; laser.style.transform = 'translateY(0px)';
+      void laser.offsetWidth;
+      laser.style.transition = 'transform 0.25s linear, opacity 0.1s ease';
+      laser.style.transform = `translateY(${targetDistance}px)`; ship.style.transform = 'scale(1.1)';
+      setTimeout(() => {
+        ship.style.transform = 'scale(1)'; laser.style.opacity = '0';
+        if (isCorrect) {
+          asteroidBox.style.opacity = '0'; asteroidBox.style.transform = 'scale(0.2)';
+          explosion.style.opacity = '1'; explosion.classList.add('animate-explosion');
+          sdScore += 100; if (sdScore % 300 === 0) sdWave++;
+          updateSDUI(); setTimeout(() => nextSDAsteroid(), 400);
+        } else {
+          sdAsteroidPos = 220; asteroid.style.transform = `translateY(${sdAsteroidPos}px)`;
+          setTimeout(() => handleSDImpact(), 200);
+        }
+      }, 250);
+    }
+    function handleSDImpact() {
+      const ship = document.getElementById('sdShip'), shipExplosion = document.getElementById('sdShipExplosion'), canvas = document.getElementById('sdCanvasContainer');
+      ship.style.opacity = '0.2'; shipExplosion.style.opacity = '1'; shipExplosion.classList.add('animate-explosion');
+      if (canvas) { canvas.classList.add('animate-shake'); setTimeout(() => canvas.classList.remove('animate-shake'), 400); }
+      sdLives--; updateSDUI();
+      setTimeout(() => {
+        if (sdLives <= 0) mostrarModalResultadosJuego('Base Destroyed! 💥', `${sdScore} PTS`, `You reached Wave ${sdWave} in Space Defender.`);
+        else nextSDAsteroid();
+      }, 600);
+    }
   </script>
 </body>
 </html>
