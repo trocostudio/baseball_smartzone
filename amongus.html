@@ -1459,7 +1459,7 @@ function fireSDRocket(isCorrect) {
   }
 }
 
-/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION WITH NATIVE MASK & TASK PROGRESS */
+/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION (COLISIONES DESACTIVADAS) */
 const MAP_WIDTH = 1600;
 const MAP_HEIGHT = 1200;
 const VISION_RADIUS = 220;
@@ -1468,41 +1468,6 @@ const VISION_RADIUS = 220;
 const MAP_IMAGE_URL = "https://drive.google.com/thumbnail?id=1ZVUpyAtSaU3fpkxWvbfB8FKVbXqrKwCf&sz=w1600";
 const mapSprite = new Image();
 mapSprite.src = MAP_IMAGE_URL;
-
-// MÁSCARA DIBUJADA EN MEMORIA LOCAL PARA EVITAR CORS / Canvas Tainted
-const collisionCanvas = document.createElement("canvas");
-collisionCanvas.width = MAP_WIDTH;
-collisionCanvas.height = MAP_HEIGHT;
-const collisionCtx = collisionCanvas.getContext("2d");
-
-function drawNativeCollisionMask() {
-  collisionCtx.fillStyle = "black";
-  collisionCtx.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
-  collisionCtx.strokeStyle = "red";
-  collisionCtx.lineWidth = 25;
-
-  // Marco Exterior
-  collisionCtx.strokeRect(30, 30, MAP_WIDTH - 60, MAP_HEIGHT - 60);
-
-  // Cuarto Superior Central
-  collisionCtx.strokeRect(700, 30, 200, 200);
-
-  // Fila Superior de Aulas
-  const topRoomsX = [200, 420, 640, 860, 1080, 1300];
-  topRoomsX.forEach(x => collisionCtx.strokeRect(x, 280, 180, 180));
-
-  // Aulas Laterales
-  collisionCtx.strokeRect(180, 500, 180, 180);
-  collisionCtx.strokeRect(1240, 500, 180, 180);
-
-  // Fila Inferior de Aulas
-  const bottomRoomsX = [200, 420, 640, 860, 1080];
-  bottomRoomsX.forEach(x => collisionCtx.strokeRect(x, 720, 180, 180));
-
-  // Esquina Inferior Izquierda
-  collisionCtx.strokeRect(30, 950, 160, 180);
-}
-drawNativeCollisionMask();
 
 // 13 PUNTOS AZULES DE TAREAS MAPEADOS
 const TASK_LOCATIONS = [
@@ -1568,21 +1533,8 @@ let myData = {
 
 const inputState = { up: false, down: false, left: false, right: false };
 
+// COLISIONES DESACTIVADAS
 function isWalkable(targetX, targetY) {
-  try {
-    const px = Math.floor(Math.max(0, Math.min(MAP_WIDTH - 1, targetX)));
-    const py = Math.floor(Math.max(0, Math.min(MAP_HEIGHT - 1, targetY)));
-    const pixel = collisionCtx.getImageData(px, py, 1, 1).data;
-    const r = pixel[0];
-    const g = pixel[1];
-    const b = pixel[2];
-    // BLOQUEO SI TOCA PARED ROJA
-    if (r > 180 && g < 100 && b < 100) {
-      return false;
-    }
-  } catch(e) {
-    return true;
-  }
   return true;
 }
 
@@ -1955,14 +1907,11 @@ function update() {
   nextX = Math.max(20, Math.min(MAP_WIDTH - 20, nextX));
   nextY = Math.max(20, Math.min(MAP_HEIGHT - 20, nextY));
 
-  // COLISIONES MÁSCARA
-  if (isWalkable(nextX, myData.y)) {
-    if (nextX !== myData.x) moved = true;
+  // MOVIMIENTO LIBRE (SIN MÁSCARA NI PAREDES)
+  if (nextX !== myData.x || nextY !== myData.y) {
     myData.x = nextX;
-  }
-  if (isWalkable(myData.x, nextY)) {
-    if (nextY !== myData.y) moved = true;
     myData.y = nextY;
+    moved = true;
   }
 
   if (moved) {
