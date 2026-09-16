@@ -227,20 +227,43 @@
     });
 
     // --- RED PEERJS ---
-    function createRoom() {
-      isHost = true;
-      myData.name = document.getElementById("playerName").value;
-      peer = new Peer();
+   // Función para generar un código corto de 4 letras aleatorias (ej. "ABCD")
+function generateShortId() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "";
+  for (let i = 0; i < 4; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
 
-      peer.on("open", id => {
-        myId = id;
-        myData.id = id;
-        players[id] = myData;
-        document.getElementById("roomStatus").innerText = "ID de Sala: " + id;
-        setupHostLogic();
-        gameLoop();
-      });
+function createRoom() {
+  isHost = true;
+  myData.name = document.getElementById("playerName").value;
+  
+  // Generamos un código corto de 4 letras
+  const shortCode = generateShortId();
+
+  // Le pasamos ese código corto a PeerJS
+  peer = new Peer(shortCode);
+
+  peer.on("open", id => {
+    myId = id;
+    myData.id = id;
+    players[id] = myData;
+    // Mostramos solo las 4 letras en pantalla
+    document.getElementById("roomStatus").innerText = "SALA: " + id;
+    setupHostLogic();
+    gameLoop();
+  });
+
+  // Si por rara coincidencia el código ya existe, generará una alerta
+  peer.on("error", err => {
+    if (err.type === "unavailable-id") {
+      alert("El código se duplicó, presiona Crear Sala de nuevo.");
     }
+  });
+}
 
     function setupHostLogic() {
       peer.on("connection", conn => {
