@@ -200,7 +200,7 @@
         broadcastGameState();
       } else if (data.type === "KILL") {
         if (players[data.targetId]) {
-          players[data.targetId].isDead = true; // Se convierte en fantasma
+          players[data.targetId].isDead = true;
           bodies.push({ x: players[data.targetId].x, y: players[data.targetId].y, color: players[data.targetId].color });
           checkWinCondition();
         }
@@ -226,6 +226,7 @@
         document.getElementById("meetingModal").classList.remove("hidden");
         if(isHost) document.getElementById("btnEndMeeting").style.display = "block";
       } else if (data.type === "SHOW_RESULT") {
+        // Cierre forzado del modal de votación para TODOS los jugadores
         document.getElementById("meetingModal").classList.add("hidden");
         document.getElementById("resultTitle").innerText = data.title;
         document.getElementById("resultTitle").style.color = data.color;
@@ -249,7 +250,6 @@
         }
       }
 
-      // Botón de saltar voto
       const skipBtn = document.createElement("div");
       skipBtn.className = "vote-btn" + (myData.isDead ? " vote-btn-disabled" : "");
       skipBtn.style.borderColor = "#aaa";
@@ -298,7 +298,7 @@
         resultDesc = "Skipped / Tied vote.";
       } else {
         let p = players[ejectedId];
-        p.isDead = true; // <-- El jugador expulsado se convierte en fantasma
+        p.isDead = true; 
 
         if (p.isImpostor) {
           resultTitle = "VICTORY!";
@@ -357,6 +357,8 @@
 
     function closeResultModal() {
       document.getElementById("resultModal").classList.add("hidden");
+      document.getElementById("meetingModal").classList.add("hidden");
+      hasVoted = false;
     }
 
     function startGame() {
@@ -434,10 +436,8 @@
         let p = players[id];
         let dist = Math.hypot(p.x - myData.x, p.y - myData.y);
 
-        // Si el jugador local está vivo, respeta el campo de visión
         if (!myData.isDead && dist > VISION_RADIUS && id !== myId) continue;
 
-        // Si el jugador dibujado está muerto, renderizar como fantasma (transparente)
         ctx.globalAlpha = p.isDead ? 0.35 : 1.0; 
         ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = "#aaddff"; ctx.fillRect(p.x - 4, p.y - 6, 10, 7);
@@ -450,7 +450,6 @@
       }
       ctx.restore();
 
-      // Niebla de guerra solo para jugadores vivos
       if (!myData.isDead) {
         ctx.save();
         ctx.fillStyle = "rgba(0, 0, 0, 0.82)";
