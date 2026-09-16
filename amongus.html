@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Classroom Impostor Mobile</title>
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body {
+      font-family: sans-serif;
+      background: #121212;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    h1 { margin: 5px 0; font-size: 1.2rem; }
+    
+    .controls-panel { margin: 5px; }
+    input, button { padding: 8px; font-size: 14px; margin: 3px; border-radius: 5px; border: none; }
+    button { background: #007bff; color: white; font-weight: bold; }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 55vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      background: #222;
+      border: 2px solid #555;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* CONTROLES TÁCTILES MÓVILES */
+    #touch-controls {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      height: 35vh;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 15px;
+      box-sizing: border-box;
+      z-index: 5;
+    }
+
+    /* D-PAD Cruceta Móvil */
+    .dpad {
+      position: relative;
+      width: 130px;
+      height: 130px;
+    }
+    .dpad-btn {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      border-radius: 8px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+    }
+    .dpad-btn:active { background: rgba(255, 255, 255, 0.5); }
+    .dpad-up { top: 0; left: 42px; width: 45px; height: 45px; }
+    .dpad-down { bottom: 0; left: 42px; width: 45px; height: 45px; }
+    .dpad-left { top: 42px; left: 0; width: 45px; height: 45px; }
+    .dpad-right { top: 42px; right: 0; width: 45px; height: 45px; }
+
+    /* Botones de Acción Móviles */
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .action-btn {
+      width: 80px;
+      height: 55px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 12px;
+      display: none; /* Se activan dinámicamente */
+      border: 2px solid #fff;
+    }
+    #btnKill { background: #d9534f; color: white; }
+    #btnReport { background: #f0ad4e; color: black; }
+
+    /* Modal de Reunión */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+    #chat-box {
+      width: 85%; height: 140px; background: #222; color: #fff;
+      margin: 10px 0; overflow-y: scroll; text-align: left; padding: 10px;
+      border: 1px solid #444; border-radius: 5px; font-size: 14px;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <h1>Classroom Impostor</h1>
+
+  <!-- Pantalla de Conexión -->
+  <div class="controls-panel">
+    <input type="text" id="playerName" value="Player" placeholder="Tu Nombre" style="width: 100px;">
+    <button onclick="createRoom()">Crear Sala</button>
+    <br>
+    <input type="text" id="joinId" placeholder="ID Sala" style="width: 100px;">
+    <button onclick="joinRoom()">Unirse</button>
+  </div>
+  <p id="roomStatus" style="font-size: 12px; margin: 2px;">Estado: No conectado</p>
+
+  <!-- Lienzo de Juego -->
+  <div id="game-container">
+    <canvas id="canvas" width="800" height="500"></canvas>
+  </div>
+
+  <!-- Controles Táctiles en Pantalla -->
+  <div id="touch-controls">
+    <div class="dpad">
+      <div class="dpad-btn dpad-up" id="btnUp">▲</div>
+      <div class="dpad-btn dpad-down" id="btnDown">▼</div>
+      <div class="dpad-btn dpad-left" id="btnLeft">◄</div>
+      <div class="dpad-btn dpad-right" id="btnRight">►</div>
+    </div>
+
+    <div class="action-buttons">
+      <button id="btnKill" class="action-btn" onclick="killPlayer()">KILL</button>
+      <button id="btnReport" class="action-btn" onclick="reportBody()">REPORT</button>
+    </div>
+  </div>
+
+  <!-- Modal Emergency Meeting -->
+  <div id="meetingModal" class="overlay hidden">
+    <h2 style="color: red; margin: 5px;">EMERGENCY MEETING!</h2>
+    <p style="font-size: 12px; margin: 5px;">Discuss who the impostor is in English!</p>
+    <div id="chat-box"></div>
+    <div style="width: 90%;">
+      <input type="text" id="chatInput" placeholder="Write in English..." style="width: 60%;">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+    <br>
+    <button onclick="closeMeeting()" style="background: green; color: white;">End Meeting</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    let peer = null;
+    let connections = [];
+    let hostConn = null;
+    let isHost = false;
+    let myId = "";
+
+    let players = {}; 
+    let bodies = [];
+
+    const colors = ["#ff4d4d", "#4d79ff", "#4dff88", "#ffff4d", "#ff994d", "#cc66ff"];
+
+    let myData = {
+      id: "",
+      name: "",
+      x: 100 + Math.random() * 200,
+      y: 100 + Math.random() * 200,
+      color: colors[0],
+      isImpostor: false,
+      isDead: false
+    };
+
+    // Estado de las Teclas y Toques Táctiles
+    const inputState = { up: false, down: false, left: false, right: false };
+
+    // --- MANEJO DE EVENTOS TÁCTILES PARA MÓVIL ---
+    function bindTouch(elementId, direction) {
+      const btn = document.getElementById(elementId);
+      
+      const start = (e) => { e.preventDefault(); inputState[direction] = true; };
+      const end = (e) => { e.preventDefault(); inputState[direction] = false; };
+
+      btn.addEventListener("touchstart", start);
+      btn.addEventListener("touchend", end);
+      btn.addEventListener("mousedown", start);
+      btn.addEventListener("mouseup", end);
+    }
+
+    bindTouch("btnUp", "up");
+    bindTouch("btnDown", "down");
+    bindTouch("btnLeft", "left");
+    bindTouch("btnRight", "right");
+
+    // Soporte opcional para teclado físico
+    window.addEventListener("keydown", e => {
+      if(e.key === "ArrowUp" || e.key === "w") inputState.up = true;
+      if(e.key === "ArrowDown" || e.key === "s") inputState.down = true;
+      if(e.key === "ArrowLeft" || e.key === "a") inputState.left = true;
+      if(e.key === "ArrowRight" || e.key === "d") inputState.right = true;
+    });
+    window.addEventListener("keyup", e => {
+      if(e.key === "ArrowUp" || e.key === "w") inputState.up = false;
+      if(e.key === "ArrowDown" || e.key === "s") inputState.down = false;
+      if(e.key === "ArrowLeft" || e.key === "a") inputState.left = false;
+      if(e.key === "ArrowRight" || e.key === "d") inputState.right = false;
+    });
+
+    // --- RED PEERJS ---
+    function createRoom() {
+      isHost = true;
+      myData.name = document.getElementById("playerName").value;
+      peer = new Peer();
+
+      peer.on("open", id => {
+        myId = id;
+        myData.id = id;
+        players[id] = myData;
+        document.getElementById("roomStatus").innerText = "ID de Sala: " + id;
+        setupHostLogic();
+        gameLoop();
+      });
+    }
+
+    function setupHostLogic() {
+      peer.on("connection", conn => {
+        connections.push(conn);
+        conn.on("data", data => handleIncomingData(data, conn));
+        conn.on("close", () => {
+          delete players[conn.peer];
+          broadcastGameState();
+        });
+      });
+    }
+
+    function joinRoom() {
+      const roomCode = document.getElementById("joinId").value.trim();
+      if (!roomCode) return alert("Ingresa un ID válido");
+
+      myData.name = document.getElementById("playerName").value;
+      peer = new Peer();
+
+      peer.on("open", id => {
+        myId = id;
+        myData.id = id;
+        hostConn = peer.connect(roomCode);
+
+        hostConn.on("open", () => {
+          document.getElementById("roomStatus").innerText = "¡Conectado!";
+          hostConn.send({ type: "JOIN", player: myData });
+          gameLoop();
+        });
+
+        hostConn.on("data", handleClientIncomingData);
+      });
+    }
+
+    // --- LÓGICA DE JUEGO Y RED ---
+    function handleIncomingData(data, conn) {
+      if (data.type === "JOIN") {
+        data.player.color = colors[Object.keys(players).length % colors.length];
+        players[data.player.id] = data.player;
+
+        if (Object.keys(players).length === 6) assignImpostor();
+        broadcastGameState();
+      } 
+      else if (data.type === "UPDATE_POS") {
+        if (players[data.id]) {
+          players[data.id].x = data.x;
+          players[data.id].y = data.y;
+        }
+        broadcastGameState();
+      }
+      else if (data.type === "KILL") {
+        if (players[data.targetId]) {
+          players[data.targetId].isDead = true;
+          bodies.push({ x: players[data.targetId].x, y: players[data.targetId].y, color: players[data.targetId].color });
+        }
+        broadcastGameState();
+      }
+      else if (data.type === "MEETING") broadcast({ type: "START_MEETING" });
+      else if (data.type === "CHAT") broadcast(data);
+    }
+
+    function handleClientIncomingData(data) {
+      if (data.type === "STATE") {
+        players = data.players;
+        bodies = data.bodies;
+        if (players[myId]) {
+          myData.isImpostor = players[myId].isImpostor;
+          myData.isDead = players[myId].isDead;
+        }
+      } else if (data.type === "START_MEETING") {
+        document.getElementById("meetingModal").classList.remove("hidden");
+      } else if (data.type === "CHAT") {
+        const box = document.getElementById("chat-box");
+        box.innerHTML += `<p style="margin:2px;"><b>${data.sender}:</b> ${data.msg}</p>`;
+        box.scrollTop = box.scrollHeight;
+      }
+    }
+
+    function assignImpostor() {
+      const keysArr = Object.keys(players);
+      const randomImpostorId = keysArr[Math.floor(Math.random() * keysArr.length)];
+      for (let id in players) players[id].isImpostor = (id === randomImpostorId);
+    }
+
+    function broadcastGameState() {
+      if (!isHost) return;
+      const state = { type: "STATE", players: players, bodies: bodies };
+      connections.forEach(conn => conn.send(state));
+    }
+
+    function broadcast(msg) {
+      if (isHost) {
+        connections.forEach(conn => conn.send(msg));
+        handleClientIncomingData(msg);
+      } else if (hostConn) hostConn.send(msg);
+    }
+
+    // --- LOOP PRINCIPAL Y RENDERIZADO ---
+    function update() {
+      let moved = false;
+      const speed = 3;
+
+      if (inputState.up) { myData.y -= speed; moved = true; }
+      if (inputState.down) { myData.y += speed; moved = true; }
+      if (inputState.left) { myData.x -= speed; moved = true; }
+      if (inputState.right) { myData.x += speed; moved = true; }
+
+      myData.x = Math.max(15, Math.min(canvas.width - 15, myData.x));
+      myData.y = Math.max(15, Math.min(canvas.height - 15, myData.y));
+
+      if (moved) {
+        if (isHost) {
+          players[myId].x = myData.x;
+          players[myId].y = myData.y;
+          broadcastGameState();
+        } else if (hostConn) {
+          hostConn.send({ type: "UPDATE_POS", id: myId, x: myData.x, y: myData.y });
+        }
+      }
+
+      // Visibilidad de botones en móvil
+      const btnKill = document.getElementById("btnKill");
+      const btnReport = document.getElementById("btnReport");
+
+      btnKill.style.display = (myData.isImpostor && !myData.isDead) ? "block" : "none";
+      
+      let nearBody = bodies.some(b => Math.hypot(b.x - myData.x, b.y - myData.y) < 45);
+      btnReport.style.display = nearBody ? "block" : "none";
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Dibujar Mapa
+      ctx.strokeStyle = "#444";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+      // Cuerpos
+      bodies.forEach(b => {
+        ctx.fillStyle = b.color;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y + 5, 12, 0, Math.PI, false);
+        ctx.fill();
+        ctx.fillStyle = "white";
+        ctx.fillText("X_X", b.x - 8, b.y);
+      });
+
+      // Jugadores
+      for (let id in players) {
+        let p = players[id];
+
+        ctx.globalAlpha = p.isDead ? 0.4 : 1.0; 
+
+        // Cuerpo del personaje
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 15, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Visor
+        ctx.fillStyle = "#aaddff";
+        ctx.fillRect(p.x - 4, p.y - 6, 10, 7);
+
+        ctx.globalAlpha = 1.0;
+
+        // Nombre
+        ctx.fillStyle = "white";
+        ctx.font = "12px sans-serif";
+        ctx.textAlign = "center";
+        let label = p.name + (p.id === myId ? " (You)" : "");
+        if (p.id === myId && p.isImpostor) label += " [IMP]";
+        ctx.fillText(label, p.x, p.y - 20);
+      }
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function killPlayer() {
+      for (let id in players) {
+        if (id !== myId && !players[id].isDead) {
+          let dist = Math.hypot(players[id].x - myData.x, players[id].y - myData.y);
+          if (dist < 45) {
+            broadcast({ type: "KILL", targetId: id });
+            break;
+          }
+        }
+      }
+    }
+
+    function reportBody() { broadcast({ type: "MEETING" }); }
+
+    function sendMessage() {
+      const input = document.getElementById("chatInput");
+      if (input.value.trim() !== "") {
+        broadcast({ type: "CHAT", sender: myData.name, msg: input.value });
+        input.value = "";
+      }
+    }
+
+    function closeMeeting() {
+      document.getElementById("meetingModal").classList.add("hidden");
+    }
+  </script>
+</body>
+</html>
