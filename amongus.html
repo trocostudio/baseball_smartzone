@@ -229,7 +229,7 @@ body {
         <button class="w-full py-2.5 bg-violet-50 text-violet-600 font-bold text-xs rounded-xl group-hover:bg-violet-600 group-hover:text-white transition">Defend Base!</button>
       </div>
 
-      <!-- NUEVO JUEGO: CLASSROOM IMPOSTOR -->
+      <!-- CLASSROOM IMPOSTOR -->
       <div onclick="openGame('impostor')" class="bg-white border border-slate-200/80 hover:border-red-500 p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between group">
         <div>
           <span class="w-16 h-16 rounded-2xl bg-red-500/10 text-red-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all">ඞ</span>
@@ -383,11 +383,8 @@ body {
 
         <!-- CONTENEDOR ANCLADO AL LIENZO PHOTOSHOP -->
         <div class="relative w-full aspect-[1377/768] rounded-2xl overflow-hidden border border-slate-700 select-none shadow-2xl bg-slate-950">
-          
-          <!-- CAMPO (ANCLAJE BASE) -->
           <img src="https://drive.google.com/thumbnail?id=1bWad_TGuyLKUz7ScoUVdpYcWrL2Nfsxl&sz=w1600" class="absolute inset-0 w-full h-full object-fill pointer-events-none z-0" alt="Goal Field Background">
 
-          <!-- TIMER EN LA ESQUINA SUPERIOR IZQUIERDA -->
           <div class="absolute top-3 left-3 sm:top-5 sm:left-5 pointer-events-none z-40">
             <div class="bg-slate-950/80 border border-amber-400/50 backdrop-blur-md rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 shadow-2xl flex items-center gap-2">
               <span class="text-[10px] sm:text-xs font-black uppercase text-amber-300 tracking-widest leading-none">⏱️ TIME:</span>
@@ -395,22 +392,15 @@ body {
             </div>
           </div>
 
-          <!-- FEEDBACK TEXT FLOTANTE (GOAL / MISSED / BLOCKED / TURN INFO) -->
           <div id="penaltyFeedback" class="absolute inset-0 flex items-center justify-center pointer-events-none z-50 opacity-0 transition-all duration-300 transform scale-50">
             <span id="penaltyFeedbackText" class="text-5xl sm:text-7xl font-black tracking-tighter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] uppercase"></span>
           </div>
 
-          <!-- PORTERO -->
           <img id="penaltyKeeperImg" src="https://drive.google.com/thumbnail?id=14ePNT76YwZIOpCSs4ptlWldonDwvyZ2i&sz=w1600" class="absolute inset-0 w-full h-full object-fill pointer-events-none transition-transform duration-500 z-10" alt="Goalkeeper">
-
-          <!-- PATEADOR -->
           <img id="penaltyPlayerImg" src="https://drive.google.com/thumbnail?id=1RMmKNl1OJ_bSZw-z80V1q1PkaD1N3qc8&sz=w1600" class="absolute inset-0 w-full h-full object-fill pointer-events-none transition-all duration-300 z-20" alt="Soccer Player">
-
-          <!-- BALÓN -->
           <img id="penaltyBallImg" src="https://drive.google.com/thumbnail?id=11hrLhw5Sey-otpQQrxE0XjybSjpSy7TL&sz=w1600" class="absolute inset-0 w-full h-full object-fill pointer-events-none transition-all duration-700 ease-out z-30" alt="Soccer Ball">
         </div>
 
-        <!-- PREGUNTA Y TURNOS -->
         <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl space-y-3 text-center">
           <div id="penaltyTurnBadge" class="inline-block px-4 py-1 bg-sky-500 text-slate-950 font-black text-xs uppercase rounded-full tracking-wider">
             🔵 Blue Team — SHOOTING!
@@ -428,7 +418,6 @@ body {
     <div id="spacedefenderView" class="hidden space-y-6">
       <div class="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 space-y-4 p-4 sm:p-6">
         
-        <!-- HEADER / SCOREBAR -->
         <div class="flex justify-between items-center text-xs font-black tracking-widest z-10 relative flex-wrap gap-2">
           <span class="bg-violet-500/20 text-violet-400 border border-violet-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
             SCORE: <span id="sdScore">0</span> PTS
@@ -444,33 +433,22 @@ body {
           </span>
         </div>
 
-        <!-- CANVAS ESPACIAL CON FONDO DE GALAXIA HD -->
         <div id="sdCanvasContainer" class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden border border-slate-700 select-none shadow-2xl bg-slate-950 flex flex-col justify-between p-4">
-          
-          <!-- IMAGEN FONDO GALAXIA -->
           <img src="https://drive.google.com/thumbnail?id=1tdcR5GyTogalY_khypqYxKSmjcD9qal_&sz=w1600" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-0" alt="Galaxy Background">
 
-          <!-- ASTEROIDE FLOTANTE (CON LA PISTA) -->
           <div id="sdAsteroid" class="relative mx-auto transition-transform duration-300 ease-linear z-20 max-w-md w-full text-center">
             <div id="sdAsteroidBox" class="bg-slate-950/85 border-2 border-amber-500/80 backdrop-blur-md rounded-2xl p-4 shadow-[0_0_25px_rgba(245,158,11,0.5)] transition-all duration-200">
               <span class="text-[10px] font-black uppercase text-amber-400 tracking-widest block mb-1">☄️ INCOMING ASTEROID</span>
               <p id="sdClueText" class="text-xs sm:text-base font-bold text-white leading-snug">"Clue text..."</p>
             </div>
-            <!-- EFECTO DE EXPLOSIÓN EN EL ASTEROIDE -->
             <div id="sdExplosion" class="absolute inset-0 flex items-center justify-center text-7xl pointer-events-none opacity-0">
               💥
             </div>
           </div>
 
-          <!-- CONTENEDOR ANCLADO DE NAVE + COHETE CENTRADO -->
           <div class="relative z-20 flex justify-center items-center w-full pb-2">
-            <!-- MISIL ESPACIAL (Ajustado para spawnear directo desde su posición central) -->
             <img id="sdLaser" src="https://drive.google.com/thumbnail?id=1DImCHuzl0D5xEz0JcowolX1TIB1z23HZ&sz=w1600" class="absolute bottom-[70px] w-20 sm:w-24 h-auto object-contain z-10 opacity-0 pointer-events-none filter drop-shadow-[0_0_20px_rgba(239,68,68,0.9)]" alt="Space Missile">
-
-            <!-- NAVE ESPACIAL -->
             <img id="sdShip" src="https://drive.google.com/thumbnail?id=1KVi8WbOUU5qzsPb9xj3yt9Mmu8LghVXL&sz=w1600" class="h-36 sm:h-42 w-auto object-contain filter drop-shadow-[0_0_25px_rgba(56,189,248,0.9)] transition-all duration-200 relative z-20" alt="Spaceship">
-
-            <!-- EXPLOSIÓN EN LA NAVE CUANDO EL METEORITO LA IMPACTA -->
             <div id="sdShipExplosion" class="absolute inset-0 flex items-center justify-center text-8xl pointer-events-none opacity-0 z-30">
               💥
             </div>
@@ -478,7 +456,6 @@ body {
 
         </div>
 
-        <!-- BOTONES DE OPCIONES DE RESPUESTA -->
         <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-2xl space-y-2 text-center">
           <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Select Target Word to Fire:</span>
           <div id="sdOptions" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
@@ -1069,7 +1046,7 @@ function checkTTTWinner(p) {
   return wins.some(w => w.every(i => tttBoardState[i] === p));
 }
 
-/* 5. TUG OF WAR LOGIC (CON TIMER DE 5 MIN) */
+/* 5. TUG OF WAR LOGIC */
 let blueScore = 0, redScore = 0, tugTimer = 300, tugInterval = null;
 
 function initTugOfWar() {
@@ -1465,10 +1442,33 @@ function fireSDRocket(isCorrect) {
   }
 }
 
-/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION */
+/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION WITH CUSTOM MAP & AUTO-ASSIGNED CHARACTERS */
 const MAP_WIDTH = 1600;
 const MAP_HEIGHT = 1200;
 const VISION_RADIUS = 220;
+
+// MAPA PERSONALIZADO EN FORMATO DE IMAGEN DIRECTO
+const MAP_IMAGE_URL = "https://drive.google.com/thumbnail?id=1ZVUpyAtSaU3fpkxWvbfB8FKVbXqrKwCf&sz=w1600";
+const mapSprite = new Image();
+mapSprite.src = MAP_IMAGE_URL;
+
+// ENLACES DIRECTOS A LOS 6 PERSONAJES DE GOOGLE DRIVE
+const PERSONAJES_ASSETS = [
+  "https://drive.google.com/thumbnail?id=17U4_9EqwOJSlOkbBy2gQPVmN_Wy23ux6&sz=w800",
+  "https://drive.google.com/thumbnail?id=1Ml_6OS1a4M_E3RuKXeI36Qq9gC4qJaH7&sz=w800",
+  "https://drive.google.com/thumbnail?id=17Bw9pZ5YujtRI9xsiJ57gdujN7uUB6nP&sz=w800",
+  "https://drive.google.com/thumbnail?id=1qvyoZVm0G1gCz62q3ERAMnMF6tjqdD70&sz=w800",
+  "https://drive.google.com/thumbnail?id=1ZuBzMVdhOPxkcDJrgBBqJvSU94F4exO8&sz=w800",
+  "https://drive.google.com/thumbnail?id=1WXb7D2PazCh0snG4Q53KRz2svkmkO3Pp&sz=w800"
+];
+
+// PRECARGA DE SPRITES DE PERSONAJES
+const playerSprites = {};
+PERSONAJES_ASSETS.forEach((url, idx) => {
+  const img = new Image();
+  img.src = url;
+  playerSprites[idx] = img;
+});
 
 let peer = null;
 let connections = [];
@@ -1488,7 +1488,10 @@ let myData = {
   id: "", name: "",
   x: 200 + Math.random() * (MAP_WIDTH - 400),
   y: 200 + Math.random() * (MAP_HEIGHT - 400),
-  color: colors[0], isImpostor: false, isDead: false
+  color: colors[0], 
+  characterIndex: 0,
+  isImpostor: false, 
+  isDead: false
 };
 
 const inputState = { up: false, down: false, left: false, right: false };
@@ -1529,6 +1532,9 @@ function generateShortId() {
 function createRoom() {
   isHost = true;
   myData.name = document.getElementById("playerName").value || "Player";
+  myData.characterIndex = 0; // El creador siempre obtiene el primer personaje (índice 0)
+  myData.color = colors[0];
+
   const shortCode = generateShortId();
   peer = new Peer(shortCode);
 
@@ -1566,7 +1572,11 @@ function joinRoom() {
 
 function handleIncomingData(data, conn) {
   if (data.type === "JOIN") {
-    data.player.color = colors[Object.keys(players).length % colors.length];
+    // ASIGNACIÓN AUTOMÁTICA SECUENCIAL DE LOS 6 PERSONAJES
+    const playerIndex = Object.keys(players).length;
+    data.player.characterIndex = playerIndex % PERSONAJES_ASSETS.length;
+    data.player.color = colors[playerIndex % colors.length];
+
     players[data.player.id] = data.player;
     if (isHost && !gameStarted && Object.keys(players).length >= 2) {
       document.getElementById("btnStartGame").style.display = "inline-block";
@@ -1596,6 +1606,7 @@ function handleClientIncomingData(data) {
     if (players[myId]) {
       myData.isImpostor = players[myId].isImpostor;
       myData.isDead = players[myId].isDead;
+      myData.characterIndex = players[myId].characterIndex;
     }
   } else if (data.type === "START_MEETING") {
     hasVoted = false;
@@ -1799,13 +1810,22 @@ function draw() {
   ctx.save();
   ctx.translate(-cameraX, -cameraY);
 
-  ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 2;
-  for (let x = 0; x < MAP_WIDTH; x += 100) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT); ctx.stroke(); }
-  for (let y = 0; y < MAP_HEIGHT; y += 100) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH, y); ctx.stroke(); }
+  // 1. RENDERIZADO DEL MAPA HD PERSONALIZADO
+  if (mapSprite.complete && mapSprite.naturalWidth !== 0) {
+    ctx.drawImage(mapSprite, 0, 0, MAP_WIDTH, MAP_HEIGHT);
+  } else {
+    ctx.fillStyle = "#0f172a";
+    ctx.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+    ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 2;
+    for (let x = 0; x < MAP_WIDTH; x += 100) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT); ctx.stroke(); }
+    for (let y = 0; y < MAP_HEIGHT; y += 100) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH, y); ctx.stroke(); }
+  }
 
+  // LÍMITE DEL MAPA
   ctx.strokeStyle = "#f43f5e"; ctx.lineWidth = 6;
   ctx.strokeRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
+  // 2. CADÁVERES
   bodies.forEach(b => {
     let dist = Math.hypot(b.x - myData.x, b.y - myData.y);
     if (myData.isDead || dist <= VISION_RADIUS) {
@@ -1814,6 +1834,7 @@ function draw() {
     }
   });
 
+  // 3. RENDERIZADO DE JUGADORES CON TUS SPRITES
   for (let id in players) {
     let p = players[id];
     let dist = Math.hypot(p.x - myData.x, p.y - myData.y);
@@ -1821,17 +1842,28 @@ function draw() {
     if (!myData.isDead && dist > VISION_RADIUS && id !== myId) continue;
 
     ctx.globalAlpha = p.isDead ? 0.35 : 1.0; 
-    ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#38bdf8"; ctx.fillRect(p.x - 4, p.y - 6, 10, 7);
+    
+    let sprite = playerSprites[p.characterIndex !== undefined ? p.characterIndex : 0];
+    if (sprite && sprite.complete && sprite.naturalWidth !== 0) {
+      ctx.drawImage(sprite, p.x - 20, p.y - 25, 40, 50);
+    } else {
+      ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#38bdf8"; ctx.fillRect(p.x - 4, p.y - 6, 10, 7);
+    }
+    
     ctx.globalAlpha = 1.0;
 
-    ctx.fillStyle = p.isDead ? "#94a3b8" : "white"; ctx.font = "12px sans-serif"; ctx.textAlign = "center";
+    // ETIQUETA DE NOMBRE Y ROL
+    ctx.fillStyle = p.isDead ? "#94a3b8" : "white"; 
+    ctx.font = "bold 12px sans-serif"; 
+    ctx.textAlign = "center";
     let label = (p.isDead ? "👻 " : "") + p.name + (p.id === myId ? " (You)" : "");
     if (p.id === myId && p.isImpostor) label += " [IMP]";
-    ctx.fillText(label, p.x, p.y - 20);
+    ctx.fillText(label, p.x, p.y - 30);
   }
   ctx.restore();
 
+  // 4. NIEBLA DE GUERRA / LÍNEA DE VISIÓN
   if (!myData.isDead) {
     ctx.save();
     ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
