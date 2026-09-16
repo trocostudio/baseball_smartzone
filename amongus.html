@@ -78,7 +78,7 @@ body {
 .backface-hidden { backface-visibility: hidden; }
 .rotate-y-180 { transform: rotateY(180deg); }
 
-/* ANIMACIÓN DE EXPLOSIÓN ESPACIAL */
+/* ANIMACIONES ESPACIALES */
 @keyframes explode {
   0% { transform: scale(0.3); opacity: 1; }
   50% { transform: scale(1.8); opacity: 0.9; }
@@ -88,7 +88,6 @@ body {
   animation: explode 0.4s ease-out forwards;
 }
 
-/* ANIMACIÓN DE SACUDIDA AL RECIBIR IMPACTO */
 @keyframes shakeCanvas {
   0%, 100% { transform: translate(0, 0); }
   20% { transform: translate(-8px, 6px); }
@@ -100,7 +99,7 @@ body {
   animation: shakeCanvas 0.35s ease-in-out;
 }
 
-/* ESTILOS ESPECÍFICOS DEL JUEGO CLASSROOM IMPOSTOR INTEGRADOS */
+/* CONTROLES CLASSROOM IMPOSTOR */
 .dpad { position: relative; width: 120px; height: 120px; }
 .dpad-btn { position: absolute; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); color: white; border-radius: 8px; font-size: 16px; display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; }
 .dpad-btn:active { background: rgba(56, 189, 248, 0.4); border-color: #38bdf8; }
@@ -139,7 +138,7 @@ body {
         Select a difficulty level and challenge yourself with our interactive minigames!
       </p>
 
-      <!-- Main Level Selector -->
+      <!-- Level Selector -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
         <label for="levelSelect" class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Selected Level:</label>
         <select id="levelSelect" onchange="cambiarNivel(this.value)" class="p-2.5 px-4 bg-white border border-slate-200 rounded-xl font-extrabold text-sm text-sky-600 shadow-xs focus:outline-none cursor-pointer">
@@ -234,7 +233,7 @@ body {
         <div>
           <span class="w-16 h-16 rounded-2xl bg-red-500/10 text-red-600 flex items-center justify-center font-bold text-3xl mb-4 group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all">ඞ</span>
           <h3 class="font-extrabold text-slate-900 text-xl mb-2">Classroom Impostor</h3>
-          <p class="text-xs text-slate-500 leading-relaxed mb-4">Multiplayer game! Uncover the impostor or eliminate crewmates.</p>
+          <p class="text-xs text-slate-500 leading-relaxed mb-4">Multiplayer game! Uncover the impostor or complete vocabulary tasks.</p>
         </div>
         <button class="w-full py-2.5 bg-red-50 text-red-600 font-bold text-xs rounded-xl group-hover:bg-red-500 group-hover:text-white transition">Play Online!</button>
       </div>
@@ -368,7 +367,6 @@ body {
     <div id="penaltyshootView" class="hidden space-y-6">
       <div class="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 space-y-4 p-4 sm:p-6">
         
-        <!-- MARCADOR SUPERIOR -->
         <div class="flex justify-between items-center text-xs font-black tracking-widest z-10 relative flex-wrap gap-2">
           <span class="bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 sm:px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
             BLUE TEAM: <span id="penaltyBlueScore">0</span> GOALS
@@ -381,7 +379,6 @@ body {
           </span>
         </div>
 
-        <!-- CONTENEDOR ANCLADO AL LIENZO PHOTOSHOP -->
         <div class="relative w-full aspect-[1377/768] rounded-2xl overflow-hidden border border-slate-700 select-none shadow-2xl bg-slate-950">
           <img src="https://drive.google.com/thumbnail?id=1bWad_TGuyLKUz7ScoUVdpYcWrL2Nfsxl&sz=w1600" class="absolute inset-0 w-full h-full object-fill pointer-events-none z-0" alt="Goal Field Background">
 
@@ -468,6 +465,17 @@ body {
     <div id="impostorView" class="hidden space-y-4">
       <div class="bg-slate-900 border border-slate-800 p-4 sm:p-6 rounded-3xl text-white relative overflow-hidden">
         
+        <!-- Barra Superior de Tareas Colectivas -->
+        <div class="bg-slate-950/90 border border-sky-500/30 p-3 rounded-2xl mb-3 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-black text-sky-400 tracking-wider">TOTAL TASKS:</span>
+            <span id="taskCounter" class="text-xs font-extrabold text-white">0 / 10</span>
+          </div>
+          <div class="w-full max-w-xs bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+            <div id="taskProgressBar" class="bg-gradient-to-r from-sky-400 to-emerald-400 h-full w-0 transition-all duration-500"></div>
+          </div>
+        </div>
+
         <!-- Controles de Conexión y Sala -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-950/80 p-3 sm:p-4 rounded-2xl border border-slate-800 mb-4">
           <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
@@ -495,6 +503,7 @@ body {
               <div class="dpad-btn dpad-right" id="btnRight">►</div>
             </div>
             <div class="action-buttons flex flex-col gap-2 pointer-events-auto">
+              <button id="btnDoTask" onclick="openTaskModal()" class="bg-sky-500 hover:bg-sky-600 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl border-2 border-white shadow-xl hidden cursor-pointer">🔧 TASK</button>
               <button id="btnKill" class="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs px-4 py-2.5 rounded-xl border-2 border-white shadow-xl hidden cursor-pointer" onclick="killPlayer()">KILL</button>
               <button id="btnReport" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl border-2 border-white shadow-xl hidden cursor-pointer" onclick="reportBody()">REPORT</button>
             </div>
@@ -512,6 +521,16 @@ body {
           <button id="btnEndMeeting" onclick="endMeetingHost()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-6 py-2.5 rounded-xl text-xs transition cursor-pointer hidden">End & Count Votes</button>
         </div>
 
+        <!-- Modal de Tarea Vocabulario -->
+        <div id="taskModal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center z-50 p-4 hidden">
+          <div class="bg-slate-900 border border-sky-500/40 p-6 rounded-3xl max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <span class="text-[10px] font-black uppercase text-sky-400 tracking-widest block">🔧 TASK: VOCABULARY CHALLENGE</span>
+            <p id="taskClueText" class="text-sm font-bold text-white min-h-[40px] flex items-center justify-center">"Fetching clue..."</p>
+            <div id="taskOptions" class="grid grid-cols-2 gap-2"></div>
+            <button onclick="closeTaskModal()" class="text-2xs font-bold text-slate-400 hover:text-white pt-2 cursor-pointer">Cancel Task</button>
+          </div>
+        </div>
+
         <!-- Modal Pantalla de Resultado -->
         <div id="resultModal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center z-40 p-4 hidden">
           <h1 id="resultTitle" class="text-3xl font-black mb-2 tracking-tight"></h1>
@@ -525,7 +544,7 @@ body {
   </div>
 </main>
 
-<!-- GAME RESULTS MODAL WITH INSTAGRAM REDIRECT -->
+<!-- GAME RESULTS MODAL -->
 <div id="gameResultsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[2000] flex items-center justify-center p-4 hidden">
   <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 sm:p-8 border border-slate-100 text-center space-y-5 relative">
     <button onclick="cerrarModalResultadosJuego()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-800 transition font-bold text-sm cursor-pointer" title="Close">
@@ -1340,7 +1359,7 @@ function finishPenaltyGame() {
   if (penaltyBlueScore > penaltyRedScore) {
     mostrarModalResultadosJuego('Blue Team Wins! 🔵', `${penaltyBlueScore} - ${penaltyRedScore}`, 'Fantastic shooting and defense!');
   } else if (penaltyRedScore > penaltyBlueScore) {
-    mostrarModalResultadosJuego('Red Team Wins! 🔴', `${penaltyRedScore} - ${penaltyBlueScore}`, 'Fantastic shooting and defense!');
+    mostrarModalResultadosJuego('Red Team Wins! 🔴', `${penaltyRedScore} - ${penaltyRedScore}`, 'Fantastic shooting and defense!');
   } else {
     mostrarModalResultadosJuego('Shootout Draw! 🤝', `${penaltyBlueScore} - ${penaltyRedScore}`, 'Evenly matched shootout!');
   }
@@ -1442,17 +1461,53 @@ function fireSDRocket(isCorrect) {
   }
 }
 
-/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION WITH CUSTOM MAP & AUTO-ASSIGNED CHARACTERS */
+/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION WITH MASK MAP & TASK LOCATIONS */
 const MAP_WIDTH = 1600;
 const MAP_HEIGHT = 1200;
 const VISION_RADIUS = 220;
 
-// MAPA PERSONALIZADO EN FORMATO DE IMAGEN DIRECTO
+// MAPA VISUAL HD
 const MAP_IMAGE_URL = "https://drive.google.com/thumbnail?id=1ZVUpyAtSaU3fpkxWvbfB8FKVbXqrKwCf&sz=w1600";
 const mapSprite = new Image();
 mapSprite.src = MAP_IMAGE_URL;
 
-// ENLACES DIRECTOS A LOS 6 PERSONAJES DE GOOGLE DRIVE
+// MÁSCARA DE COLISIONES (LÍMITES ROJOS)
+const COLLISION_IMAGE_URL = "https://drive.google.com/thumbnail?id=1oqtBjTqqBDFiXy_IoaGoLmijrdWwXxa-&sz=w1600";
+const collisionSprite = new Image();
+collisionSprite.crossOrigin = "Anonymous";
+collisionSprite.src = COLLISION_IMAGE_URL;
+
+const collisionCanvas = document.createElement("canvas");
+collisionCanvas.width = MAP_WIDTH;
+collisionCanvas.height = MAP_HEIGHT;
+const collisionCtx = collisionCanvas.getContext("2d");
+
+collisionSprite.onload = () => {
+  collisionCtx.drawImage(collisionSprite, 0, 0, MAP_WIDTH, MAP_HEIGHT);
+};
+
+// 13 PUNTOS AZULES DE TAREAS MAPEADOS DIRECTAMENTE A TU IMAGEN
+const TASK_LOCATIONS = [
+  { id: 1, x: 940, y: 130, label: "Top Hallway" },
+  { id: 2, x: 1510, y: 140, label: "Top Right Corner" },
+  { id: 3, x: 550, y: 310, label: "Upper Room 2" },
+  { id: 4, x: 800, y: 310, label: "Upper Room 3" },
+  { id: 5, x: 1050, y: 310, label: "Upper Room 4" },
+  { id: 6, x: 250, y: 590, label: "Left Middle Room" },
+  { id: 7, x: 1380, y: 600, label: "Right Middle Room" },
+  { id: 8, x: 800, y: 870, label: "Lower Room 3" },
+  { id: 9, x: 1050, y: 870, label: "Lower Room 4" },
+  { id: 10, x: 1510, y: 870, label: "Far Right Lower Corridor" },
+  { id: 11, x: 200, y: 1030, label: "Bottom Left Entrance" },
+  { id: 12, x: 540, y: 1130, label: "Bottom Wall Left" },
+  { id: 13, x: 1330, y: 1130, label: "Bottom Wall Right" }
+];
+
+let globalTasksDone = 0;
+const TOTAL_TASKS_REQUIRED = 10;
+let activeTaskIndex = null;
+
+// PERSONAJES
 const PERSONAJES_ASSETS = [
   "https://drive.google.com/thumbnail?id=17U4_9EqwOJSlOkbBy2gQPVmN_Wy23ux6&sz=w800",
   "https://drive.google.com/thumbnail?id=1Ml_6OS1a4M_E3RuKXeI36Qq9gC4qJaH7&sz=w800",
@@ -1462,7 +1517,6 @@ const PERSONAJES_ASSETS = [
   "https://drive.google.com/thumbnail?id=1WXb7D2PazCh0snG4Q53KRz2svkmkO3Pp&sz=w800"
 ];
 
-// PRECARGA DE SPRITES DE PERSONAJES
 const playerSprites = {};
 PERSONAJES_ASSETS.forEach((url, idx) => {
   const img = new Image();
@@ -1495,6 +1549,25 @@ let myData = {
 };
 
 const inputState = { up: false, down: false, left: false, right: false };
+
+function isWalkable(targetX, targetY) {
+  if (!collisionSprite.complete || collisionSprite.naturalWidth === 0) return true;
+  try {
+    const px = Math.floor(Math.max(0, Math.min(MAP_WIDTH - 1, targetX)));
+    const py = Math.floor(Math.max(0, Math.min(MAP_HEIGHT - 1, targetY)));
+    const pixel = collisionCtx.getImageData(px, py, 1, 1).data;
+    const r = pixel[0];
+    const g = pixel[1];
+    const b = pixel[2];
+    // BLOQUEO EN PÍXELES PREDOMINANTEMENTE ROJOS (Rojo > 180, Verde/Azul < 100)
+    if (r > 180 && g < 100 && b < 100) {
+      return false;
+    }
+  } catch(e) {
+    return true;
+  }
+  return true;
+}
 
 function initImpostorGame() {
   bindTouch("btnUp", "up"); bindTouch("btnDown", "down");
@@ -1532,7 +1605,7 @@ function generateShortId() {
 function createRoom() {
   isHost = true;
   myData.name = document.getElementById("playerName").value || "Player";
-  myData.characterIndex = 0; // El creador siempre obtiene el primer personaje (índice 0)
+  myData.characterIndex = 0;
   myData.color = colors[0];
 
   const shortCode = generateShortId();
@@ -1572,7 +1645,6 @@ function joinRoom() {
 
 function handleIncomingData(data, conn) {
   if (data.type === "JOIN") {
-    // ASIGNACIÓN AUTOMÁTICA SECUENCIAL DE LOS 6 PERSONAJES
     const playerIndex = Object.keys(players).length;
     data.player.characterIndex = playerIndex % PERSONAJES_ASSETS.length;
     data.player.color = colors[playerIndex % colors.length];
@@ -1597,12 +1669,23 @@ function handleIncomingData(data, conn) {
     broadcast({ type: "START_MEETING" });
   } else if (data.type === "CAST_VOTE") {
     votes[data.voterId] = data.targetId;
+  } else if (data.type === "TASK_COMPLETED") {
+    globalTasksDone++;
+    broadcastGameState();
+    if (isHost && globalTasksDone >= TOTAL_TASKS_REQUIRED) {
+      broadcast({ type: "SHOW_RESULT", title: "CREWMATES WIN! 🎉", desc: "All English vocabulary tasks have been completed!", color: "#4dff88" });
+      resetGame();
+    }
   }
 }
 
 function handleClientIncomingData(data) {
   if (data.type === "STATE") {
     players = data.players; bodies = data.bodies;
+    if (data.tasksDone !== undefined) {
+      globalTasksDone = data.tasksDone;
+      updateTaskProgressBar();
+    }
     if (players[myId]) {
       myData.isImpostor = players[myId].isImpostor;
       myData.isDead = players[myId].isDead;
@@ -1619,6 +1702,16 @@ function handleClientIncomingData(data) {
     document.getElementById("resultTitle").style.color = data.color;
     document.getElementById("resultDesc").innerText = data.desc;
     document.getElementById("resultModal").classList.remove("hidden");
+  }
+}
+
+function updateTaskProgressBar() {
+  const counter = document.getElementById("taskCounter");
+  const bar = document.getElementById("taskProgressBar");
+  if (counter) counter.textContent = `${globalTasksDone} / ${TOTAL_TASKS_REQUIRED}`;
+  if (bar) {
+    const pct = Math.min(100, Math.floor((globalTasksDone / TOTAL_TASKS_REQUIRED) * 100));
+    bar.style.width = `${pct}%`;
   }
 }
 
@@ -1734,6 +1827,8 @@ function checkWinCondition() {
 
 function resetGame() {
   gameStarted = false;
+  globalTasksDone = 0;
+  updateTaskProgressBar();
   bodies = [];
   for (let id in players) {
     players[id].isDead = false;
@@ -1748,10 +1843,51 @@ function closeResultModal() {
   hasVoted = false;
 }
 
+function openTaskModal() {
+  if (activeTaskIndex === null || gamesData.length === 0) return;
+
+  const qItem = gamesData[Math.floor(Math.random() * gamesData.length)];
+  document.getElementById("taskClueText").textContent = `"${qItem.CLUE}"`;
+
+  let options = [qItem.WORDS];
+  while (options.length < 4 && options.length < gamesData.length) {
+    let randWord = gamesData[Math.floor(Math.random() * gamesData.length)].WORDS;
+    if (!options.includes(randWord)) options.push(randWord);
+  }
+  options.sort(() => 0.5 - Math.random());
+
+  const optContainer = document.getElementById("taskOptions");
+  optContainer.innerHTML = "";
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.className = "py-2.5 bg-slate-800 hover:bg-sky-500 text-white font-bold text-xs rounded-xl border border-slate-700 transition cursor-pointer";
+    btn.onclick = () => answerTask(opt === qItem.WORDS);
+    optContainer.appendChild(btn);
+  });
+
+  document.getElementById("taskModal").classList.remove("hidden");
+}
+
+function answerTask(isCorrect) {
+  document.getElementById("taskModal").classList.add("hidden");
+  if (isCorrect) {
+    broadcast({ type: "TASK_COMPLETED" });
+  } else {
+    alert("❌ Incorrect! Try another task spot.");
+  }
+}
+
+function closeTaskModal() {
+  document.getElementById("taskModal").classList.add("hidden");
+}
+
 function startGame() {
   if (!isHost) return;
   if (Object.keys(players).length < 2) return alert("Mínimo 2 jugadores.");
   gameStarted = true;
+  globalTasksDone = 0;
+  updateTaskProgressBar();
   document.getElementById("btnStartGame").style.display = "none";
   assignImpostor();
   broadcastGameState();
@@ -1765,7 +1901,8 @@ function assignImpostor() {
 
 function broadcastGameState() {
   if (!isHost) return;
-  const state = { type: "STATE", players: players, bodies: bodies };
+  const state = { type: "STATE", players: players, bodies: bodies, tasksDone: globalTasksDone };
+  updateTaskProgressBar();
   connections.forEach(conn => conn.send(state));
 }
 
@@ -1779,18 +1916,48 @@ function broadcast(msg) {
 function update() {
   if (juegoActivoActual !== 'impostor') return;
   let moved = false; const speed = 4;
-  if (inputState.up) { myData.y -= speed; moved = true; }
-  if (inputState.down) { myData.y += speed; moved = true; }
-  if (inputState.left) { myData.x -= speed; moved = true; }
-  if (inputState.right) { myData.x += speed; moved = true; }
 
-  myData.x = Math.max(20, Math.min(MAP_WIDTH - 20, myData.x));
-  myData.y = Math.max(20, Math.min(MAP_HEIGHT - 20, myData.y));
+  let nextX = myData.x;
+  let nextY = myData.y;
+
+  if (inputState.up) nextY -= speed;
+  if (inputState.down) nextY += speed;
+  if (inputState.left) nextX -= speed;
+  if (inputState.right) nextX += speed;
+
+  // LÍMITES CANVAS
+  nextX = Math.max(20, Math.min(MAP_WIDTH - 20, nextX));
+  nextY = Math.max(20, Math.min(MAP_HEIGHT - 20, nextY));
+
+  // COLISIONES MÁSCARA
+  if (isWalkable(nextX, myData.y)) {
+    if (nextX !== myData.x) moved = true;
+    myData.x = nextX;
+  }
+  if (isWalkable(myData.x, nextY)) {
+    if (nextY !== myData.y) moved = true;
+    myData.y = nextY;
+  }
 
   if (moved) {
     if (isHost) { players[myId].x = myData.x; players[myId].y = myData.y; broadcastGameState(); }
     else if (hostConn) hostConn.send({ type: "UPDATE_POS", id: myId, x: myData.x, y: myData.y });
   }
+
+  // DETECCIÓN TAREAS Y BOTONES ACCIÓN
+  let nearTask = false;
+  activeTaskIndex = null;
+  if (!myData.isDead && !myData.isImpostor) {
+    TASK_LOCATIONS.forEach((t, idx) => {
+      if (Math.hypot(t.x - myData.x, t.y - myData.y) < 55) {
+        nearTask = true;
+        activeTaskIndex = idx;
+      }
+    });
+  }
+
+  const btnTask = document.getElementById("btnDoTask");
+  if (btnTask) btnTask.style.display = nearTask ? "block" : "none";
 
   document.getElementById("btnKill").style.display = (myData.isImpostor && !myData.isDead) ? "block" : "none";
   let nearBody = bodies.some(b => Math.hypot(b.x - myData.x, b.y - myData.y) < 50);
@@ -1810,22 +1977,34 @@ function draw() {
   ctx.save();
   ctx.translate(-cameraX, -cameraY);
 
-  // 1. RENDERIZADO DEL MAPA HD PERSONALIZADO
+  // DIBUJAR MAPA VISUAL HD
   if (mapSprite.complete && mapSprite.naturalWidth !== 0) {
     ctx.drawImage(mapSprite, 0, 0, MAP_WIDTH, MAP_HEIGHT);
   } else {
     ctx.fillStyle = "#0f172a";
     ctx.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
-    ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 2;
-    for (let x = 0; x < MAP_WIDTH; x += 100) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT); ctx.stroke(); }
-    for (let y = 0; y < MAP_HEIGHT; y += 100) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH, y); ctx.stroke(); }
   }
 
-  // LÍMITE DEL MAPA
-  ctx.strokeStyle = "#f43f5e"; ctx.lineWidth = 6;
-  ctx.strokeRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+  // DIBUJAR PUNTOS AZULES DE TAREAS
+  TASK_LOCATIONS.forEach(t => {
+    let dist = Math.hypot(t.x - myData.x, t.y - myData.y);
+    if (myData.isDead || dist <= VISION_RADIUS) {
+      ctx.fillStyle = "#38bdf8";
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 3;
+      ctx.stroke();
 
-  // 2. CADÁVERES
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 14px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("!", t.x, t.y + 5);
+    }
+  });
+
+  // CADÁVERES
   bodies.forEach(b => {
     let dist = Math.hypot(b.x - myData.x, b.y - myData.y);
     if (myData.isDead || dist <= VISION_RADIUS) {
@@ -1834,7 +2013,7 @@ function draw() {
     }
   });
 
-  // 3. RENDERIZADO DE JUGADORES CON TUS SPRITES
+  // JUGADORES
   for (let id in players) {
     let p = players[id];
     let dist = Math.hypot(p.x - myData.x, p.y - myData.y);
@@ -1853,7 +2032,7 @@ function draw() {
     
     ctx.globalAlpha = 1.0;
 
-    // ETIQUETA DE NOMBRE Y ROL
+    // NOMBRE Y ETIQUETA
     ctx.fillStyle = p.isDead ? "#94a3b8" : "white"; 
     ctx.font = "bold 12px sans-serif"; 
     ctx.textAlign = "center";
@@ -1863,7 +2042,7 @@ function draw() {
   }
   ctx.restore();
 
-  // 4. NIEBLA DE GUERRA / LÍNEA DE VISIÓN
+  // NIEBLA DE GUERRA
   if (!myData.isDead) {
     ctx.save();
     ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
