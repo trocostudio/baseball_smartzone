@@ -98,13 +98,35 @@ body {
   animation: shakeCanvas 0.35s ease-in-out;
 }
 
-.dpad { position: relative; width: 120px; height: 120px; }
-.dpad-btn { position: absolute; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); color: white; border-radius: 8px; font-size: 16px; display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; }
-.dpad-btn:active { background: rgba(56, 189, 248, 0.4); border-color: #38bdf8; }
-.dpad-up { top: 0; left: 40px; width: 40px; height: 40px; }
-.dpad-down { bottom: 0; left: 40px; width: 40px; height: 40px; }
-.dpad-left { top: 40px; left: 0; width: 40px; height: 40px; }
-.dpad-right { top: 40px; right: 0; width: 40px; height: 40px; }
+/* JOYSTICK STYLES */
+.joystick-container {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(56, 189, 248, 0.35);
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+  touch-action: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.joystick-knob {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background: radial-gradient(circle, #38bdf8 0%, #0284c7 100%);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+  pointer-events: none;
+  transition: transform 0.05s ease-out;
+}
+
 .vote-btn { background: #1e293b; color: white; border: 1px solid #475569; padding: 10px; border-radius: 8px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s; }
 .vote-btn:hover { background: #334155; border-color: #38bdf8; }
 .vote-btn-disabled { opacity: 0.5; pointer-events: none; }
@@ -492,14 +514,13 @@ body {
         <div class="relative w-full bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
           <canvas id="canvas" width="400" height="400" class="bg-slate-950 max-w-full h-auto block rounded-xl border border-slate-800"></canvas>
           
-          <!-- Controles Táctiles Integrados -->
+          <!-- Controles Táctiles Integrados con Joystick -->
           <div id="touch-controls" class="absolute inset-x-0 bottom-3 px-4 flex justify-between items-end pointer-events-none z-10">
-            <div class="dpad pointer-events-auto">
-              <div class="dpad-btn dpad-up" id="btnUp">▲</div>
-              <div class="dpad-btn dpad-down" id="btnDown">▼</div>
-              <div class="dpad-btn dpad-left" id="btnLeft">◄</div>
-              <div class="dpad-btn dpad-right" id="btnRight">►</div>
+            <!-- JOYSTICK VIRTUAL 360° -->
+            <div id="joystickZone" class="joystick-container pointer-events-auto">
+              <div id="joystickKnob" class="joystick-knob"></div>
             </div>
+
             <div class="action-buttons flex flex-col gap-2 pointer-events-auto">
               <button id="btnDoTask" onclick="openTaskModal()" class="bg-sky-500 hover:bg-sky-600 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl border-2 border-white shadow-xl hidden cursor-pointer">🔧 TASK</button>
               <button id="btnSabotage" onclick="sabotageTask()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl border-2 border-white shadow-xl hidden cursor-pointer">⚡ SABOTAGE</button>
@@ -1460,7 +1481,7 @@ function fireSDRocket(isCorrect) {
   }
 }
 
-/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION (TAREAS REACTIVABLES) */
+/* 9. CLASSROOM IMPOSTOR LOGIC INTEGRATION (CON JOYSTICK VIRTUAL) */
 const MAP_WIDTH = 1600;
 const MAP_HEIGHT = 1200;
 const VISION_RADIUS = 220;
@@ -1469,7 +1490,7 @@ const MAP_IMAGE_URL = "https://drive.google.com/thumbnail?id=1ZVUpyAtSaU3fpkxWvb
 const mapSprite = new Image();
 mapSprite.src = MAP_IMAGE_URL;
 
-// 13 PUNTOS DE TAREAS CON ESTADO DINÁMICO (active: true/false)
+// 13 PUNTOS DE TAREAS CON ESTADO DINÁMICO
 let taskLocations = [
   { id: 0, x: 940, y: 130, label: "Top Hallway", active: true },
   { id: 1, x: 1510, y: 140, label: "Top Right Corner", active: true },
@@ -1530,15 +1551,12 @@ let myData = {
   isDead: false
 };
 
+// ESTADO DEL JOYSTICK Y TECLADO
+const joystickVector = { x: 0, y: 0 };
 const inputState = { up: false, down: false, left: false, right: false };
 
-function isWalkable(targetX, targetY) {
-  return true;
-}
-
 function initImpostorGame() {
-  bindTouch("btnUp", "up"); bindTouch("btnDown", "down");
-  bindTouch("btnLeft", "left"); bindTouch("btnRight", "right");
+  setupJoystick();
 
   window.addEventListener("keydown", e => {
     if(e.key === "ArrowUp" || e.key === "w") inputState.up = true;
@@ -1554,13 +1572,92 @@ function initImpostorGame() {
   });
 }
 
-function bindTouch(elementId, direction) {
-  const btn = document.getElementById(elementId);
-  if(!btn) return;
-  const start = (e) => { e.preventDefault(); inputState[direction] = true; };
-  const end = (e) => { e.preventDefault(); inputState[direction] = false; };
-  btn.addEventListener("touchstart", start); btn.addEventListener("touchend", end);
-  btn.addEventListener("mousedown", start); btn.addEventListener("mouseup", end);
+function setupJoystick() {
+  const zone = document.getElementById("joystickZone");
+  const knob = document.getElementById("joystickKnob");
+  if (!zone || !knob) return;
+
+  let activeTouchId = null;
+  let isMouseDown = false;
+
+  const handleStart = (clientX, clientY, identifier) => {
+    activeTouchId = identifier;
+    handleMove(clientX, clientY);
+  };
+
+  const handleMove = (clientX, clientY) => {
+    const rect = zone.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    let deltaX = clientX - centerX;
+    let deltaY = clientY - centerY;
+    const distance = Math.hypot(deltaX, deltaY);
+    const maxRadius = rect.width / 2;
+
+    if (distance > maxRadius) {
+      const angle = Math.atan2(deltaY, deltaX);
+      deltaX = Math.cos(angle) * maxRadius;
+      deltaY = Math.sin(angle) * maxRadius;
+    }
+
+    knob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    
+    // Normalizado (-1 a 1)
+    joystickVector.x = deltaX / maxRadius;
+    joystickVector.y = deltaY / maxRadius;
+  };
+
+  const handleEnd = () => {
+    activeTouchId = null;
+    isMouseDown = false;
+    knob.style.transform = `translate(0px, 0px)`;
+    joystickVector.x = 0;
+    joystickVector.y = 0;
+  };
+
+  // TOUCH EVENTS
+  zone.addEventListener("touchstart", e => {
+    e.preventDefault();
+    if (activeTouchId !== null) return;
+    const touch = e.changedTouches[0];
+    handleStart(touch.clientX, touch.clientY, touch.identifier);
+  }, { passive: false });
+
+  window.addEventListener("touchmove", e => {
+    if (activeTouchId === null) return;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === activeTouchId) {
+        handleMove(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+        break;
+      }
+    }
+  }, { passive: false });
+
+  window.addEventListener("touchend", e => {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === activeTouchId) {
+        handleEnd();
+        break;
+      }
+    }
+  });
+
+  // MOUSE FALLBACK FOR DESKTOP TESTING
+  zone.addEventListener("mousedown", e => {
+    isMouseDown = true;
+    handleStart(e.clientX, e.clientY, "mouse");
+  });
+
+  window.addEventListener("mousemove", e => {
+    if (isMouseDown && activeTouchId === "mouse") {
+      handleMove(e.clientX, e.clientY);
+    }
+  });
+
+  window.addEventListener("mouseup", () => {
+    if (activeTouchId === "mouse") handleEnd();
+  });
 }
 
 function generateShortId() {
@@ -1915,15 +2012,26 @@ function broadcast(msg) {
 
 function update() {
   if (juegoActivoActual !== 'impostor') return;
-  let moved = false; const speed = 4;
+  let moved = false; 
+  const speed = 4;
 
-  let nextX = myData.x;
-  let nextY = myData.y;
+  let moveX = 0;
+  let moveY = 0;
 
-  if (inputState.up) nextY -= speed;
-  if (inputState.down) nextY += speed;
-  if (inputState.left) nextX -= speed;
-  if (inputState.right) nextX += speed;
+  // Entrada por Joystick Táctil
+  if (joystickVector.x !== 0 || joystickVector.y !== 0) {
+    moveX = joystickVector.x * speed;
+    moveY = joystickVector.y * speed;
+  } else {
+    // Entrada por Teclado WASD / Flechas
+    if (inputState.up) moveY -= speed;
+    if (inputState.down) moveY += speed;
+    if (inputState.left) moveX -= speed;
+    if (inputState.right) moveX += speed;
+  }
+
+  let nextX = myData.x + moveX;
+  let nextY = myData.y + moveY;
 
   nextX = Math.max(20, Math.min(MAP_WIDTH - 20, nextX));
   nextY = Math.max(20, Math.min(MAP_HEIGHT - 20, nextY));
