@@ -127,6 +127,38 @@ body {
   transition: transform 0.05s ease-out;
 }
 
+/* FULLSCREEN BUTTON STYLES */
+.btn-fullscreen {
+  background: #0f172a;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-fullscreen:hover {
+  background: #38bdf8;
+  color: #090d16;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+}
+
+/* Estilo para ajustar fondos durante pantalla completa */
+#gameContainer:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  padding: 2rem !important;
+  overflow-y: auto !important;
+  background-color: #020617 !important;
+}
+
 .vote-btn { background: #1e293b; color: white; border: 1px solid #475569; padding: 10px; border-radius: 8px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s; }
 .vote-btn:hover { background: #334155; border-color: #38bdf8; }
 .vote-btn-disabled { opacity: 0.5; pointer-events: none; }
@@ -262,10 +294,19 @@ body {
 
   <!-- ACTIVE GAME CONTAINER -->
   <div id="gameContainer" class="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-6 sm:p-10 border border-slate-200/80 hidden">
+    
+    <!-- BARRA SUPERIOR GENERAL DEL CONTENEDOR DE JUEGOS -->
     <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
-      <button onclick="backToMenu()" class="text-xs font-bold text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition cursor-pointer flex items-center gap-1">
-        ← Games Menu
-      </button>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button onclick="backToMenu()" class="text-xs font-bold text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition cursor-pointer flex items-center gap-1">
+          ← Menu
+        </button>
+        <!-- BOTÓN PANTALLA COMPLETA UNIVERSAL -->
+        <button onclick="toggleFullscreen()" class="btn-fullscreen" title="Pantalla Completa">
+          <span id="fsIcon">⛶</span> <span id="fsText">FULLSCREEN</span>
+        </button>
+      </div>
+
       <div class="text-right">
         <span id="gameTitle" class="text-lg font-black text-slate-800 uppercase tracking-wider block">GAME TITLE</span>
         <span id="lblNivelActivo" class="text-xs font-bold text-sky-500 uppercase">LEVEL A1</span>
@@ -723,12 +764,55 @@ function openGame(gameId) {
 }
 
 function backToMenu() {
+  if (document.fullscreenElement) {
+    toggleFullscreen();
+  }
   document.getElementById('gameContainer').classList.add('hidden');
   document.getElementById('gamesMenu').classList.remove('hidden');
   if (guessInterval) clearInterval(guessInterval);
   if (tugInterval) clearInterval(tugInterval);
   if (penaltyInterval) clearInterval(penaltyInterval);
   if (sdAsteroidTimer) clearInterval(sdAsteroidTimer);
+}
+
+/* FULLSCREEN API LOGIC */
+function toggleFullscreen() {
+  const targetElement = document.getElementById('gameContainer');
+
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    if (targetElement.requestFullscreen) {
+      targetElement.requestFullscreen();
+    } else if (targetElement.webkitRequestFullscreen) {
+      targetElement.webkitRequestFullscreen();
+    } else if (targetElement.msRequestFullscreen) {
+      targetElement.msRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+
+document.addEventListener('fullscreenchange', updateFullscreenBtn);
+document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);
+
+function updateFullscreenBtn() {
+  const fsText = document.getElementById('fsText');
+  const fsIcon = document.getElementById('fsIcon');
+  if (!fsText || !fsIcon) return;
+
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    fsText.textContent = "EXIT FULL";
+    fsIcon.textContent = "🗗";
+  } else {
+    fsText.textContent = "FULLSCREEN";
+    fsIcon.textContent = "⛶";
+  }
 }
 
 /* RESULTS MODAL FUNCTION */
@@ -1490,7 +1574,6 @@ const MAP_IMAGE_URL = "https://drive.google.com/thumbnail?id=1ZVUpyAtSaU3fpkxWvb
 const mapSprite = new Image();
 mapSprite.src = MAP_IMAGE_URL;
 
-// 13 PUNTOS DE TAREAS CON ESTADO DINÁMICO
 let taskLocations = [
   { id: 0, x: 940, y: 130, label: "Top Hallway", active: true },
   { id: 1, x: 1510, y: 140, label: "Top Right Corner", active: true },
@@ -1551,7 +1634,6 @@ let myData = {
   isDead: false
 };
 
-// ESTADO DEL JOYSTICK Y TECLADO
 const joystickVector = { x: 0, y: 0 };
 const inputState = { up: false, down: false, left: false, right: false };
 
@@ -1603,7 +1685,6 @@ function setupJoystick() {
 
     knob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     
-    // Normalizado (-1 a 1)
     joystickVector.x = deltaX / maxRadius;
     joystickVector.y = deltaY / maxRadius;
   };
@@ -1616,7 +1697,6 @@ function setupJoystick() {
     joystickVector.y = 0;
   };
 
-  // TOUCH EVENTS
   zone.addEventListener("touchstart", e => {
     e.preventDefault();
     if (activeTouchId !== null) return;
@@ -1643,7 +1723,6 @@ function setupJoystick() {
     }
   });
 
-  // MOUSE FALLBACK FOR DESKTOP TESTING
   zone.addEventListener("mousedown", e => {
     isMouseDown = true;
     handleStart(e.clientX, e.clientY, "mouse");
@@ -2018,12 +2097,10 @@ function update() {
   let moveX = 0;
   let moveY = 0;
 
-  // Entrada por Joystick Táctil
   if (joystickVector.x !== 0 || joystickVector.y !== 0) {
     moveX = joystickVector.x * speed;
     moveY = joystickVector.y * speed;
   } else {
-    // Entrada por Teclado WASD / Flechas
     if (inputState.up) moveY -= speed;
     if (inputState.down) moveY += speed;
     if (inputState.left) moveX -= speed;
@@ -2047,7 +2124,6 @@ function update() {
     else if (hostConn) hostConn.send({ type: "UPDATE_POS", id: myId, x: myData.x, y: myData.y });
   }
 
-  // DETECCIÓN TAREAS SEGÚN ESTADO Y ROL
   let canDoTask = false;
   let canSabotage = false;
   activeTaskIndex = null;
@@ -2095,7 +2171,6 @@ function draw() {
     ctx.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
   }
 
-  // DIBUJAR PUNTOS DE TAREAS (Azul si está activa, Gris si está completada)
   taskLocations.forEach(t => {
     let dist = Math.hypot(t.x - myData.x, t.y - myData.y);
     if (myData.isDead || dist <= VISION_RADIUS) {
@@ -2114,7 +2189,6 @@ function draw() {
     }
   });
 
-  // CADÁVERES
   bodies.forEach(b => {
     let dist = Math.hypot(b.x - myData.x, b.y - myData.y);
     if (myData.isDead || dist <= VISION_RADIUS) {
@@ -2123,7 +2197,6 @@ function draw() {
     }
   });
 
-  // JUGADORES
   for (let id in players) {
     let p = players[id];
     let dist = Math.hypot(p.x - myData.x, p.y - myData.y);
@@ -2142,7 +2215,6 @@ function draw() {
     
     ctx.globalAlpha = 1.0;
 
-    // NOMBRE Y ETIQUETA
     ctx.fillStyle = p.isDead ? "#94a3b8" : "white"; 
     ctx.font = "bold 12px sans-serif"; 
     ctx.textAlign = "center";
@@ -2152,7 +2224,6 @@ function draw() {
   }
   ctx.restore();
 
-  // NIEBLA DE GUERRA
   if (!myData.isDead) {
     ctx.save();
     ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
