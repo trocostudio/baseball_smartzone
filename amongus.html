@@ -117,7 +117,7 @@ body {
     <img src="https://lh3.googleusercontent.com/d/1sVfKrSCV_fRlJEqF_Oy8pyNOhLKrfVoT" alt="Logo Institucional" class="logo-img h-8 sm:h-10 w-auto object-contain">
   </a>
   <div class="header-nav-levels min-w-0 mx-2 flex-1 flex justify-center">
-    <!-- NIVELES DEL HEADER: Ocultos por defecto en la Home -->
+    <!-- BARRA NIVELES HEADER: Oculta por defecto -->
     <div id="nivelContainerDesk" class="hidden flex items-center space-x-1 sm:space-x-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-sky-400/20 max-w-full overflow-x-auto no-scrollbar whitespace-nowrap shadow-inner">
       <button onclick="ejecutarNivelHeader('INTRO')" data-level="INTRO" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">INTRO</button>
       <button onclick="ejecutarNivelHeader('A1')" data-level="A1" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">A1</button>
@@ -256,7 +256,7 @@ Check Answers
 <div id="classesInterface" class="w-full flex flex-col md:flex-row gap-6 hidden">
 <div class="w-full md:w-80 bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 h-fit md:sticky md:top-24 border border-slate-200/60">
 
-<!-- TARJETA DE PROGRESO DE NIVELES (SOLO PREMIUM EN LECCIONES) -->
+<!-- TARJETA DE PROGRESO DE NIVELES -->
 <div id="studentProgressCard" class="hidden bg-slate-900 text-white p-4 rounded-2xl mb-5 border border-sky-400/20 shadow-md">
   <div class="flex justify-between items-center mb-1.5">
     <span class="text-xs font-bold uppercase tracking-wider text-sky-400">Level Progress</span>
@@ -448,21 +448,19 @@ function irAlHome() {
   document.getElementById('exercisesInterface').classList.add('hidden');
   document.getElementById('classesInterface').classList.add('hidden');
   regresarAlPaso1();
-  removerBotonesActivos();
 }
 
-function removerBotonesActivos() {
+function regresarAlPaso1() {
+  document.getElementById('landingStep2').classList.add('hidden');
+  document.getElementById('landingStep1').classList.remove('hidden');
   document.getElementById('nivelContainerDesk').classList.add('hidden');
-  document.querySelectorAll('#nivelContainerDesk button').forEach(btn => {
-    btn.className = "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20";
-  });
 }
 
 function irAJuegos() {
   window.location.href = "games.html";
 }
 
-// CONTROL DE ACCESO PREMIUM SOLO EN LECCIONES
+// VALIDA SOLAMENTE LAS SECCIONES PREMIUM
 function intentarAccesoModo(modo) {
   if (modo === 'clases' && !usuarioAutenticado) {
     tablaAuthActual = "Usuarios";
@@ -483,23 +481,20 @@ function seleccionarModoLanding(modo) {
   modoActual = modo;
   const txtModo = document.getElementById('txtModoSeleccionado');
   if (modo === "clases") {
-    txtModo.textContent = "Selected: See Classes 📚";
-    txtModo.className = "text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-3.5 py-2 rounded-xl border border-sky-200";
+    if (txtModo) {
+      txtModo.textContent = "Selected: See Classes 📚";
+      txtModo.className = "text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-3.5 py-2 rounded-xl border border-sky-200";
+    }
   } else {
-    txtModo.textContent = "Selected: Practice Grammar 📝";
-    txtModo.className = "text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3.5 py-2 rounded-xl border border-emerald-200";
+    if (txtModo) {
+      txtModo.textContent = "Selected: Practice Grammar 📝";
+      txtModo.className = "text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3.5 py-2 rounded-xl border border-emerald-200";
+    }
   }
   document.getElementById('landingStep1').classList.add('hidden');
   document.getElementById('landingStep2').classList.remove('hidden');
 }
 
-function regresarAlPaso1() {
-  document.getElementById('landingStep2').classList.add('hidden');
-  document.getElementById('landingStep1').classList.remove('hidden');
-  document.getElementById('nivelContainerDesk').classList.add('hidden');
-}
-
-// EJECUTA LA CAMBIADA DE NIVEL DESDE EL HEADER VALIDANDO ACCESOS
 function ejecutarNivelHeader(nivel) {
   if (modoActual === 'clases' && !usuarioAutenticado) {
     tablaAuthActual = "Usuarios";
@@ -524,14 +519,14 @@ async function cambiarNivel(nuevoNivel) {
   }
   document.documentElement.style.setProperty('--nexo-highlight', coloresNivel[nuevoNivel] || '#0f172a');
   
-  // MOSTRAR EL HEADER DE NIVELES ÚNICAMENTE AL ENTRAR A UNA INTERFAZ DE NIVELES
+  // MOSTRAR NIVELES EN EL HEADER SOLO AL ESTAR EN CURSO
   const barraHeader = document.getElementById('nivelContainerDesk');
   barraHeader.classList.remove('hidden');
   
   document.querySelectorAll('#nivelContainerDesk button').forEach(btn => {
     btn.className = (btn.getAttribute('data-level') === nuevoNivel)
-      ? "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl bg-sky-400 text-slate-950 shadow-sm cursor-default"
-      : "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20";
+      ? "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl bg-sky-400 text-slate-950 shadow-sm cursor-default flex-shrink-0"
+      : "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0";
   });
 
   // 1. CARGAR CLASES DE EJERCICIOS GRATIS
@@ -599,15 +594,15 @@ async function cambiarNivel(nuevoNivel) {
     } catch(e) { console.error("Error clases:", e); }
   }
 
-  // 3. ACTUALIZACIÓN PROTEGIDA DE LA BARRA DE PROGRESO DE SUPABASE
+  // 3. ACTUALIZAR PROGRESO SIN BLOQUEAR INTERFAZ
   try {
     actualizarBarraProgresoUI();
   } catch (e) {
-    console.warn("No se pudo cargar el progreso:", e);
+    console.warn("Sin datos de progreso:", e);
   }
 }
 
-/* ==================== FUNCIONES SEGUIMIENTO DE PROGRESO ==================== */
+/* ==================== FUNCIONES PROGRESO SUPABASE ==================== */
 async function registrarProgresoClase(claseId, score) {
   if (!usuarioAutenticado || !nivelActual || !claseId) return;
   try {
@@ -624,12 +619,12 @@ async function registrarProgresoClase(claseId, score) {
       );
 
     if (error) {
-      console.error("Error al guardar el progreso en Supabase:", error);
+      console.error("Error guardando progreso:", error);
     } else {
       await actualizarBarraProgresoUI();
     }
   } catch (err) {
-    console.error("Excepción al guardar progreso:", err);
+    console.error("Excepción en progreso:", err);
   }
 }
 
@@ -661,7 +656,6 @@ async function obtenerProgresoNivel(nivel) {
       porcentaje: Math.min(porcentaje, 100)
     };
   } catch(e) {
-    console.error("Error leyendo progreso:", e);
     return { completadas: [], porcentaje: 0 };
   }
 }
@@ -689,8 +683,8 @@ async function actualizarBarraProgresoUI() {
     });
   }
 }
-/* ============================================================================== */
 
+/* ==================== AUTENTICACIÓN FLEXIBLE ==================== */
 async function autenticarUsuario() {
   const inputVal = document.getElementById('usernameInput').value.trim();
   const errDiv = document.getElementById('authErrorMsg');
@@ -707,12 +701,17 @@ async function autenticarUsuario() {
   btnAuth.textContent = "Verifying...";
 
   try {
-    const idSearchValue = !isNaN(inputVal) ? Number(inputVal) : inputVal;
+    const isNum = !isNaN(inputVal) && inputVal !== "";
+    const idSearchValue = isNum ? Number(inputVal) : inputVal;
 
-    const { data: registros, error } = await supabaseClient
-      .from(tablaAuthActual)
-      .select('*')
-      .or(`USER.eq.${inputVal},USER.eq.${idSearchValue}`);
+    let query = supabaseClient.from(tablaAuthActual).select('*');
+    if (isNum) {
+      query = query.or(`USER.eq.${inputVal},USER.eq.${idSearchValue}`);
+    } else {
+      query = query.eq('USER', inputVal);
+    }
+
+    const { data: registros, error } = await query;
 
     btnAuth.disabled = false; 
     btnAuth.textContent = "Verify Access";
