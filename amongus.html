@@ -117,14 +117,13 @@ body {
     <img src="https://lh3.googleusercontent.com/d/1sVfKrSCV_fRlJEqF_Oy8pyNOhLKrfVoT" alt="Logo Institucional" class="logo-img h-8 sm:h-10 w-auto object-contain">
   </a>
   <div class="header-nav-levels min-w-0 mx-2 flex-1 flex justify-center">
-    <!-- BARRA NIVELES HEADER: Oculta por defecto -->
-    <div id="nivelContainerDesk" class="hidden flex items-center space-x-1 sm:space-x-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-sky-400/20 max-w-full overflow-x-auto no-scrollbar whitespace-nowrap shadow-inner">
-      <button onclick="ejecutarNivelHeader('INTRO')" data-level="INTRO" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">INTRO</button>
-      <button onclick="ejecutarNivelHeader('A1')" data-level="A1" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">A1</button>
-      <button onclick="ejecutarNivelHeader('A2')" data-level="A2" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">A2</button>
-      <button onclick="ejecutarNivelHeader('B1')" data-level="B1" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">B1</button>
-      <button onclick="ejecutarNivelHeader('B2')" data-level="B2" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">B2</button>
-      <button onclick="ejecutarNivelHeader('C1')" data-level="C1" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">C1</button>
+    <div id="nivelContainerDesk" class="flex items-center space-x-1 sm:space-x-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-sky-400/20 max-w-full overflow-x-auto no-scrollbar whitespace-nowrap shadow-inner">
+      <button onclick="cambiarNivel('INTRO')" data-level="INTRO" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">INTRO</button>
+      <button onclick="cambiarNivel('A1')" data-level="A1" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">A1</button>
+      <button onclick="cambiarNivel('A2')" data-level="A2" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">A2</button>
+      <button onclick="cambiarNivel('B1')" data-level="B1" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">B1</button>
+      <button onclick="cambiarNivel('B2')" data-level="B2" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">B2</button>
+      <button onclick="cambiarNivel('C1')" data-level="C1" class="px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-lg transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0">C1</button>
     </div>
   </div>
   <div class="header-actions flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
@@ -165,6 +164,7 @@ body {
     </div>
   </div>
 
+  <!-- NUEVA TARJETA GRATUITA PARA JUEGOS INTERACTIVOS -->
   <div onclick="irAJuegos()" class="border border-slate-200/80 hover:border-teal-500 bg-white hover:bg-teal-50/20 p-6 rounded-2xl cursor-pointer transition-all duration-300 transform hover:-translate-y-1.5 shadow-sm hover:shadow-xl group text-center flex flex-col justify-between">
     <div>
       <span class="w-16 h-16 rounded-2xl bg-teal-500/10 text-teal-600 flex items-center justify-center font-bold text-3xl mx-auto mb-4 shadow-inner group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300">🎮</span>
@@ -255,7 +255,6 @@ Check Answers
 </div>
 <div id="classesInterface" class="w-full flex flex-col md:flex-row gap-6 hidden">
 <div class="w-full md:w-80 bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 h-fit md:sticky md:top-24 border border-slate-200/60">
-
 <!-- TARJETA DE PROGRESO DE NIVELES -->
 <div id="studentProgressCard" class="hidden bg-slate-900 text-white p-4 rounded-2xl mb-5 border border-sky-400/20 shadow-md">
   <div class="flex justify-between items-center mb-1.5">
@@ -266,7 +265,6 @@ Check Answers
     <div id="barProgresoEstudiante" class="bg-gradient-to-r from-sky-400 to-emerald-400 h-full w-0 transition-all duration-500"></div>
   </div>
 </div>
-
 <h2 class="text-lg font-extrabold dinamic-accent text-center mb-5 tracking-tight flex items-center justify-center gap-2"><span>📚</span> Class Navigation</h2>
 <div class="mb-4">
 <label for="unidadSelectClases" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Select Unit:</label>
@@ -425,7 +423,7 @@ let ejerciciosActuales = [];
 let nivelActual = null;
 let modoActual = "ejercicios";
 let usuarioAutenticado = sessionStorage.getItem('nexo_verified_user') || null;
-let tablaAuthActual = "Usuarios"; 
+let tablaAuthActual = "Usuarios"; // Controla qué tabla consultar en el modal ('Usuarios' o 'Usuarios_Examen')
 let accionPendientePostAuth = null;
 
 const coloresNivel = {
@@ -448,19 +446,21 @@ function irAlHome() {
   document.getElementById('exercisesInterface').classList.add('hidden');
   document.getElementById('classesInterface').classList.add('hidden');
   regresarAlPaso1();
+  removerBotonesActivos();
 }
 
-function regresarAlPaso1() {
-  document.getElementById('landingStep2').classList.add('hidden');
-  document.getElementById('landingStep1').classList.remove('hidden');
+function removerBotonesActivos() {
   document.getElementById('nivelContainerDesk').classList.add('hidden');
+  document.querySelectorAll('#nivelContainerDesk button').forEach(btn => {
+    btn.className = "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20";
+  });
 }
 
 function irAJuegos() {
   window.location.href = "games.html";
 }
 
-// VALIDA SOLAMENTE LAS SECCIONES PREMIUM
+// ACCESO A CLASES (Usa la tabla "Usuarios")
 function intentarAccesoModo(modo) {
   if (modo === 'clases' && !usuarioAutenticado) {
     tablaAuthActual = "Usuarios";
@@ -471,6 +471,7 @@ function intentarAccesoModo(modo) {
   seleccionarModoLanding(modo);
 }
 
+// ACCESO AL EXAMEN (Usa la tabla "Usuarios_Examen")
 function intentarAccesoExamen() {
   tablaAuthActual = "Usuarios_Examen";
   accionPendientePostAuth = function() { window.open(URL_EXAMEN_PREMIUM, '_blank'); };
@@ -481,28 +482,20 @@ function seleccionarModoLanding(modo) {
   modoActual = modo;
   const txtModo = document.getElementById('txtModoSeleccionado');
   if (modo === "clases") {
-    if (txtModo) {
-      txtModo.textContent = "Selected: See Classes 📚";
-      txtModo.className = "text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-3.5 py-2 rounded-xl border border-sky-200";
-    }
+    txtModo.textContent = "Selected: See Classes 📚";
+    txtModo.className = "text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-3.5 py-2 rounded-xl border border-sky-200";
   } else {
-    if (txtModo) {
-      txtModo.textContent = "Selected: Practice Grammar 📝";
-      txtModo.className = "text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3.5 py-2 rounded-xl border border-emerald-200";
-    }
+    txtModo.textContent = "Selected: Practice Grammar 📝";
+    txtModo.className = "text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3.5 py-2 rounded-xl border border-emerald-200";
   }
   document.getElementById('landingStep1').classList.add('hidden');
   document.getElementById('landingStep2').classList.remove('hidden');
 }
 
-function ejecutarNivelHeader(nivel) {
-  if (modoActual === 'clases' && !usuarioAutenticado) {
-    tablaAuthActual = "Usuarios";
-    accionPendientePostAuth = function() { cambiarNivel(nivel); };
-    mostrarModalAuth("Lesson Materials are premium features. Please verify your access or enter your username.");
-    return;
-  }
-  cambiarNivel(nivel);
+function regresarAlPaso1() {
+  document.getElementById('landingStep2').classList.add('hidden');
+  document.getElementById('landingStep1').classList.remove('hidden');
+  document.getElementById('nivelContainerDesk').classList.add('hidden');
 }
 
 async function cambiarNivel(nuevoNivel) {
@@ -516,175 +509,77 @@ async function cambiarNivel(nuevoNivel) {
   } else {
     document.getElementById('classesInterface').classList.remove('hidden');
     document.getElementById('exercisesInterface').classList.add('hidden');
+    actualizarBarraProgresoUI(); // Actualiza progreso sin bloquear
   }
   document.documentElement.style.setProperty('--nexo-highlight', coloresNivel[nuevoNivel] || '#0f172a');
-  
-  // MOSTRAR NIVELES EN EL HEADER SOLO AL ESTAR EN CURSO
   const barraHeader = document.getElementById('nivelContainerDesk');
   barraHeader.classList.remove('hidden');
   
   document.querySelectorAll('#nivelContainerDesk button').forEach(btn => {
     btn.className = (btn.getAttribute('data-level') === nuevoNivel)
-      ? "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl bg-sky-400 text-slate-950 shadow-sm cursor-default flex-shrink-0"
-      : "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20 flex-shrink-0";
+      ? "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl bg-sky-400 text-slate-950 shadow-sm cursor-default"
+      : "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20";
   });
 
   // 1. CARGAR CLASES DE EJERCICIOS GRATIS
   const uSel = document.getElementById('unidadSelect');
   const cSel = document.getElementById('claseSelect');
-  if (uSel && cSel) {
-    uSel.innerHTML = '<option value="">Loading book units...</option>';
-    cSel.innerHTML = '<option value="">-- Choose a Unit First --</option>'; cSel.disabled = true;
-    try {
-      const { data: datosGratis, error: errG } = await supabaseClient
-        .from('ejercicios_gratis')
-        .select('Clase')
-        .eq('NIVEL', nivelActual);
-      if (!errG && datosGratis) {
-        let clasesUnicas = [...new Set(datosGratis.map(d => d.Clase))];
-        clasesUnicas.sort((a, b) => 
-          a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-        );
-        window.datosEjerciciosMapeados = { "General Practice": clasesUnicas };
-        uSel.innerHTML = '<option value="">-- Choose Group --</option>';
-        let opt = document.createElement('option'); opt.value = "General Practice"; opt.textContent = "General Practice";
-        uSel.appendChild(opt);
-      } else {
-        uSel.innerHTML = '<option value="">Error loading units</option>';
-      }
-    } catch(e) { console.error("Error ejercicios gratis:", e); }
+  uSel.innerHTML = '<option value="">Loading book units...</option>';
+  cSel.innerHTML = '<option value="">-- Choose a Unit First --</option>'; cSel.disabled = true;
+  const { data: datosGratis, error: errG } = await supabaseClient
+    .from('ejercicios_gratis')
+    .select('Clase')
+    .eq('NIVEL', nivelActual);
+  if (!errG && datosGratis) {
+    let clasesUnicas = [...new Set(datosGratis.map(d => d.Clase))];
+    clasesUnicas.sort((a, b) => 
+      a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+    );
+    window.datosEjerciciosMapeados = { "General Practice": clasesUnicas };
+    uSel.innerHTML = '<option value="">-- Choose Group --</option>';
+    let opt = document.createElement('option'); opt.value = "General Practice"; opt.textContent = "General Practice";
+    uSel.appendChild(opt);
+  } else {
+    uSel.innerHTML = '<option value="">Error loading units</option>';
   }
 
   // 2. CARGAR UNIDADES Y CLASES
   const uSelC = document.getElementById('unidadSelectClases');
   const cSelC = document.getElementById('claseSelectClases');
-  if (uSelC && cSelC) {
-    uSelC.innerHTML = '<option value="">Loading book units...</option>';
-    cSelC.innerHTML = '<option value="">-- Choose a Unit First --</option>'; cSelC.disabled = true;
-    try {
-      const { data: datosClases, error: errC } = await supabaseClient
-        .from('clases')
-        .select('Unit, ID_Lesson')
-        .eq('Level', nivelActual);
-      if (!errC && datosClases) {
-        window.datosClasesMapeados = {};
-        datosClases.forEach(item => {
-          if (!window.datosClasesMapeados[item.Unit]) window.datosClasesMapeados[item.Unit] = [];
-          if (!window.datosClasesMapeados[item.Unit].includes(item.ID_Lesson)) {
-            window.datosClasesMapeados[item.Unit].push(item.ID_Lesson);
-          }
-        });
-        Object.keys(window.datosClasesMapeados).forEach(unidad => {
-          window.datosClasesMapeados[unidad].sort((a, b) => 
-            a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-          );
-        });
-        
-        uSelC.innerHTML = '<option value="">-- Choose a Unit --</option>';
-        const unidadesOrdenadas = Object.keys(window.datosClasesMapeados).sort((a, b) => 
-          a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-        );
-        unidadesOrdenadas.forEach(unidad => {
-          let opt = document.createElement('option'); opt.value = unidad; opt.textContent = unidad;
-          uSelC.appendChild(opt);
-        });
-      } else {
-        uSelC.innerHTML = '<option value="">Error loading units</option>';
-      }
-    } catch(e) { console.error("Error clases:", e); }
-  }
-
-  // 3. ACTUALIZAR PROGRESO SIN BLOQUEAR INTERFAZ
-  try {
-    actualizarBarraProgresoUI();
-  } catch (e) {
-    console.warn("Sin datos de progreso:", e);
-  }
-}
-
-/* ==================== FUNCIONES PROGRESO SUPABASE ==================== */
-async function registrarProgresoClase(claseId, score) {
-  if (!usuarioAutenticado || !nivelActual || !claseId) return;
-  try {
-    const { error } = await supabaseClient
-      .from('progreso_estudiantes')
-      .upsert(
-        {
-          usuario_id: usuarioAutenticado,
-          nivel: nivelActual,
-          clase_id: claseId,
-          score: score
-        },
-        { onConflict: 'usuario_id,nivel,clase_id' }
-      );
-
-    if (error) {
-      console.error("Error guardando progreso:", error);
-    } else {
-      await actualizarBarraProgresoUI();
-    }
-  } catch (err) {
-    console.error("Excepción en progreso:", err);
-  }
-}
-
-async function obtenerProgresoNivel(nivel) {
-  if (!usuarioAutenticado) return { completadas: [], porcentaje: 0 };
-  try {
-    const { data: clasesVistas } = await supabaseClient
-      .from('progreso_estudiantes')
-      .select('clase_id')
-      .eq('usuario_id', usuarioAutenticado)
-      .eq('nivel', nivel);
-
-    const { data: totalClases } = await supabaseClient
-      .from('clases')
-      .select('ID_Lesson')
-      .eq('Level', nivel);
-
-    if (!totalClases || totalClases.length === 0) {
-      return { completadas: [], porcentaje: 0 };
-    }
-
-    const vistasIds = (clasesVistas || []).map(item => item.clase_id);
-    const completadasUnicas = [...new Set(vistasIds)];
-    const total = totalClases.length;
-    const porcentaje = Math.round((completadasUnicas.length / total) * 100);
-
-    return {
-      completadas: completadasUnicas,
-      porcentaje: Math.min(porcentaje, 100)
-    };
-  } catch(e) {
-    return { completadas: [], porcentaje: 0 };
-  }
-}
-
-async function actualizarBarraProgresoUI() {
-  if (!usuarioAutenticado || !nivelActual) return;
-
-  const card = document.getElementById('studentProgressCard');
-  if (card) card.classList.remove('hidden');
-
-  const { completadas, porcentaje } = await obtenerProgresoNivel(nivelActual);
-
-  const txtPorcentaje = document.getElementById('txtPorcentajeProgreso');
-  const barProgreso = document.getElementById('barProgresoEstudiante');
-
-  if (txtPorcentaje) txtPorcentaje.textContent = `${porcentaje}%`;
-  if (barProgreso) barProgreso.style.width = `${porcentaje}%`;
-
-  const cSelC = document.getElementById('claseSelectClases');
-  if (cSelC) {
-    Array.from(cSelC.options).forEach(opt => {
-      if (completadas.includes(opt.value) && !opt.textContent.startsWith('✓')) {
-        opt.textContent = `✓ ${opt.textContent}`;
+  uSelC.innerHTML = '<option value="">Loading book units...</option>';
+  cSelC.innerHTML = '<option value="">-- Choose a Unit First --</option>'; cSelC.disabled = true;
+  const { data: datosClases, error: errC } = await supabaseClient
+    .from('clases')
+    .select('Unit, ID_Lesson')
+    .eq('Level', nivelActual);
+  if (!errC && datosClases) {
+    window.datosClasesMapeados = {};
+    datosClases.forEach(item => {
+      if (!window.datosClasesMapeados[item.Unit]) window.datosClasesMapeados[item.Unit] = [];
+      if (!window.datosClasesMapeados[item.Unit].includes(item.ID_Lesson)) {
+        window.datosClasesMapeados[item.Unit].push(item.ID_Lesson);
       }
     });
+    Object.keys(window.datosClasesMapeados).forEach(unidad => {
+      window.datosClasesMapeados[unidad].sort((a, b) => 
+        a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+      );
+    });
+    
+    uSelC.innerHTML = '<option value="">-- Choose a Unit --</option>';
+    const unidadesOrdenadas = Object.keys(window.datosClasesMapeados).sort((a, b) => 
+      a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+    );
+    unidadesOrdenadas.forEach(unidad => {
+      let opt = document.createElement('option'); opt.value = unidad; opt.textContent = unidad;
+      uSelC.appendChild(opt);
+    });
+  } else {
+    uSelC.innerHTML = '<option value="">Error loading units</option>';
   }
 }
 
-/* ==================== AUTENTICACIÓN FLEXIBLE ==================== */
+/* FUNCIÓN DE AUTENTICACIÓN DINÁMICA CON REVISIÓN DE FECHACADUCIDAD */
 async function autenticarUsuario() {
   const inputVal = document.getElementById('usernameInput').value.trim();
   const errDiv = document.getElementById('authErrorMsg');
@@ -701,17 +596,13 @@ async function autenticarUsuario() {
   btnAuth.textContent = "Verifying...";
 
   try {
-    const isNum = !isNaN(inputVal) && inputVal !== "";
-    const idSearchValue = isNum ? Number(inputVal) : inputVal;
+    const idSearchValue = !isNaN(inputVal) ? Number(inputVal) : inputVal;
 
-    let query = supabaseClient.from(tablaAuthActual).select('*');
-    if (isNum) {
-      query = query.or(`USER.eq.${inputVal},USER.eq.${idSearchValue}`);
-    } else {
-      query = query.eq('USER', inputVal);
-    }
-
-    const { data: registros, error } = await query;
+    // Consulta flexible por tipo numérico o texto en la tabla seleccionada (Usuarios o Usuarios_Examen)
+    const { data: registros, error } = await supabaseClient
+      .from(tablaAuthActual)
+      .select('*')
+      .or(`USER.eq.${inputVal},USER.eq.${idSearchValue}`);
 
     btnAuth.disabled = false; 
     btnAuth.textContent = "Verify Access";
@@ -723,6 +614,7 @@ async function autenticarUsuario() {
       return;
     }
 
+    // 1. Validar existencia del usuario
     if (!registros || registros.length === 0) {
       errDiv.textContent = `User/ID "${inputVal}" is not registered. Please verify.`; 
       errDiv.classList.remove('hidden');
@@ -732,6 +624,7 @@ async function autenticarUsuario() {
     const usuarioEncontrado = registros[0];
     const campoFecha = usuarioEncontrado.FECHACADUCIDAD || usuarioEncontrado.FECHA_CADUCIDAD || usuarioEncontrado.EXPIRATION;
 
+    // 2. Validar FECHACADUCIDAD
     if (campoFecha) {
       const fechaStr = String(campoFecha).trim().split('T')[0];
       const fechaCaducidad = new Date(`${fechaStr}T23:59:59`);
@@ -749,6 +642,7 @@ async function autenticarUsuario() {
       }
     }
 
+    // Si la autenticación es exitosa
     usuarioAutenticado = inputVal;
     sessionStorage.setItem('nexo_verified_user', usuarioAutenticado);
     ocultarModalAuth();
@@ -815,10 +709,6 @@ function actualizarSelectorClasesParaContenido() {
   (window.datosClasesMapeados[unidadSeleccionada] || []).forEach(clase => {
     let option = document.createElement('option'); option.value = clase; option.textContent = clase; claseSelect.appendChild(option);
   });
-  
-  try {
-    actualizarBarraProgresoUI();
-  } catch(e) {}
 }
 
 async function cargarEjercicios() {
@@ -978,6 +868,9 @@ async function cargarContenidoDeClase() {
     container.innerHTML = `<p class="text-center text-slate-400 py-16 font-medium">⚠️ No content available for ${claseId} in level${nivelActual}.</p>`;
     return;
   }
+
+  // Registrar que el alumno abrió/completó esta lección
+  registrarProgresoClase(claseId, 100);
 
   const formatearTexto = (txt) => txt ? txt.replace(/\[BREAK\]/g, '<br>') : '';
   let generoVoz = info.voz ? info.voz.toLowerCase().trim() : 'female';
@@ -1263,19 +1156,61 @@ async function revisarRespuestasInline() {
     btn.disabled = false;
     btn.textContent = "Check Answers";
   }
-
-  try {
-    const claseId = document.getElementById('claseSelectClases').value;
-    const porcentajeScore = Math.round((correctas / total) * 100);
-
-    if (porcentajeScore >= 50) {
-      await registrarProgresoClase(claseId, porcentajeScore);
-    }
-  } catch(e) {
-    console.error("Error al registrar el progreso final:", e);
-  }
-
   mostrarModalResultados(correctas, total);
+}
+
+// LÓGICA DE PROGRESO AISLADA Y SEGURA
+async function registrarProgresoClase(claseId, score) {
+  if (!usuarioAutenticado || !nivelActual || !claseId) return;
+  try {
+    await supabaseClient
+      .from('progreso_estudiantes')
+      .upsert(
+        { usuario_id: usuarioAutenticado, nivel: nivelActual, clase_id: claseId, score: score },
+        { onConflict: 'usuario_id,nivel,clase_id' }
+      );
+    actualizarBarraProgresoUI();
+  } catch (err) {
+    console.warn("No se pudo registrar el progreso:", err);
+  }
+}
+
+async function actualizarBarraProgresoUI() {
+  const card = document.getElementById('studentProgressCard');
+  if (!usuarioAutenticado || !nivelActual) {
+    if (card) card.classList.add('hidden');
+    return;
+  }
+  try {
+    const { data: clasesVistas } = await supabaseClient
+      .from('progreso_estudiantes')
+      .select('clase_id')
+      .eq('usuario_id', usuarioAutenticado)
+      .eq('nivel', nivelActual);
+
+    const { data: totalClases } = await supabaseClient
+      .from('clases')
+      .select('ID_Lesson')
+      .eq('Level', nivelActual);
+
+    if (!totalClases || totalClases.length === 0) {
+      if (card) card.classList.add('hidden');
+      return;
+    }
+
+    const vistasIds = (clasesVistas || []).map(item => item.clase_id);
+    const completadasUnicas = [...new Set(vistasIds)];
+    const porcentaje = Math.min(Math.round((completadasUnicas.length / totalClases.length) * 100), 100);
+
+    const txtPorcentaje = document.getElementById('txtPorcentajeProgreso');
+    const barProgreso = document.getElementById('barProgresoEstudiante');
+
+    if (card) card.classList.remove('hidden');
+    if (txtPorcentaje) txtPorcentaje.textContent = `${porcentaje}%`;
+    if (barProgreso) barProgreso.style.width = `${porcentaje}%`;
+  } catch (e) {
+    console.warn("Error al cargar la barra de progreso:", e);
+  }
 }
 
 let recSpeaking = null;
