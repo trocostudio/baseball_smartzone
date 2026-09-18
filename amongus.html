@@ -4,7 +4,7 @@
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>v1</title>
+<title>v1.2/title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <!-- CDN DE SUPABASE JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -509,7 +509,8 @@ async function cambiarNivel(nuevoNivel) {
   } else {
     document.getElementById('classesInterface').classList.remove('hidden');
     document.getElementById('exercisesInterface').classList.add('hidden');
-    actualizarBarraProgresoUI(); // Actualiza progreso sin bloquear
+    // Ejecución asíncrona no bloqueante
+    setTimeout(() => { actualizarBarraProgresoUI(); }, 0);
   }
   document.documentElement.style.setProperty('--nexo-highlight', coloresNivel[nuevoNivel] || '#0f172a');
   const barraHeader = document.getElementById('nivelContainerDesk');
@@ -869,8 +870,8 @@ async function cargarContenidoDeClase() {
     return;
   }
 
-  // Registrar que el alumno abrió/completó esta lección
-  registrarProgresoClase(claseId, 100);
+  // Se registra en segundo plano sin interrumpir la carga del HTML
+  setTimeout(() => { registrarProgresoClase(claseId, 100); }, 0);
 
   const formatearTexto = (txt) => txt ? txt.replace(/\[BREAK\]/g, '<br>') : '';
   let generoVoz = info.voz ? info.voz.toLowerCase().trim() : 'female';
@@ -1159,48 +1160,38 @@ async function revisarRespuestasInline() {
   mostrarModalResultados(correctas, total);
 }
 
-// LÓGICA DE PROGRESO AISLADA Y SEGURA
-async function registrarProgresoClase(claseId, score) {
+// FUNCIONES DE PROGRESO 100% AISLADAS Y BLINDADAS
+function registrarProgresoClase(claseId, score) {
   if (!usuarioAutenticado || !nivelActual || !claseId) return;
-  try {
-    await supabaseClient
-      .from('progreso_estudiantes')
-      .upsert(
-        { usuario_id: usuarioAutenticado, nivel: nivelActual, clase_id: claseId, score: score },
-        { onConflict: 'usuario_id,nivel,clase_id' }
-      );
-    actualizarBarraProgresoUI();
-  } catch (err) {
-    console.warn("No se pudo registrar el progreso:", err);
-  }
+  supabaseClient
+    .from('progreso_estudiantes')
+    .upsert(
+      { usuario_id: usuarioAutenticado, nivel: nivelActual, clase_id: claseId, score: score },
+      { onConflict: 'usuario_id,nivel,clase_id' }
+    )
+    .then(() => { actualizarBarraProgresoUI(); })
+    .catch(err => { console.warn("No se pudo registrar progreso:", err); });
 }
 
-async function actualizarBarraProgresoUI() {
+function actualizarBarraProgresoUI() {
   const card = document.getElementById('studentProgressCard');
   if (!usuarioAutenticado || !nivelActual) {
     if (card) card.classList.add('hidden');
     return;
   }
-  try {
-    const { data: clasesVistas } = await supabaseClient
-      .from('progreso_estudiantes')
-      .select('clase_id')
-      .eq('usuario_id', usuarioAutenticado)
-      .eq('nivel', nivelActual);
 
-    const { data: totalClases } = await supabaseClient
-      .from('clases')
-      .select('ID_Lesson')
-      .eq('Level', nivelActual);
-
-    if (!totalClases || totalClases.length === 0) {
+  Promise.all([
+    supabaseClient.from('progreso_estudiantes').select('clase_id').eq('usuario_id', usuarioAutenticado).eq('nivel', nivelActual),
+    supabaseClient.from('clases').select('ID_Lesson').eq('Level', nivelActual)
+  ]).then(([resProgreso, resTotal]) => {
+    if (resTotal.error || !resTotal.data || resTotal.data.length === 0) {
       if (card) card.classList.add('hidden');
       return;
     }
 
-    const vistasIds = (clasesVistas || []).map(item => item.clase_id);
+    const vistasIds = (resProgreso.data || []).map(item => item.clase_id);
     const completadasUnicas = [...new Set(vistasIds)];
-    const porcentaje = Math.min(Math.round((completadasUnicas.length / totalClases.length) * 100), 100);
+    const porcentaje = Math.min(Math.round((completadasUnicas.length / resTotal.data.length) * 100), 100);
 
     const txtPorcentaje = document.getElementById('txtPorcentajeProgreso');
     const barProgreso = document.getElementById('barProgresoEstudiante');
@@ -1208,9 +1199,9 @@ async function actualizarBarraProgresoUI() {
     if (card) card.classList.remove('hidden');
     if (txtPorcentaje) txtPorcentaje.textContent = `${porcentaje}%`;
     if (barProgreso) barProgreso.style.width = `${porcentaje}%`;
-  } catch (e) {
-    console.warn("Error al cargar la barra de progreso:", e);
-  }
+  }).catch(e => {
+    console.warn("Error al cargar progreso:", e);
+  });
 }
 
 let recSpeaking = null;
