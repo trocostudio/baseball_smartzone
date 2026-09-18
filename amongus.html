@@ -432,7 +432,8 @@ let modoActual = "ejercicios";
 let usuarioAutenticado = sessionStorage.getItem('nexo_verified_user') || null;
 let tablaAuthActual = "Usuarios"; 
 let accionPendientePostAuth = null;
-let claseActualCargada = null; // Guarda la lección que el usuario está viendo actualmente
+let claseActualCargada = null; 
+window.clasesCompletadasUsuario = new Set(); // Guarda los IDs de clases hechas por el estudiante
 
 const coloresNivel = {
   'INTRO': '#9333ea',
@@ -508,6 +509,8 @@ function regresarAlPaso1() {
 async function cambiarNivel(nuevoNivel) {
   nivelActual = nuevoNivel;
   claseActualCargada = null;
+  window.clasesCompletadasUsuario = new Set();
+
   document.querySelectorAll('.lblNivel').forEach(el => el.textContent = nuevoNivel);
   document.getElementById('landingPage').classList.add('hidden');
   
@@ -535,6 +538,20 @@ async function cambiarNivel(nuevoNivel) {
   cSel.innerHTML = '<option value="">-- Choose a Unit First --</option>'; cSel.disabled = true;
 
   if (supabaseClient) {
+    // 1. OBTENER PROGRESO PREVIO DEL ESTUDIANTE EN ESTE NIVEL
+    if (usuarioAutenticado) {
+      const { data: progresoData } = await supabaseClient
+        .from('progreso_estudiantes')
+        .select('clase_id')
+        .eq('usuario_id', usuarioAutenticado)
+        .eq('nivel', nuevoNivel);
+
+      if (progresoData) {
+        window.clasesCompletadasUsuario = new Set(progresoData.map(p => p.clase_id));
+      }
+    }
+
+    // 2. CARGAR EJERCICIOS GRATIS
     const { data: datosGratis, error: errG } = await supabaseClient
       .from('ejercicios_gratis')
       .select('Clase')
@@ -552,6 +569,7 @@ async function cambiarNivel(nuevoNivel) {
       uSel.innerHTML = '<option value="">Error loading units</option>';
     }
 
+    // 3. CARGAR UNIDADES Y LECCIONES DE CLASE
     const uSelC = document.getElementById('unidadSelectClases');
     const cSelC = document.getElementById('claseSelectClases');
     uSelC.innerHTML = '<option value="">Loading book units...</option>';
@@ -709,8 +727,19 @@ function actualizarSelectorClasesParaContenido() {
   const claseSelect = document.getElementById('claseSelectClases');
   if (!unidadSeleccionada) { claseSelect.innerHTML = '<option value="">-- Choose a Unit First --</option>'; claseSelect.disabled = true; return; }
   claseSelect.innerHTML = '<option value="">-- Choose Material --</option>'; claseSelect.disabled = false;
+  
   (window.datosClasesMapeados[unidadSeleccionada] || []).forEach(clase => {
-    let option = document.createElement('option'); option.value = clase; option.textContent = clase; claseSelect.appendChild(option);
+    let option = document.createElement('option'); 
+    option.value = clase; 
+    
+    // Si el usuario ya la completó, agregamos el check verde
+    if (window.clasesCompletadasUsuario && window.clasesCompletadasUsuario.has(clase)) {
+      option.textContent = `✓ ${clase} (Completed)`;
+    } else {
+      option.textContent = clase;
+    }
+
+    claseSelect.appendChild(option);
   });
 }
 
@@ -860,7 +889,7 @@ async function cargarContenidoDeClase() {
   const container = document.getElementById('contenidoClaseContainer');
   if (!claseId || !supabaseClient) return;
   
-  claseActualCargada = claseId; // Guardamos la lección seleccionada
+  claseActualCargada = claseId;
   container.innerHTML = '<p class="text-center text-slate-500 py-16 font-medium">Loading class materials...</p>';
 
   const { data: info, error } = await supabaseClient
@@ -1166,10 +1195,15 @@ async function revisarRespuestasInline() {
     }
   }
 
-  // REGISTRAR LA LECCIÓN COMO COMPLETADA AL REVISAR LOS EJERCICIOS
+  // MARCAR LECCIÓN COMO COMPLETADA E INSERTAR EN SUPABASE
   if (claseActualCargada) {
     let scoreFinalCalculado = total > 0 ? Math.round((correctas / total) * 100) : 100;
-    setTimeout(() => { registrarProgresoClase(claseActualCargada, scoreFinalCalculado); }, 0);
+    
+    if (!window.clasesCompletadasUsuario) window.clasesCompletadasUsuario = new Set();
+    window.clasesCompletadasUsuario.add(claseActualCargada);
+
+    registrarProgresoClase(claseActualCargada, scoreFinalCalculado);
+    actualizarSelectorClasesParaContenido();
   }
 
   if (btn) {
