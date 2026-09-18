@@ -4,7 +4,7 @@
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>v1.2</title>
+<title>WeSpeak - Nexo AI Teacher</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <!-- CDN DE SUPABASE JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -164,7 +164,6 @@ body {
     </div>
   </div>
 
-  <!-- NUEVA TARJETA GRATUITA PARA JUEGOS INTERACTIVOS -->
   <div onclick="irAJuegos()" class="border border-slate-200/80 hover:border-teal-500 bg-white hover:bg-teal-50/20 p-6 rounded-2xl cursor-pointer transition-all duration-300 transform hover:-translate-y-1.5 shadow-sm hover:shadow-xl group text-center flex flex-col justify-between">
     <div>
       <span class="w-16 h-16 rounded-2xl bg-teal-500/10 text-teal-600 flex items-center justify-center font-bold text-3xl mx-auto mb-4 shadow-inner group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300">🎮</span>
@@ -408,7 +407,15 @@ Check Answers
 // URL Y CLAVE PUBLICABLE DE SUPABASE
 const SUPABASE_URL = "https://jlcwoukhukrtjbbizwxs.supabase.co"; 
 const SUPABASE_ANON_KEY = "sb_publishable_oI5J-Q2_dT8NmmAmMxkobQ_fmTNKzLh"; 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseClient = null;
+
+try {
+  if (typeof supabase !== 'undefined') {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch (e) {
+  console.error("Error inicializando Supabase:", e);
+}
 
 const MASCOTA = {
   error: 'https://drive.google.com/thumbnail?id=1CkhbIWRpoVLHt7t97xY4CBcHxj31L-9_&sz=w800',
@@ -423,7 +430,7 @@ let ejerciciosActuales = [];
 let nivelActual = null;
 let modoActual = "ejercicios";
 let usuarioAutenticado = sessionStorage.getItem('nexo_verified_user') || null;
-let tablaAuthActual = "Usuarios"; // Controla qué tabla consultar en el modal ('Usuarios' o 'Usuarios_Examen')
+let tablaAuthActual = "Usuarios"; 
 let accionPendientePostAuth = null;
 
 const coloresNivel = {
@@ -460,7 +467,6 @@ function irAJuegos() {
   window.location.href = "games.html";
 }
 
-// ACCESO A CLASES (Usa la tabla "Usuarios")
 function intentarAccesoModo(modo) {
   if (modo === 'clases' && !usuarioAutenticado) {
     tablaAuthActual = "Usuarios";
@@ -471,7 +477,6 @@ function intentarAccesoModo(modo) {
   seleccionarModoLanding(modo);
 }
 
-// ACCESO AL EXAMEN (Usa la tabla "Usuarios_Examen")
 function intentarAccesoExamen() {
   tablaAuthActual = "Usuarios_Examen";
   accionPendientePostAuth = function() { window.open(URL_EXAMEN_PREMIUM, '_blank'); };
@@ -509,7 +514,6 @@ async function cambiarNivel(nuevoNivel) {
   } else {
     document.getElementById('classesInterface').classList.remove('hidden');
     document.getElementById('exercisesInterface').classList.add('hidden');
-    // Ejecución asíncrona no bloqueante
     setTimeout(() => { actualizarBarraProgresoUI(); }, 0);
   }
   document.documentElement.style.setProperty('--nexo-highlight', coloresNivel[nuevoNivel] || '#0f172a');
@@ -522,65 +526,65 @@ async function cambiarNivel(nuevoNivel) {
       : "px-3 py-1.5 text-2xs sm:text-xs font-bold rounded-xl transition cursor-pointer text-slate-300 hover:text-white hover:bg-sky-500/20";
   });
 
-  // 1. CARGAR CLASES DE EJERCICIOS GRATIS
   const uSel = document.getElementById('unidadSelect');
   const cSel = document.getElementById('claseSelect');
   uSel.innerHTML = '<option value="">Loading book units...</option>';
   cSel.innerHTML = '<option value="">-- Choose a Unit First --</option>'; cSel.disabled = true;
-  const { data: datosGratis, error: errG } = await supabaseClient
-    .from('ejercicios_gratis')
-    .select('Clase')
-    .eq('NIVEL', nivelActual);
-  if (!errG && datosGratis) {
-    let clasesUnicas = [...new Set(datosGratis.map(d => d.Clase))];
-    clasesUnicas.sort((a, b) => 
-      a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-    );
-    window.datosEjerciciosMapeados = { "General Practice": clasesUnicas };
-    uSel.innerHTML = '<option value="">-- Choose Group --</option>';
-    let opt = document.createElement('option'); opt.value = "General Practice"; opt.textContent = "General Practice";
-    uSel.appendChild(opt);
-  } else {
-    uSel.innerHTML = '<option value="">Error loading units</option>';
-  }
 
-  // 2. CARGAR UNIDADES Y CLASES
-  const uSelC = document.getElementById('unidadSelectClases');
-  const cSelC = document.getElementById('claseSelectClases');
-  uSelC.innerHTML = '<option value="">Loading book units...</option>';
-  cSelC.innerHTML = '<option value="">-- Choose a Unit First --</option>'; cSelC.disabled = true;
-  const { data: datosClases, error: errC } = await supabaseClient
-    .from('clases')
-    .select('Unit, ID_Lesson')
-    .eq('Level', nivelActual);
-  if (!errC && datosClases) {
-    window.datosClasesMapeados = {};
-    datosClases.forEach(item => {
-      if (!window.datosClasesMapeados[item.Unit]) window.datosClasesMapeados[item.Unit] = [];
-      if (!window.datosClasesMapeados[item.Unit].includes(item.ID_Lesson)) {
-        window.datosClasesMapeados[item.Unit].push(item.ID_Lesson);
-      }
-    });
-    Object.keys(window.datosClasesMapeados).forEach(unidad => {
-      window.datosClasesMapeados[unidad].sort((a, b) => 
+  if (supabaseClient) {
+    const { data: datosGratis, error: errG } = await supabaseClient
+      .from('ejercicios_gratis')
+      .select('Clase')
+      .eq('NIVEL', nivelActual);
+    if (!errG && datosGratis) {
+      let clasesUnicas = [...new Set(datosGratis.map(d => d.Clase))];
+      clasesUnicas.sort((a, b) => 
         a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
       );
-    });
-    
-    uSelC.innerHTML = '<option value="">-- Choose a Unit --</option>';
-    const unidadesOrdenadas = Object.keys(window.datosClasesMapeados).sort((a, b) => 
-      a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-    );
-    unidadesOrdenadas.forEach(unidad => {
-      let opt = document.createElement('option'); opt.value = unidad; opt.textContent = unidad;
-      uSelC.appendChild(opt);
-    });
-  } else {
-    uSelC.innerHTML = '<option value="">Error loading units</option>';
+      window.datosEjerciciosMapeados = { "General Practice": clasesUnicas };
+      uSel.innerHTML = '<option value="">-- Choose Group --</option>';
+      let opt = document.createElement('option'); opt.value = "General Practice"; opt.textContent = "General Practice";
+      uSel.appendChild(opt);
+    } else {
+      uSel.innerHTML = '<option value="">Error loading units</option>';
+    }
+
+    const uSelC = document.getElementById('unidadSelectClases');
+    const cSelC = document.getElementById('claseSelectClases');
+    uSelC.innerHTML = '<option value="">Loading book units...</option>';
+    cSelC.innerHTML = '<option value="">-- Choose a Unit First --</option>'; cSelC.disabled = true;
+    const { data: datosClases, error: errC } = await supabaseClient
+      .from('clases')
+      .select('Unit, ID_Lesson')
+      .eq('Level', nivelActual);
+    if (!errC && datosClases) {
+      window.datosClasesMapeados = {};
+      datosClases.forEach(item => {
+        if (!window.datosClasesMapeados[item.Unit]) window.datosClasesMapeados[item.Unit] = [];
+        if (!window.datosClasesMapeados[item.Unit].includes(item.ID_Lesson)) {
+          window.datosClasesMapeados[item.Unit].push(item.ID_Lesson);
+        }
+      });
+      Object.keys(window.datosClasesMapeados).forEach(unidad => {
+        window.datosClasesMapeados[unidad].sort((a, b) => 
+          a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+        );
+      });
+      
+      uSelC.innerHTML = '<option value="">-- Choose a Unit --</option>';
+      const unidadesOrdenadas = Object.keys(window.datosClasesMapeados).sort((a, b) => 
+        a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+      );
+      unidadesOrdenadas.forEach(unidad => {
+        let opt = document.createElement('option'); opt.value = unidad; opt.textContent = unidad;
+        uSelC.appendChild(opt);
+      });
+    } else {
+      uSelC.innerHTML = '<option value="">Error loading units</option>';
+    }
   }
 }
 
-/* FUNCIÓN DE AUTENTICACIÓN DINÁMICA CON REVISIÓN DE FECHACADUCIDAD */
 async function autenticarUsuario() {
   const inputVal = document.getElementById('usernameInput').value.trim();
   const errDiv = document.getElementById('authErrorMsg');
@@ -598,8 +602,8 @@ async function autenticarUsuario() {
 
   try {
     const idSearchValue = !isNaN(inputVal) ? Number(inputVal) : inputVal;
+    if (!supabaseClient) throw new Error("Supabase client not initialized.");
 
-    // Consulta flexible por tipo numérico o texto en la tabla seleccionada (Usuarios o Usuarios_Examen)
     const { data: registros, error } = await supabaseClient
       .from(tablaAuthActual)
       .select('*')
@@ -609,13 +613,11 @@ async function autenticarUsuario() {
     btnAuth.textContent = "Verify Access";
 
     if (error) {
-      console.error(`Error al consultar ${tablaAuthActual}:`, error);
-      errDiv.textContent = `Error (${error.code \vert{}\vert{} 'RLS'}):${error.message}`;
+      errDiv.textContent = `Error (${error.code || 'RLS'}): ${error.message}`;
       errDiv.classList.remove('hidden');
       return;
     }
 
-    // 1. Validar existencia del usuario
     if (!registros || registros.length === 0) {
       errDiv.textContent = `User/ID "${inputVal}" is not registered. Please verify.`; 
       errDiv.classList.remove('hidden');
@@ -625,7 +627,6 @@ async function autenticarUsuario() {
     const usuarioEncontrado = registros[0];
     const campoFecha = usuarioEncontrado.FECHACADUCIDAD || usuarioEncontrado.FECHA_CADUCIDAD || usuarioEncontrado.EXPIRATION;
 
-    // 2. Validar FECHACADUCIDAD
     if (campoFecha) {
       const fechaStr = String(campoFecha).trim().split('T')[0];
       const fechaCaducidad = new Date(`${fechaStr}T23:59:59`);
@@ -643,7 +644,6 @@ async function autenticarUsuario() {
       }
     }
 
-    // Si la autenticación es exitosa
     usuarioAutenticado = inputVal;
     sessionStorage.setItem('nexo_verified_user', usuarioAutenticado);
     ocultarModalAuth();
@@ -659,7 +659,6 @@ async function autenticarUsuario() {
   } catch (errEx) {
     btnAuth.disabled = false; 
     btnAuth.textContent = "Verify Access";
-    console.error("Excepción al autenticar:", errEx);
     errDiv.textContent = "Network error or invalid query. Check browser console.";
     errDiv.classList.remove('hidden');
   }
@@ -684,7 +683,7 @@ function ocultarModalAuth() {
 }
 
 function mostrarModalResultados(correctas, total) {
-  document.getElementById('scoreModalText').textContent = `${correctas} de${total}`;
+  document.getElementById('scoreModalText').textContent = `${correctas} de ${total}`;
   document.getElementById('resultsModal').classList.remove('hidden');
 }
 
@@ -718,19 +717,25 @@ async function cargarEjercicios() {
   const btn = document.getElementById('btnRevisar');
   if (!clase) { btn.classList.add('hidden'); return; }
   container.innerHTML = '<p class="text-center text-slate-500 py-16 font-medium">Loading questions...</p>';
+  
+  if (!supabaseClient) return;
+
   const { data: ejercicios, error } = await supabaseClient
     .from('ejercicios_gratis')
     .select('*')
     .eq('NIVEL', nivelActual)
     .eq('Clase', clase);
+
   if (error || !ejercicios || ejercicios.length === 0) {
     container.innerHTML = '<p class="text-center text-rose-500 py-16 font-medium">No exercises found for this selection.</p>';
     btn.classList.add('hidden');
     return;
   }
+
   ejerciciosActuales = ejercicios;
   container.innerHTML = '';
   let ultimaInstruccion = null;
+
   ejercicios.forEach((ej, index) => {
     let ejKey = ej.ID_Pregunta || (index + 1).toString();
     ej.keyFinal = ejKey;
@@ -742,11 +747,13 @@ async function cargarEjercicios() {
       container.appendChild(bannerInstruccion);
       ultimaInstruccion = ej.instruccion;
     }
+
     let card = document.createElement('div');
     card.className = "bg-slate-50/70 border border-slate-200/80 p-5 rounded-2xl shadow-xs transition-colors duration-300";
     card.id = `card-${ejKey}`;
     let opciones = ej.Opciones ? ej.Opciones.split(',').map(o => o.trim()) : [];
-    let htmlPregunta = `<p class="font-semibold text-slate-900 mb-3 text-base"><span class="dinamic-accent font-extrabold mr-1">${ejKey}.</span>${ej.Enunciado}</p>`;
+    let htmlPregunta = `<p class="font-semibold text-slate-900 mb-3 text-base"><span class="dinamic-accent font-extrabold mr-1">${ejKey}.</span> ${ej.Enunciado}</p>`;
+    
     if ((ej.Tipo === "Opción múltiple" || ej.Tipo === "Opcion multiple") && opciones.length > 0) {
       opciones.forEach(opc => {
         htmlPregunta += `<label class="flex items-center space-x-3 bg-white p-3 my-2 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100/80 transition shadow-2xs"><input type="radio" name="input-${ejKey}" value="${opc}" class="dinamic-radio h-4 w-4"><span class="text-sm font-medium text-slate-700">${opc}</span></label>`;
@@ -756,6 +763,7 @@ async function cargarEjercicios() {
     } else {
       htmlPregunta += `<input type="text" id="input-${ejKey}" placeholder="Type your answer here..." class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none dinamic-focus shadow-2xs">`;
     }
+    
     htmlPregunta += `<div id="feedback-${ejKey}" class="mt-3 p-3.5 text-sm rounded-xl border hidden"></div>`;
     card.innerHTML = htmlPregunta;
     container.appendChild(card);
@@ -784,13 +792,10 @@ async function evaluarRedaccionConIA(nivel, instruccion, enunciado, respuestaEst
     });
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Error en la Edge Function:", errorText);
-      return { score: 50, feedback: `Error from server (${response.status}):${errorText}` };
+      return { score: 50, feedback: `Error from server (${response.status}): ${errorText}` };
     }
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error("Excepción al conectar con la IA:", error);
     return { score: 50, feedback: "Error connecting to AI teacher: " + error.message };
   }
 }
@@ -803,6 +808,7 @@ async function revisarRespuestas() {
   btn.textContent = "Checking answers with NEXO AI Teacher...";
   let correctas = 0;
   let total = ejerciciosActuales.length;
+
   for (let ej of ejerciciosActuales) {
     let ejKey = ej.keyFinal || ej.ID_Pregunta;
     let respuestaUsuario = "";
@@ -849,7 +855,7 @@ async function revisarRespuestas() {
 async function cargarContenidoDeClase() {
   const claseId = document.getElementById('claseSelectClases').value;
   const container = document.getElementById('contenidoClaseContainer');
-  if (!claseId) return;
+  if (!claseId || !supabaseClient) return;
   container.innerHTML = '<p class="text-center text-slate-500 py-16 font-medium">Loading class materials...</p>';
 
   const { data: info, error } = await supabaseClient
@@ -859,18 +865,17 @@ async function cargarContenidoDeClase() {
     .eq('ID_Lesson', claseId)
     .maybeSingle();
 
-  const { data: ejerciciosClase, error: errEj } = await supabaseClient
+  const { data: ejerciciosClase } = await supabaseClient
     .from('ejercicios_clases')
     .select('*')
     .eq('Level', nivelActual)
     .eq('ID_Lesson', claseId);
 
   if (error || !info) {
-    container.innerHTML = `<p class="text-center text-slate-400 py-16 font-medium">⚠️ No content available for ${claseId} in level${nivelActual}.</p>`;
+    container.innerHTML = `<p class="text-center text-slate-400 py-16 font-medium">⚠️ No content available for ${claseId} in level ${nivelActual}.</p>`;
     return;
   }
 
-  // Se registra en segundo plano sin interrumpir la carga del HTML
   setTimeout(() => { registrarProgresoClase(claseId, 100); }, 0);
 
   const formatearTexto = (txt) => txt ? txt.replace(/\[BREAK\]/g, '<br>') : '';
@@ -888,9 +893,7 @@ async function cargarContenidoDeClase() {
     </div>`;
   }
 
-  let textoLimpioAudio = info.Dialog ? info.Dialog.replace(/['"`]/g, '').replace(/\r\n|\n|\r/g, '|').trim() : '';
   let ejerciciosHtml = '';
-
   if (ejerciciosClase && ejerciciosClase.length > 0) {
     window.ejerciciosClaseActual = ejerciciosClase;
     let listaEjerciciosHtml = '';
@@ -920,7 +923,59 @@ async function cargarContenidoDeClase() {
       </div>`;
   }
 
-  const fraseSpeaking = (info.Speaking_Phrase || info.Lesson_Title || "I would like to order a cup of coffee, please.").replace(/['"`]/g, '').trim();
+  const fraseSpeaking = (info.Speaking_Phrase || info.Lesson_Title || "I would like to order a cup of coffee, please.").replace(/["'\\]/g, '').trim();
+
+  let htmlDialogos = '';
+  if (info.Dialog) {
+    const lineasChat = info.Dialog.split(/\r\n|\n|\r/).map(l => l.trim()).filter(l => l.length > 0);
+    lineasChat.forEach((linea, idx) => {
+      let esMasculino = (generoVoz === 'male');
+      let textoFinal = linea;
+      const lineaLower = linea.toLowerCase();
+      if (lineaLower.startsWith('(male)')) {
+        esMasculino = true;
+        textoFinal = linea.substring(6).trim();
+      } else if (lineaLower.startsWith('(female)')) {
+        esMasculino = false;
+        textoFinal = linea.substring(8).trim();
+      }
+      let nombrePersonaje = esMasculino ? "Michael" : "Jennifer"; 
+      if (textoFinal.includes(':')) {
+        const partes = textoFinal.split(':');
+        nombrePersonaje = partes[0].trim();
+        textoFinal = partes.slice(1).join(':').trim();
+      }
+      
+      const audioId = `audio_dialog_${idx}`;
+      window[audioId] = textoFinal.replace(/["'\\]/g, '').trim();
+
+      if (esMasculino) {
+        htmlDialogos += `
+          <div class="flex flex-col items-start w-full">
+            <span class="text-xs font-bold text-slate-400 ml-2 mb-1">${nombrePersonaje}</span>
+            <div class="flex items-center gap-2 max-w-[85%] md:max-w-[70%]">
+              <div class="bg-slate-100 text-slate-800 px-5 py-3 rounded-2xl rounded-tl-none border border-slate-200/80 shadow-2xs text-sm font-medium leading-relaxed">
+                ${textoFinal}
+              </div>
+              <button onclick="reproducirTexto(window['${audioId}'], 'male')" class="w-8 h-8 flex items-center justify-center bg-slate-50 hover:bg-slate-200 border border-slate-200 rounded-full text-xs text-sky-500 transition shadow-2xs cursor-pointer" title="Listen line">🔊</button>
+            </div>
+          </div>`;
+      } else {
+        htmlDialogos += `
+          <div class="flex flex-col items-end w-full">
+            <span class="text-xs font-bold text-slate-400 mr-2 mb-1">${nombrePersonaje}</span>
+            <div class="flex items-center justify-end gap-2 max-w-[85%] md:max-w-[70%]">
+              <button onclick="reproducirTexto(window['${audioId}'], 'female')" class="w-8 h-8 flex items-center justify-center bg-slate-50 hover:bg-slate-200 border border-slate-200 rounded-full text-xs text-sky-500 transition order-1 shadow-2xs cursor-pointer" title="Listen line">🔊</button>
+              <div class="bg-gradient-to-r from-amber-500 to-purple-500 text-white px-5 py-3 rounded-2xl rounded-tr-none shadow-md text-sm font-medium leading-relaxed order-2">
+                ${textoFinal}
+              </div>
+            </div>
+          </div>`;
+      }
+    });
+  }
+
+  window.dialogoCompletoTexto = info.Dialog ? info.Dialog.replace(/["'\\]/g, '').replace(/\r\n|\n|\r/g, '|').trim() : '';
 
   container.innerHTML = `
   <div class="w-full space-y-6 text-left">
@@ -939,58 +994,12 @@ async function cargarContenidoDeClase() {
           <img src="${MASCOTA.wink}" class="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-xs" alt="Wink Bot">
           <span class="text-base sm:text-lg text-slate-800 font-extrabold">DIALOGUE</span>
         </h4>
-        <button onclick="reproducirTexto('${textoLimpioAudio}', '${generoVoz}')" class="flex items-center gap-1.5 px-4 py-2 bg-amber-100 text-amber-900 hover:bg-amber-200 font-bold rounded-full text-xs transition cursor-pointer shadow-xs border border-amber-200/60">
+        <button onclick="reproducirTexto(window.dialogoCompletoTexto, '${generoVoz}')" class="flex items-center gap-1.5 px-4 py-2 bg-amber-100 text-amber-900 hover:bg-amber-200 font-bold rounded-full text-xs transition cursor-pointer shadow-xs border border-amber-200/60">
           <span>▶</span> Play Dialogue 
         </button>
       </div>
       <div class="space-y-4 my-2">
-        ${(() => {
-          const lineasChat = info.Dialog.split(/\r\n|\n|\r/).map(l => l.trim()).filter(l => l.length > 0);
-          let htmlBurbujas = '';
-          lineasChat.forEach((linea) => {
-            let esMasculino = (generoVoz === 'male');
-            let textoFinal = linea;
-            const lineaLower = linea.toLowerCase();
-            if (lineaLower.startsWith('(male)')) {
-              esMasculino = true;
-              textoFinal = linea.substring(6).trim();
-            } else if (lineaLower.startsWith('(female)')) {
-              esMasculino = false;
-              textoFinal = linea.substring(8).trim();
-            }
-            let nombrePersonaje = esMasculino ? "Michael" : "Jennifer"; 
-            if (textoFinal.includes(':')) {
-              const partes = textoFinal.split(':');
-              nombrePersonaje = partes[0].trim();
-              textoFinal = partes.slice(1).join(':').trim();
-            }
-            const audioIndividualText = textoFinal.replace(/['"`]/g, '').trim();
-            if (esMasculino) {
-              htmlBurbujas += `
-                <div class="flex flex-col items-start w-full">
-                  <span class="text-xs font-bold text-slate-400 ml-2 mb-1">${nombrePersonaje}</span>
-                  <div class="flex items-center gap-2 max-w-[85%] md:max-w-[70%]">
-                    <div class="bg-slate-100 text-slate-800 px-5 py-3 rounded-2xl rounded-tl-none border border-slate-200/80 shadow-2xs text-sm font-medium leading-relaxed">
-                      ${textoFinal}
-                    </div>
-                    <button onclick="reproducirTexto('${audioIndividualText}', 'male')" class="w-8 h-8 flex items-center justify-center bg-slate-50 hover:bg-slate-200 border border-slate-200 rounded-full text-xs text-sky-500 transition shadow-2xs cursor-pointer" title="Listen line">🔊</button>
-                  </div>
-                </div>`;
-            } else {
-              htmlBurbujas += `
-                <div class="flex flex-col items-end w-full">
-                  <span class="text-xs font-bold text-slate-400 mr-2 mb-1">${nombrePersonaje}</span>
-                  <div class="flex items-center justify-end gap-2 max-w-[85%] md:max-w-[70%]">
-                    <button onclick="reproducirTexto('${audioIndividualText}', 'female')" class="w-8 h-8 flex items-center justify-center bg-slate-50 hover:bg-slate-200 border border-slate-200 rounded-full text-xs text-sky-500 transition order-1 shadow-2xs cursor-pointer" title="Listen line">🔊</button>
-                    <div class="bg-gradient-to-r from-amber-500 to-purple-500 text-white px-5 py-3 rounded-2xl rounded-tr-none shadow-md text-sm font-medium leading-relaxed order-2">
-                      ${textoFinal}
-                    </div>
-                  </div>
-                </div>`;
-            }
-          });
-          return htmlBurbujas;
-        })()}
+        ${htmlDialogos}
       </div>
     </div>` : ''}
 
@@ -1160,9 +1169,8 @@ async function revisarRespuestasInline() {
   mostrarModalResultados(correctas, total);
 }
 
-// FUNCIONES DE PROGRESO 100% AISLADAS Y BLINDADAS
 function registrarProgresoClase(claseId, score) {
-  if (!usuarioAutenticado || !nivelActual || !claseId) return;
+  if (!usuarioAutenticado || !nivelActual || !claseId || !supabaseClient) return;
   supabaseClient
     .from('progreso_estudiantes')
     .upsert(
@@ -1175,7 +1183,7 @@ function registrarProgresoClase(claseId, score) {
 
 function actualizarBarraProgresoUI() {
   const card = document.getElementById('studentProgressCard');
-  if (!usuarioAutenticado || !nivelActual) {
+  if (!usuarioAutenticado || !nivelActual || !supabaseClient) {
     if (card) card.classList.add('hidden');
     return;
   }
@@ -1299,6 +1307,7 @@ function evaluarPronunciacion(textoEscuchado) {
 
 let vozMasculinaGlobal = null;
 let vozFemeninaGlobal = null;
+
 function cargarVocesFijas() {
   const voces = window.speechSynthesis.getVoices();
   if (voces.length === 0) return;
@@ -1319,6 +1328,7 @@ if (typeof window !== 'undefined' && window.speechSynthesis) {
 }
 
 function reproducirTexto(texto, generoBase) {
+  if (!texto) return;
   if (window.speechSynthesis.speaking) {
     window.speechSynthesis.cancel();
   }
@@ -1328,6 +1338,7 @@ function reproducirTexto(texto, generoBase) {
   const lineas = texto.split('|'); 
   const lineasValidas = lineas.map(l => l.trim()).filter(l => l.length > 0);
   if (lineasValidas.length === 0) return;
+
   lineasValidas.forEach(lineaLimpia => {
     let usarVozMasculina = (generoBase === 'male');
     let textoAPronunciar = lineaLimpia;
