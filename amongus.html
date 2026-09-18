@@ -432,6 +432,7 @@ let modoActual = "ejercicios";
 let usuarioAutenticado = sessionStorage.getItem('nexo_verified_user') || null;
 let tablaAuthActual = "Usuarios"; 
 let accionPendientePostAuth = null;
+let claseActualCargada = null; // Guarda la lección que el usuario está viendo actualmente
 
 const coloresNivel = {
   'INTRO': '#9333ea',
@@ -448,6 +449,7 @@ window.onload = function() {
 
 function irAlHome() {
   nivelActual = null;
+  claseActualCargada = null;
   document.documentElement.style.setProperty('--nexo-highlight', '#0f172a');
   document.getElementById('landingPage').classList.remove('hidden');
   document.getElementById('exercisesInterface').classList.add('hidden');
@@ -505,6 +507,7 @@ function regresarAlPaso1() {
 
 async function cambiarNivel(nuevoNivel) {
   nivelActual = nuevoNivel;
+  claseActualCargada = null;
   document.querySelectorAll('.lblNivel').forEach(el => el.textContent = nuevoNivel);
   document.getElementById('landingPage').classList.add('hidden');
   
@@ -856,6 +859,8 @@ async function cargarContenidoDeClase() {
   const claseId = document.getElementById('claseSelectClases').value;
   const container = document.getElementById('contenidoClaseContainer');
   if (!claseId || !supabaseClient) return;
+  
+  claseActualCargada = claseId; // Guardamos la lección seleccionada
   container.innerHTML = '<p class="text-center text-slate-500 py-16 font-medium">Loading class materials...</p>';
 
   const { data: info, error } = await supabaseClient
@@ -875,8 +880,6 @@ async function cargarContenidoDeClase() {
     container.innerHTML = `<p class="text-center text-slate-400 py-16 font-medium">⚠️ No content available for ${claseId} in level ${nivelActual}.</p>`;
     return;
   }
-
-  setTimeout(() => { registrarProgresoClase(claseId, 100); }, 0);
 
   const formatearTexto = (txt) => txt ? txt.replace(/\[BREAK\]/g, '<br>') : '';
   let generoVoz = info.voz ? info.voz.toLowerCase().trim() : 'female';
@@ -1162,6 +1165,13 @@ async function revisarRespuestasInline() {
       }
     }
   }
+
+  // REGISTRAR LA LECCIÓN COMO COMPLETADA AL REVISAR LOS EJERCICIOS
+  if (claseActualCargada) {
+    let scoreFinalCalculado = total > 0 ? Math.round((correctas / total) * 100) : 100;
+    setTimeout(() => { registrarProgresoClase(claseActualCargada, scoreFinalCalculado); }, 0);
+  }
+
   if (btn) {
     btn.disabled = false;
     btn.textContent = "Check Answers";
