@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Academia Living English — Hero Section</title>
   
-  <!-- Fuente Geist -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,300;0,400;0,500;0,600&amp;display=swap">
+  <!-- Fuentes Google: Fredoka (Títulos estilo KiddoLearn) y Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     /* RESET & BASE */
@@ -19,7 +21,7 @@
     body {
       background-color: #0b1936;
       color: #ffffff;
-      font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
@@ -38,7 +40,7 @@
       padding-bottom: clamp(40px, 8vh, 64px);
       overflow: hidden;
 
-      /* Imagen de fondo limpia sin overlay de niebla */
+      /* Imagen de fondo nítida */
       background-image: url('https://lh3.googleusercontent.com/d/19sb4amWXBo82wq92BbvMXkU90TgwK7Wr');
       background-size: cover;
       background-position: center;
@@ -70,19 +72,21 @@
     }
 
     .brand-logo {
-      font-weight: 600;
-      font-size: 20px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 26px;
       color: #ffffff;
       text-decoration: none;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
       display: flex;
       align-items: center;
-      gap: 10px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+      gap: 6px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
     }
 
+    /* Acento de Marca en Azul Vibrante */
     .brand-logo span {
-      color: #ff5722;
+      color: #38bdf8;
     }
 
     .desktop-nav {
@@ -98,48 +102,48 @@
     }
 
     .nav-link {
-      font-weight: 400;
+      font-weight: 600;
       font-size: 15px;
       color: #ffffff;
       text-decoration: none;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
       transition: color 0.2s ease;
     }
 
     .nav-link:hover,
     .nav-link:focus-visible {
-      color: #ff5722;
+      color: #38bdf8;
     }
 
     .btn-talk {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: #ff5722;
+      background-color: #0073e6;
       color: #ffffff;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 14px;
-      padding: 10px 20px;
+      padding: 10px 22px;
       border-radius: 8px;
       text-decoration: none;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0, 115, 230, 0.4);
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
     .btn-talk:hover {
-      background-color: #f44336;
+      background-color: #005bb5;
     }
 
-    /* BOTÓN DE MENÚ MÓVIL */
+    /* BOTÓN MENÚ MÓVIL */
     .mobile-menu-btn {
       display: flex;
       background: none;
       border: none;
       color: #ffffff;
-      font-weight: 500;
-      font-size: 15px;
+      font-weight: 600;
+      font-size: 16px;
       cursor: pointer;
       padding: 8px 0;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
@@ -196,7 +200,7 @@
 
     .mobile-menu-links .nav-link {
       font-size: 24px;
-      font-weight: 300;
+      font-weight: 500;
       color: #ffffff;
       text-shadow: none;
     }
@@ -212,76 +216,81 @@
       font-size: 16px;
     }
 
-    /* CONTENIDO PRINCIPAL / TEXTOS HERO */
+    /* CONTENIDO PRINCIPAL / TEXTOS HERO ESTILO KIDDOLEARN */
     .hero-content {
       position: relative;
       z-index: 10;
-      max-width: 768px;
+      max-width: 800px;
       margin-top: auto;
       text-align: left;
     }
 
     .tagline {
       display: inline-block;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 13px;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: #ffffff;
-      background: #ff5722;
-      padding: 6px 12px;
+      background: #0073e6;
+      padding: 8px 16px;
       border-radius: 6px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(0, 115, 230, 0.3);
     }
 
+    /* Título estilo KiddoLearn (Fredoka Bold, Mayúsculas impactantes) */
     .hero-title {
-      font-weight: 400;
-      font-size: 48px;
-      line-height: 0.95;
-      letter-spacing: -0.03em;
-      margin-bottom: 24px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 46px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      margin-bottom: 20px;
       word-break: normal;
       overflow-wrap: break-word;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+      text-shadow: 0 3px 10px rgba(0, 0, 0, 0.7);
     }
 
     @media (min-width: 600px) {
       .hero-title {
-        font-size: 60px;
+        font-size: 58px;
       }
     }
 
     @media (min-width: 768px) {
       .hero-title {
-        font-size: 72px;
+        font-size: 70px;
       }
     }
 
     @media (min-width: 1024px) {
       .hero-title {
-        font-size: 96px;
+        font-size: 88px;
       }
     }
 
+    /* Línea 1 en Blanco puro */
     .hero-title-line1 {
       display: block;
       color: #ffffff;
     }
 
+    /* Línea 2 con el color Acento Amarillo/Dorado estilo KiddoLearn */
     .hero-title-line2 {
       display: block;
-      color: #f0f0f0;
+      color: #ffcc00;
     }
 
     .hero-description {
-      font-weight: 400;
+      font-weight: 500;
       font-size: 16px;
-      line-height: 1.4;
+      line-height: 1.5;
       color: #ffffff;
       max-width: 480px;
       margin-bottom: 32px;
-      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
     }
 
     @media (min-width: 768px) {
@@ -290,7 +299,7 @@
       }
     }
 
-    /* ACCIONES / BOTONES HERO */
+    /* ACCIONES / BOTONES HERO (Mantenidos en estructura, azul de acento) */
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
@@ -301,31 +310,31 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: #ff5722;
+      background-color: #0073e6;
       color: #ffffff;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 15px;
       padding: 14px 28px;
       border-radius: 8px;
       text-decoration: none;
-      border: 1px solid #ff5722;
+      border: 1px solid #0073e6;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 14px rgba(0, 115, 230, 0.4);
       transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
     .btn-primary:hover {
-      background-color: #e64a19;
-      border-color: #e64a19;
+      background-color: #005bb5;
+      border-color: #005bb5;
     }
 
     .btn-secondary {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: rgba(11, 25, 54, 0.6);
+      background-color: rgba(11, 25, 54, 0.65);
       color: #ffffff;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 15px;
       padding: 14px 28px;
       border-radius: 8px;
@@ -337,14 +346,14 @@
     }
 
     .btn-secondary:hover {
-      background-color: rgba(11, 25, 54, 0.85);
+      background-color: rgba(11, 25, 54, 0.9);
       border-color: #ffffff;
     }
 
     /* FOCO VISIBLE PARA ACCESIBILIDAD */
     a:focus-visible,
     button:focus-visible {
-      outline: 2px solid #ff5722;
+      outline: 2px solid #38bdf8;
       outline-offset: 4px;
     }
 
@@ -406,13 +415,13 @@
       </button>
     </header>
 
-    <!-- CONTENIDO HERO -->
+    <!-- CONTENIDO HERO ESTILO KIDDOLEARN -->
     <div class="hero-content">
       <span class="tagline reveal-item reveal-delay-1">#ConstruyeTuFuturoYa</span>
       
       <h1 class="hero-title">
         <span class="hero-title-line1 reveal-item reveal-delay-2">Aprende inglés</span>
-        <span class="hero-title-line2 reveal-item reveal-delay-3">de forma fluida y real.</span>
+        <span class="hero-title-line2 reveal-item reveal-delay-3">de forma fluida y real</span>
       </h1>
 
       <p class="hero-description reveal-item reveal-delay-4">
