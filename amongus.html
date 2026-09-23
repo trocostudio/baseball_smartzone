@@ -19,7 +19,7 @@
     }
 
     body {
-      background-color: #0b1936;
+      background-color: #0e387a;
       color: #ffffff;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -81,12 +81,12 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      text-shadow: 0 2px 8px rgba(14, 56, 122, 0.8);
     }
 
-    /* Acento de Marca en Azul Vibrante */
+    /* Acento de Marca en Naranja Oficial */
     .brand-logo span {
-      color: #38bdf8;
+      color: #ff5000;
     }
 
     .desktop-nav {
@@ -106,20 +106,21 @@
       font-size: 15px;
       color: #ffffff;
       text-decoration: none;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
       transition: color 0.2s ease;
     }
 
     .nav-link:hover,
     .nav-link:focus-visible {
-      color: #38bdf8;
+      color: #ff5000;
     }
 
+    /* Botón Acción Cabecera en Azul Eléctrico de Marca */
     .btn-talk {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: #0073e6;
+      background-color: #0066ff;
       color: #ffffff;
       font-weight: 600;
       font-size: 14px;
@@ -128,12 +129,12 @@
       text-decoration: none;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0, 115, 230, 0.4);
+      box-shadow: 0 4px 14px rgba(0, 102, 255, 0.4);
       transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
     .btn-talk:hover {
-      background-color: #005bb5;
+      background-color: #0052cc;
     }
 
     /* BOTÓN MENÚ MÓVIL */
@@ -146,7 +147,7 @@
       font-size: 16px;
       cursor: pointer;
       padding: 8px 0;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
     }
 
     @media (min-width: 768px) {
@@ -159,7 +160,7 @@
     .mobile-menu-overlay {
       position: fixed;
       inset: 0;
-      background-color: #0b1936;
+      background-color: #0e387a;
       z-index: 100;
       display: flex;
       flex-direction: column;
@@ -225,6 +226,7 @@
       text-align: left;
     }
 
+    /* Etiqueta / Tagline en Naranja Marca */
     .tagline {
       display: inline-block;
       font-weight: 700;
@@ -232,14 +234,14 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: #ffffff;
-      background: #0073e6;
+      background: #ff5000;
       padding: 8px 16px;
       border-radius: 6px;
       margin-bottom: 18px;
-      box-shadow: 0 4px 12px rgba(0, 115, 230, 0.3);
+      box-shadow: 0 4px 12px rgba(255, 80, 0, 0.35);
     }
 
-    /* Título estilo KiddoLearn (Fredoka Bold, Mayúsculas impactantes) */
+    /* Título estilo KiddoLearn (Fredoka Bold) */
     .hero-title {
       font-family: 'Fredoka', sans-serif;
       font-weight: 700;
@@ -250,7 +252,7 @@
       margin-bottom: 20px;
       word-break: normal;
       overflow-wrap: break-word;
-      text-shadow: 0 3px 10px rgba(0, 0, 0, 0.7);
+      text-shadow: 0 3px 12px rgba(14, 56, 122, 0.9);
     }
 
     @media (min-width: 600px) {
@@ -271,16 +273,16 @@
       }
     }
 
-    /* Línea 1 en Blanco puro */
+    /* Línea 1 en Blanco */
     .hero-title-line1 {
       display: block;
       color: #ffffff;
     }
 
-    /* Línea 2 con el color Acento Amarillo/Dorado estilo KiddoLearn */
+    /* Línea 2 en Naranja de la Marca */
     .hero-title-line2 {
       display: block;
-      color: #ffcc00;
+      color: #ff5000;
     }
 
     .hero-description {
@@ -299,7 +301,7 @@
       }
     }
 
-    /* ACCIONES / BOTONES HERO (Mantenidos en estructura, azul de acento) */
+    /* ACCIONES / BOTONES HERO */
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
@@ -310,50 +312,50 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: #0073e6;
+      background-color: #0066ff;
       color: #ffffff;
       font-weight: 600;
       font-size: 15px;
       padding: 14px 28px;
       border-radius: 8px;
       text-decoration: none;
-      border: 1px solid #0073e6;
+      border: 1px solid #0066ff;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0, 115, 230, 0.4);
+      box-shadow: 0 4px 14px rgba(0, 102, 255, 0.4);
       transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
     .btn-primary:hover {
-      background-color: #005bb5;
-      border-color: #005bb5;
+      background-color: #0052cc;
+      border-color: #0052cc;
     }
 
     .btn-secondary {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: rgba(11, 25, 54, 0.65);
+      background-color: rgba(14, 56, 122, 0.75);
       color: #ffffff;
       font-weight: 600;
       font-size: 15px;
       padding: 14px 28px;
       border-radius: 8px;
       text-decoration: none;
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(4px);
       cursor: pointer;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .btn-secondary:hover {
-      background-color: rgba(11, 25, 54, 0.9);
+      background-color: rgba(14, 56, 122, 0.95);
       border-color: #ffffff;
     }
 
     /* FOCO VISIBLE PARA ACCESIBILIDAD */
     a:focus-visible,
     button:focus-visible {
-      outline: 2px solid #38bdf8;
+      outline: 2px solid #ff5000;
       outline-offset: 4px;
     }
 
@@ -415,7 +417,7 @@
       </button>
     </header>
 
-    <!-- CONTENIDO HERO ESTILO KIDDOLEARN -->
+    <!-- CONTENIDO HERO ESTILO KIDDOLEARN CON COLORES DE MARCA -->
     <div class="hero-content">
       <span class="tagline reveal-item reveal-delay-1">#ConstruyeTuFuturoYa</span>
       
