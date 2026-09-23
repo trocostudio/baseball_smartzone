@@ -81,12 +81,12 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      text-shadow: 0 2px 8px rgba(14, 56, 122, 0.8);
+      text-shadow: 0 2px 8px rgba(14, 56, 122, 0.9);
     }
 
-    /* Acento de Marca en Naranja Oficial */
     .brand-logo span {
-      color: #ff5000;
+      color: #ffffff;
+      opacity: 0.9;
     }
 
     .desktop-nav {
@@ -107,34 +107,34 @@
       color: #ffffff;
       text-decoration: none;
       text-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
-      transition: color 0.2s ease;
+      transition: opacity 0.2s ease;
     }
 
     .nav-link:hover,
     .nav-link:focus-visible {
-      color: #ff5000;
+      opacity: 0.8;
     }
 
-    /* Botón Acción Cabecera en Azul Eléctrico de Marca */
+    /* Botón Acción Cabecera en Azul Profundo */
     .btn-talk {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: #0066ff;
+      background-color: #0e387a;
       color: #ffffff;
       font-weight: 600;
       font-size: 14px;
       padding: 10px 22px;
       border-radius: 8px;
       text-decoration: none;
-      border: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0, 102, 255, 0.4);
+      box-shadow: 0 4px 14px rgba(14, 56, 122, 0.5);
       transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
     .btn-talk:hover {
-      background-color: #0052cc;
+      background-color: #134693;
     }
 
     /* BOTÓN MENÚ MÓVIL */
@@ -156,7 +156,7 @@
       }
     }
 
-    /* OVERLAY MENÚ MÓVIL */
+    /* OVERLAY MENÚ MÓVIL EN AZUL PROFUNDO */
     .mobile-menu-overlay {
       position: fixed;
       inset: 0;
@@ -226,7 +226,7 @@
       text-align: left;
     }
 
-    /* Etiqueta / Tagline en Naranja Marca */
+    /* Etiqueta / Tagline en Azul Profundo */
     .tagline {
       display: inline-block;
       font-weight: 700;
@@ -234,11 +234,12 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: #ffffff;
-      background: #ff5000;
+      background: #0e387a;
       padding: 8px 16px;
       border-radius: 6px;
       margin-bottom: 18px;
-      box-shadow: 0 4px 12px rgba(255, 80, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(14, 56, 122, 0.4);
     }
 
     /* Título estilo KiddoLearn (Fredoka Bold) */
@@ -273,16 +274,15 @@
       }
     }
 
-    /* Línea 1 en Blanco */
     .hero-title-line1 {
       display: block;
       color: #ffffff;
     }
 
-    /* Línea 2 en Naranja de la Marca */
     .hero-title-line2 {
       display: block;
-      color: #ff5000;
+      color: #ffffff;
+      opacity: 0.9;
     }
 
     .hero-description {
@@ -301,7 +301,7 @@
       }
     }
 
-    /* ACCIONES / BOTONES HERO */
+    /* ACCIONES / BOTONES HERO EN AZUL PROFUNDO */
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
@@ -312,50 +312,49 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: #0066ff;
+      background-color: #0e387a;
       color: #ffffff;
       font-weight: 600;
       font-size: 15px;
       padding: 14px 28px;
       border-radius: 8px;
       text-decoration: none;
-      border: 1px solid #0066ff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0, 102, 255, 0.4);
+      box-shadow: 0 4px 14px rgba(14, 56, 122, 0.5);
       transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
     .btn-primary:hover {
-      background-color: #0052cc;
-      border-color: #0052cc;
+      background-color: #134693;
     }
 
     .btn-secondary {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: rgba(14, 56, 122, 0.75);
+      background-color: rgba(14, 56, 122, 0.65);
       color: #ffffff;
       font-weight: 600;
       font-size: 15px;
       padding: 14px 28px;
       border-radius: 8px;
       text-decoration: none;
-      border: 1px solid rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.6);
       backdrop-filter: blur(4px);
       cursor: pointer;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .btn-secondary:hover {
-      background-color: rgba(14, 56, 122, 0.95);
+      background-color: rgba(14, 56, 122, 0.9);
       border-color: #ffffff;
     }
 
     /* FOCO VISIBLE PARA ACCESIBILIDAD */
     a:focus-visible,
     button:focus-visible {
-      outline: 2px solid #ff5000;
+      outline: 2px solid #ffffff;
       outline-offset: 4px;
     }
 
@@ -417,7 +416,7 @@
       </button>
     </header>
 
-    <!-- CONTENIDO HERO ESTILO KIDDOLEARN CON COLORES DE MARCA -->
+    <!-- CONTENIDO HERO -->
     <div class="hero-content">
       <span class="tagline reveal-item reveal-delay-1">#ConstruyeTuFuturoYa</span>
       
