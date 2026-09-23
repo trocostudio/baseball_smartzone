@@ -25,7 +25,7 @@
       overflow-x: hidden;
     }
 
-    /* CONTENEDOR HERO CON IMAGEN DE FONDO */
+    /* CONTENEDOR HERO CON IMAGEN DE FONDO NÍTIDA */
     .hero-section {
       position: relative;
       width: 100%;
@@ -38,15 +38,8 @@
       padding-bottom: clamp(40px, 8vh, 64px);
       overflow: hidden;
 
-      /* Configuración de la imagen de fondo */
-      background-image: 
-        linear-gradient(
-          180deg, 
-          rgba(11, 25, 54, 0.75) 0%, 
-          rgba(11, 25, 54, 0.6) 40%, 
-          rgba(11, 25, 54, 0.95) 100%
-        ),
-        url('https://lh3.googleusercontent.com/d/19sb4amWXBo82wq92BbvMXkU90TgwK7Wr');
+      /* Imagen de fondo limpia sin overlay de niebla */
+      background-image: url('https://lh3.googleusercontent.com/d/19sb4amWXBo82wq92BbvMXkU90TgwK7Wr');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -85,6 +78,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
     }
 
     .brand-logo span {
@@ -104,16 +98,17 @@
     }
 
     .nav-link {
-      font-weight: 300;
+      font-weight: 400;
       font-size: 15px;
-      color: rgba(255, 255, 255, 0.85);
+      color: #ffffff;
       text-decoration: none;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
       transition: color 0.2s ease;
     }
 
     .nav-link:hover,
     .nav-link:focus-visible {
-      color: #ffffff;
+      color: #ff5722;
     }
 
     .btn-talk {
@@ -129,6 +124,7 @@
       text-decoration: none;
       border: none;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
     }
 
@@ -146,6 +142,7 @@
       font-size: 15px;
       cursor: pointer;
       padding: 8px 0;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     }
 
     @media (min-width: 768px) {
@@ -201,6 +198,7 @@
       font-size: 24px;
       font-weight: 300;
       color: #ffffff;
+      text-shadow: none;
     }
 
     .mobile-menu-footer {
@@ -225,26 +223,27 @@
 
     .tagline {
       display: inline-block;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 13px;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: #ff5722;
-      background: rgba(255, 87, 34, 0.12);
+      color: #ffffff;
+      background: #ff5722;
       padding: 6px 12px;
       border-radius: 6px;
-      border: 1px solid rgba(255, 87, 34, 0.3);
       margin-bottom: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     .hero-title {
-      font-weight: 300;
+      font-weight: 400;
       font-size: 48px;
       line-height: 0.95;
       letter-spacing: -0.03em;
       margin-bottom: 24px;
       word-break: normal;
       overflow-wrap: break-word;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
     }
 
     @media (min-width: 600px) {
@@ -272,16 +271,17 @@
 
     .hero-title-line2 {
       display: block;
-      color: rgba(255, 255, 255, 0.7);
+      color: #f0f0f0;
     }
 
     .hero-description {
-      font-weight: 300;
+      font-weight: 400;
       font-size: 16px;
       line-height: 1.4;
-      color: rgba(255, 255, 255, 0.85);
+      color: #ffffff;
       max-width: 480px;
       margin-bottom: 32px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
     }
 
     @media (min-width: 768px) {
@@ -310,6 +310,7 @@
       text-decoration: none;
       border: 1px solid #ff5722;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
@@ -322,21 +323,22 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: transparent;
+      background-color: rgba(11, 25, 54, 0.6);
       color: #ffffff;
       font-weight: 500;
       font-size: 15px;
       padding: 14px 28px;
       border-radius: 8px;
       text-decoration: none;
-      border: 1px solid rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(4px);
       cursor: pointer;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .btn-secondary:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(11, 25, 54, 0.85);
+      border-color: #ffffff;
     }
 
     /* FOCO VISIBLE PARA ACCESIBILIDAD */
