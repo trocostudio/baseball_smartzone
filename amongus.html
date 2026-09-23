@@ -27,7 +27,7 @@
       overflow-x: hidden;
     }
 
-    /* CONTENEDOR HERO CON IMAGEN DE FONDO NÍTIDA */
+    /* CONTENEDOR HERO CON IMAGEN DE FONDO */
     .hero-section {
       position: relative;
       width: 100%;
@@ -40,11 +40,19 @@
       padding-bottom: clamp(40px, 8vh, 64px);
       overflow: hidden;
 
-      /* Imagen de fondo nítida */
+      /* Imagen de fondo por defecto (Escritorio / Tablet) */
       background-image: url('https://lh3.googleusercontent.com/d/19sb4amWXBo82wq92BbvMXkU90TgwK7Wr');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
+    }
+
+    /* Imagen de fondo adaptada específicamente para vista móvil */
+    @media (max-width: 767px) {
+      .hero-section {
+        background-image: url('https://lh3.googleusercontent.com/d/1xz2FkAU7GdVG7iQHW48IheyvTH4ooHMp');
+        background-position: center top;
+      }
     }
 
     @media (min-width: 768px) {
