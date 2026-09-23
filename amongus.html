@@ -25,7 +25,7 @@
       overflow-x: hidden;
     }
 
-    /* CONTENEDOR HERO */
+    /* CONTENEDOR HERO CON IMAGEN DE FONDO */
     .hero-section {
       position: relative;
       width: 100%;
@@ -34,10 +34,22 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background-color: #0b1936;
       padding: 24px;
       padding-bottom: clamp(40px, 8vh, 64px);
       overflow: hidden;
+
+      /* Configuración de la imagen de fondo */
+      background-image: 
+        linear-gradient(
+          180deg, 
+          rgba(11, 25, 54, 0.75) 0%, 
+          rgba(11, 25, 54, 0.6) 40%, 
+          rgba(11, 25, 54, 0.95) 100%
+        ),
+        url('https://lh3.googleusercontent.com/d/19sb4amWXBo82wq92BbvMXkU90TgwK7Wr');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
     @media (min-width: 768px) {
@@ -52,34 +64,6 @@
         padding: 64px;
         padding-bottom: clamp(40px, 8vh, 64px);
       }
-    }
-
-    /* VIDEO DE FONDO Y OVERLAY */
-    .bg-video-container {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .bg-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-
-    .bg-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        180deg, 
-        rgba(11, 25, 54, 0.75) 0%, 
-        rgba(11, 25, 54, 0.6) 40%, 
-        rgba(11, 25, 54, 0.95) 100%
-      );
     }
 
     /* CABECERA Y NAVEGACIÓN */
@@ -399,23 +383,6 @@
 <body>
 
   <section class="hero-section">
-    <!-- VIDEO DE FONDO CON CLASES DE INGLÉS / ESTUDIANTES -->
-    <div class="bg-video-container">
-      <video 
-        id="heroVideo"
-        class="bg-video" 
-        autoplay 
-        muted 
-        loop 
-        playsinline 
-        poster="https://media.dinamosites.com/library/v1/sections/pliegue-abismal-poster-6de5dc1725ec.jpg"
-      >
-        <source src="https://media.dinamosites.com/library/v1/sections/pliegue-abismal-video-b9cea5f5cddd.mp4" type="video/mp4">
-        Tu navegador no soporta reproducción de video. Archivo pendiente: /media/living-english-hero.mp4
-      </video>
-      <div class="bg-overlay"></div>
-    </div>
-
     <!-- CABECERA -->
     <header class="header-nav">
       <a href="#" class="brand-logo">
@@ -496,28 +463,6 @@
 
     openMenuBtn.addEventListener('click', () => toggleMenu(true));
     closeMenuBtn.addEventListener('click', () => toggleMenu(false));
-
-    // ACCESIBILIDAD Y RENDIMIENTO DEL VIDEO
-    const video = document.getElementById('heroVideo');
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (prefersReducedMotion.matches && video) {
-      video.pause();
-    }
-
-    if ('IntersectionObserver' in window && video) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) {
-            video.pause();
-          } else if (!prefersReducedMotion.matches) {
-            video.play().catch(() => {});
-          }
-        });
-      }, { threshold: 0.1 });
-
-      observer.observe(video);
-    }
   </script>
 </body>
 </html>
