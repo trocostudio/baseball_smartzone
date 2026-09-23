@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pliegue — Hero Section</title>
+  <title>Academia Living English — Hero Section</title>
   
   <!-- Fuente Geist -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,300;0,400;0,500;0,600&amp;display=swap">
@@ -17,7 +17,7 @@
     }
 
     body {
-      background-color: #000000;
+      background-color: #0b1936;
       color: #ffffff;
       font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -34,7 +34,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background-color: #000000;
+      background-color: #0b1936;
       padding: 24px;
       padding-bottom: clamp(40px, 8vh, 64px);
       overflow: hidden;
@@ -54,7 +54,7 @@
       }
     }
 
-    /* VIDEO DE FONDO */
+    /* VIDEO DE FONDO Y OVERLAY */
     .bg-video-container {
       position: absolute;
       inset: 0;
@@ -76,9 +76,9 @@
       inset: 0;
       background: linear-gradient(
         180deg, 
-        rgba(0, 0, 0, 0.4) 0%, 
-        rgba(0, 0, 0, 0.2) 40%, 
-        rgba(0, 0, 0, 0.8) 100%
+        rgba(11, 25, 54, 0.75) 0%, 
+        rgba(11, 25, 54, 0.6) 40%, 
+        rgba(11, 25, 54, 0.95) 100%
       );
     }
 
@@ -98,6 +98,13 @@
       color: #ffffff;
       text-decoration: none;
       letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo span {
+      color: #ff5722;
     }
 
     .desktop-nav {
@@ -115,7 +122,7 @@
     .nav-link {
       font-weight: 300;
       font-size: 15px;
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255, 255, 255, 0.85);
       text-decoration: none;
       transition: color 0.2s ease;
     }
@@ -129,8 +136,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: #ffffff;
-      color: #000000;
+      background-color: #ff5722;
+      color: #ffffff;
       font-weight: 500;
       font-size: 14px;
       padding: 10px 20px;
@@ -138,11 +145,11 @@
       text-decoration: none;
       border: none;
       cursor: pointer;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
     }
 
     .btn-talk:hover {
-      opacity: 0.9;
+      background-color: #f44336;
     }
 
     /* BOTÓN DE MENÚ MÓVIL */
@@ -167,7 +174,7 @@
     .mobile-menu-overlay {
       position: fixed;
       inset: 0;
-      background-color: #000000;
+      background-color: #0b1936;
       z-index: 100;
       display: flex;
       flex-direction: column;
@@ -233,11 +240,16 @@
     }
 
     .tagline {
-      display: block;
-      font-weight: 300;
-      font-size: 14px;
-      letter-spacing: -0.01em;
-      color: rgba(255, 255, 255, 0.8);
+      display: inline-block;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #ff5722;
+      background: rgba(255, 87, 34, 0.12);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 87, 34, 0.3);
       margin-bottom: 16px;
     }
 
@@ -283,8 +295,8 @@
       font-weight: 300;
       font-size: 16px;
       line-height: 1.4;
-      color: rgba(255, 255, 255, 0.8);
-      max-width: 448px;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 480px;
       margin-bottom: 32px;
     }
 
@@ -305,20 +317,21 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background-color: #ffffff;
-      color: #000000;
+      background-color: #ff5722;
+      color: #ffffff;
       font-weight: 500;
       font-size: 15px;
       padding: 14px 28px;
       border-radius: 8px;
       text-decoration: none;
-      border: 1px solid #ffffff;
+      border: 1px solid #ff5722;
       cursor: pointer;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
     .btn-primary:hover {
-      opacity: 0.9;
+      background-color: #e64a19;
+      border-color: #e64a19;
     }
 
     .btn-secondary {
@@ -345,11 +358,11 @@
     /* FOCO VISIBLE PARA ACCESIBILIDAD */
     a:focus-visible,
     button:focus-visible {
-      outline: 2px solid #ffffff;
+      outline: 2px solid #ff5722;
       outline-offset: 4px;
     }
 
-    /* ANIMACIONES DE REVELADO (ASCENSO SUAVE SEPARADO POR 150 MS) */
+    /* ANIMACIONES DE REVELADO */
     .reveal-item {
       opacity: 0;
       transform: translateY(24px);
@@ -386,7 +399,7 @@
 <body>
 
   <section class="hero-section">
-    <!-- VIDEO DE FONDO -->
+    <!-- VIDEO DE FONDO CON CLASES DE INGLÉS / ESTUDIANTES -->
     <div class="bg-video-container">
       <video 
         id="heroVideo"
@@ -398,23 +411,24 @@
         poster="https://media.dinamosites.com/library/v1/sections/pliegue-abismal-poster-6de5dc1725ec.jpg"
       >
         <source src="https://media.dinamosites.com/library/v1/sections/pliegue-abismal-video-b9cea5f5cddd.mp4" type="video/mp4">
-        <!-- Indicador si el archivo o la reproducción falla -->
-        Tu navegador no soporta reproducción de video. Archivo pendiente: /media/pliegue-abismal-video.mp4
+        Tu navegador no soporta reproducción de video. Archivo pendiente: /media/living-english-hero.mp4
       </video>
       <div class="bg-overlay"></div>
     </div>
 
     <!-- CABECERA -->
     <header class="header-nav">
-      <a href="#" class="brand-logo">Pliegue</a>
+      <a href="#" class="brand-logo">
+        Living <span>English</span>
+      </a>
 
       <!-- NAVEGACIÓN ESCRITORIO -->
       <nav class="desktop-nav" aria-label="Navegación principal">
         <a href="#" class="nav-link">Inicio</a>
-        <a href="#" class="nav-link">Proyectos</a>
-        <a href="#" class="nav-link">Estudio</a>
-        <a href="#" class="nav-link">Contacto</a>
-        <a href="#" class="btn-talk">Hablemos</a>
+        <a href="#" class="nav-link">Cursos</a>
+        <a href="#" class="nav-link">Metodología</a>
+        <a href="#" class="nav-link">Sedes</a>
+        <a href="#" class="btn-talk">Inscríbete hoy</a>
       </nav>
 
       <!-- BOTÓN MENÚ MÓVIL -->
@@ -425,20 +439,20 @@
 
     <!-- CONTENIDO HERO -->
     <div class="hero-content">
-      <span class="tagline reveal-item reveal-delay-1">Estudio creativo · Océano inmersivo</span>
+      <span class="tagline reveal-item reveal-delay-1">#ConstruyeTuFuturoYa</span>
       
       <h1 class="hero-title">
-        <span class="hero-title-line1 reveal-item reveal-delay-2">Plegamos ideas</span>
-        <span class="hero-title-line2 reveal-item reveal-delay-3">hasta que respiran.</span>
+        <span class="hero-title-line1 reveal-item reveal-delay-2">Aprende inglés</span>
+        <span class="hero-title-line2 reveal-item reveal-delay-3">de forma fluida y real.</span>
       </h1>
 
       <p class="hero-description reveal-item reveal-delay-4">
-        Dirección de arte, 3D y experiencias inmersivas para marcas que quieren sumergir a su público
+        Sin guías aburridas ni ejercicios extensos. Descubre una metodología práctica para hablar desde tu primera clase.
       </p>
 
       <div class="hero-actions reveal-item reveal-delay-5">
-        <a href="#" class="btn-primary">Ver proyectos</a>
-        <a href="#" class="btn-secondary">Nuestro proceso</a>
+        <a href="#" class="btn-primary">Ver cursos</a>
+        <a href="#" class="btn-secondary">Nuestra metodología</a>
       </div>
     </div>
   </section>
@@ -446,19 +460,19 @@
   <!-- MENÚ MÓVIL EN PANTALLA COMPLETA -->
   <div class="mobile-menu-overlay" id="mobileMenu" aria-hidden="true">
     <div class="mobile-menu-header">
-      <a href="#" class="brand-logo">Pliegue</a>
+      <a href="#" class="brand-logo">Living <span>English</span></a>
       <button class="mobile-menu-close" id="closeMenuBtn" aria-label="Cerrar menú">&times;</button>
     </div>
     
     <nav class="mobile-menu-links">
       <a href="#" class="nav-link">Inicio</a>
-      <a href="#" class="nav-link">Proyectos</a>
-      <a href="#" class="nav-link">Estudio</a>
-      <a href="#" class="nav-link">Contacto</a>
+      <a href="#" class="nav-link">Cursos</a>
+      <a href="#" class="nav-link">Metodología</a>
+      <a href="#" class="nav-link">Sedes</a>
     </nav>
 
     <div class="mobile-menu-footer">
-      <a href="#" class="btn-talk">Hablemos</a>
+      <a href="#" class="btn-talk">Inscríbete hoy</a>
     </div>
   </div>
 
@@ -486,13 +500,11 @@
     // ACCESIBILIDAD Y RENDIMIENTO DEL VIDEO
     const video = document.getElementById('heroVideo');
 
-    // 1. Pausa si el usuario tiene activada la preferencia de movimiento reducido
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (prefersReducedMotion.matches && video) {
       video.pause();
     }
 
-    // 2. Pausa el video automáticamente cuando sale de la pantalla
     if ('IntersectionObserver' in window && video) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
