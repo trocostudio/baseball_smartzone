@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academia Living English — Plataforma Educativa</title>
+  
+  <!-- Fuentes Google: Fredoka y Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0e387a;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* CABECERA */
+    .app-header {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(14, 56, 122, 0.95);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-logo-img {
+      height: 56px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 16px;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-logout {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-logout:hover { opacity: 0.85; }
+
+    /* CONTENEDOR PRINCIPAL */
+    .main-container {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* SECCIÓN DE LOGIN */
+    .auth-card {
+      max-width: 440px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 32px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .auth-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 32px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .auth-subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: #d1d5db;
+      margin-bottom: 24px;
+    }
+
+    .role-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .role-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border: none;
+      background: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .role-tab.active {
+      background: #0e387a;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: #ffffff;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: #134693;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover { background: #1a56b3; }
+
+    /* DASHBOARD ESTUDIANTE */
+    .dashboard-header {
+      margin-bottom: 28px;
+    }
+
+    .dashboard-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    .level-tabs {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+    }
+
+    .level-btn {
+      padding: 10px 24px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .level-btn.active {
+      background: #ffffff;
+      color: #0e387a;
+    }
+
+    .units-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .unit-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .unit-number {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 20px;
+      color: #60a5fa;
+      margin-bottom: 4px;
+    }
+
+    .unit-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .exam-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .score {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .score-passed { color: #4ade80; }
+    .score-pending { color: #facc15; }
+
+    /* DASHBOARD DOCENTE */
+    .teacher-section {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .teacher-section {
+        grid-template-columns: 320px 1fr;
+      }
+    }
+
+    .student-list {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .student-item {
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .student-item:hover, .student-item.active {
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .student-name {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .student-level {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .grade-editor {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .teacher-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .grade-input-box {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .grade-input-box label {
+      display: block;
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+
+    .grade-input-box input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      color: white;
+      padding: 6px 10px;
+      font-weight: 700;
+    }
+
+    .btn-save-grade {
+      margin-top: 8px;
+      width: 100%;
+      padding: 6px;
+      background: #4ade80;
+      color: #0e387a;
+      border: none;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- CABECERA -->
+  <header class="app-header">
+    <a href="index.html">
+      <img src="https://lh3.googleusercontent.com/d/1C0v1Ly7YB-5Rtbj1a7Bj4CCRo3OMHYS6" alt="Academia Living English Logo" class="brand-logo-img">
+    </a>
+
+    <div id="userBadge" class="user-badge hidden">
+      <span id="userName" style="font-weight: 600; font-size: 14px;">Usuario</span>
+      <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- 1. SECCIÓN DE IDENTIFICACIÓN / LOGIN -->
+    <section id="authSection" class="auth-card">
+      <h2 class="auth-title">Plataforma Living English</h2>
+      <p class="auth-subtitle">Ingresa tus credenciales para acceder a tus exámenes y notas</p>
+
+      <div class="role-tabs">
+        <button class="role-tab active" id="tabStudent" onclick="switchRole('estudiante')">Estudiante</button>
+        <button class="role-tab" id="tabTeacher" onclick="switchRole('profesor')">Profesor</button>
+      </div>
+
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" id="loginEmail" class="form-control" placeholder="ejemplo@livingenglish.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="loginPass" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnAuthAction">Ingresar como Estudiante</button>
+      </form>
+    </section>
+
+    <!-- 2. DASHBOARD ESTUDIANTE -->
+    <section id="studentDashboard" class="hidden">
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">Mis Exámenes por Módulo</h1>
+        <p style="color: #d1d5db;">Selecciona tu nivel para revisar el estado de tus evaluaciones (Unit 1 a 16).</p>
+      </div>
+
+      <!-- PESTAÑAS DE NIVELES -->
+      <div class="level-tabs">
+        <button class="level-btn active" onclick="filterLevel('A1', this)">Módulo A1</button>
+        <button class="level-btn" onclick="filterLevel('A2', this)">Módulo A2</button>
+        <button class="level-btn" onclick="filterLevel('B1', this)">Módulo B1</button>
+        <button class="level-btn" onclick="filterLevel('B2', this)">Módulo B2</button>
+        <button class="level-btn" onclick="filterLevel('C1', this)">Módulo C1</button>
+      </div>
+
+      <!-- PARRILLA DE UNIDADES 1 A 16 -->
+      <div class="units-grid" id="unitsContainer">
+        <!-- Renderizado dinámicamente con JS -->
+      </div>
+    </section>
+
+    <!-- 3. DASHBOARD PROFESOR -->
+    <section id="teacherDashboard" class="hidden">
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">Panel de Calificaciones — Docentes</h1>
+        <p style="color: #d1d5db;">Busca un estudiante y asigna sus notas individuales por unidad.</p>
+      </div>
+
+      <div class="teacher-section">
+        <!-- LISTA / BUSCADOR DE ESTUDIANTES -->
+        <div class="student-list">
+          <div class="form-group">
+            <input type="text" id="searchStudent" class="form-control" placeholder="Buscar estudiante..." onkeyup="filterStudents()">
+          </div>
+          <div id="studentsContainer">
+            <!-- Renderizado dinámicamente -->
+          </div>
+        </div>
+
+        <!-- EDITOR DE NOTAS DEL ESTUDIANTE SELECCIONADO -->
+        <div class="grade-editor">
+          <h3 id="selectedStudentTitle" class="auth-title" style="text-align: left; font-size: 24px;">Selecciona un estudiante</h3>
+          <p id="selectedStudentSub" style="color: #d1d5db; font-size: 14px; margin-bottom: 20px;">Haz clic en un alumno de la lista izquierda para cargar sus unidades.</p>
+
+          <div class="teacher-grid" id="teacherUnitsGrid">
+            <!-- Renderizado dinámicamente -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ESTADO LOCAL DE SIMULACIÓN (ESTRUCTURA LISTA PARA CONECTAR A SUPABASE)
+    let currentRole = 'estudiante';
+    let currentActiveLevel = 'A1';
+    let selectedStudentId = null;
+
+    // Datos de demostración
+    const mockStudents = [
+      { id: 1, name: "Carlos Mendoza", email: "carlos@gmail.com", level: "A1", grades: { "Unit 1": 4.5, "Unit 2": 3.8, "Unit 3": 4.0 } },
+      { id: 2, name: "María Rodríguez", email: "maria@gmail.com", level: "A2", grades: { "Unit 1": 5.0, "Unit 2": 4.2 } },
+      { id: 3, name: "Andrés López", email: "andres@gmail.com", level: "B1", grades: { "Unit 1": 3.5 } }
+    ];
+
+    function switchRole(role) {
+      currentRole = role;
+      document.getElementById('tabStudent').classList.toggle('active', role === 'estudiante');
+      document.getElementById('tabTeacher').classList.toggle('active', role === 'profesor');
+      document.getElementById('btnAuthAction').innerText = role === 'estudiante' ? 'Ingresar como Estudiante' : 'Ingresar como Profesor';
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('userBadge').classList.remove('hidden');
+
+      if (currentRole === 'estudiante') {
+        document.getElementById('userName').innerText = `Estudiante: ${email.split('@')[0]}`;
+        document.getElementById('studentDashboard').classList.remove('hidden');
+        renderStudentUnits();
+      } else {
+        document.getElementById('userName').innerText = `Profesor: ${email.split('@')[0]}`;
+        document.getElementById('teacherDashboard').classList.remove('hidden');
+        renderStudentList();
+      }
+    }
+
+    function logout() {
+      document.getElementById('authSection').classList.remove('hidden');
+      document.getElementById('userBadge').classList.add('hidden');
+      document.getElementById('studentDashboard').classList.add('hidden');
+      document.getElementById('teacherDashboard').classList.add('hidden');
+    }
+
+    /* LÓGICA VISTA ESTUDIANTE */
+    function filterLevel(level, btn) {
+      currentActiveLevel = level;
+      document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderStudentUnits();
+    }
+
+    function renderStudentUnits() {
+      const container = document.getElementById('unitsContainer');
+      container.innerHTML = '';
+
+      // Generar de la Unidad 1 a la 16
+      for (let i = 1; i <= 16; i++) {
+        const unitName = `Unit ${i}`;
+        // Simulamos algunas notas cargadas de ejemplo
+        const hasScore = i <= 3;
+        const score = hasScore ? (3.5 + (i * 0.4)).toFixed(1) : null;
+
+        const card = document.createElement('div');
+        card.className = 'unit-card';
+        card.innerHTML = `
+          <div>
+            <div class="unit-number">${currentActiveLevel} — ${unitName}</div>
+            <div class="unit-title">Examen de evaluación de habilidades</div>
+          </div>
+          <div class="exam-badge">
+            <span>Estado:</span>
+            <span class="score ${hasScore ? 'score-passed' : 'score-pending'}">
+              ${hasScore ? `Nota: ${score}` : 'Pendiente'}
+            </span>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+    }
+
+    /* LÓGICA VISTA PROFESOR */
+    function renderStudentList() {
+      const container = document.getElementById('studentsContainer');
+      container.innerHTML = '';
+
+      mockStudents.forEach(student => {
+        const item = document.createElement('div');
+        item.className = `student-item ${selectedStudentId === student.id ? 'active' : ''}`;
+        item.onclick = () => selectStudent(student.id);
+        item.innerHTML = `
+          <div class="student-name">${student.name}</div>
+          <div class="student-level">Nivel actual: ${student.level} | ${student.email}</div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function filterStudents() {
+      const q = document.getElementById('searchStudent').value.toLowerCase();
+      const items = document.querySelectorAll('.student-item');
+      items.forEach(item => {
+        const text = item.innerText.toLowerCase();
+        item.style.display = text.includes(q) ? 'block' : 'none';
+      });
+    }
+
+    function selectStudent(id) {
+      selectedStudentId = id;
+      renderStudentList();
+      
+      const student = mockStudents.find(s => s.id === id);
+      document.getElementById('selectedStudentTitle').innerText = student.name;
+      document.getElementById('selectedStudentSub').innerText = `Calificando exámenes (Unit 1 a 16) — Nivel ${student.level}`;
+
+      const grid = document.getElementById('teacherUnitsGrid');
+      grid.innerHTML = '';
+
+      for (let i = 1; i <= 16; i++) {
+        const unitKey = `Unit ${i}`;
+        const currentGrade = student.grades[unitKey] || '';
+
+        const box = document.createElement('div');
+        box.className = 'grade-input-box';
+        box.innerHTML = `
+          <label>${unitKey}</label>
+          <input type="number" step="0.1" min="0" max="5" id="grade_${i}" value="${currentGrade}" placeholder="0.0 - 5.0">
+          <button class="btn-save-grade" onclick="saveGrade(${student.id}, '${unitKey}', 'grade_${i}')">Guardar</button>
+        `;
+        grid.appendChild(box);
+      }
+    }
+
+    function saveGrade(studentId, unitKey, inputId) {
+      const val = document.getElementById(inputId).value;
+      const student = mockStudents.find(s => s.id === studentId);
+      if (student) {
+        student.grades[unitKey] = parseFloat(val);
+        alert(`Nota guardada correctamente para ${student.name} en ${unitKey}: ${val}`);
+      }
+    }
+  </script>
+</body>
+</html>
