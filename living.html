@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academia Living English — Hero Section</title>
+  
+  <!-- Fuentes Google: Fredoka (Títulos estilo KiddoLearn) y Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* RESET & BASE */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0e387a;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* CONTENEDOR HERO CON IMAGEN DE FONDO */
+    .hero-section {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+      padding-bottom: clamp(40px, 8vh, 64px);
+      overflow: hidden;
+
+      /* Imagen de fondo por defecto (Escritorio / Tablet) */
+      background-image: url('https://lh3.googleusercontent.com/d/19sb4amWXBo82wq92BbvMXkU90TgwK7Wr');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* Imagen de fondo adaptada específicamente para vista móvil */
+    @media (max-width: 767px) {
+      .hero-section {
+        background-image: url('https://lh3.googleusercontent.com/d/1xz2FkAU7GdVG7iQHW48IheyvTH4ooHMp');
+        background-position: center top;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .hero-section {
+        padding: 48px;
+        padding-bottom: clamp(40px, 8vh, 64px);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .hero-section {
+        padding: 64px;
+        padding-bottom: clamp(40px, 8vh, 64px);
+      }
+    }
+
+    /* CABECERA Y NAVEGACIÓN */
+    .header-nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    /* IMAGEN DEL LOGO DE LA ACADEMIA (+50% MÁS GRANDE) */
+    .brand-logo-img {
+      height: 72px; /* Aumentado de 48px a 72px (+50%) */
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0px 2px 6px rgba(0, 0, 0, 0.5));
+      transition: transform 0.2s ease;
+    }
+
+    .brand-logo-link:hover .brand-logo-img {
+      transform: scale(1.02);
+    }
+
+    @media (min-width: 768px) {
+      .brand-logo-img {
+        height: 84px; /* Aumentado de 56px a 84px (+50%) */
+      }
+    }
+
+    .desktop-nav {
+      display: none;
+      align-items: center;
+      gap: 32px;
+    }
+
+    @media (min-width: 768px) {
+      .desktop-nav {
+        display: flex;
+      }
+    }
+
+    .nav-link {
+      font-weight: 600;
+      font-size: 15px;
+      color: #ffffff;
+      text-decoration: none;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      opacity: 0.8;
+    }
+
+    /* Botón Acción Cabecera en Azul Profundo */
+    .btn-talk {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #0e387a;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(14, 56, 122, 0.5);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-talk:hover {
+      background-color: #134693;
+    }
+
+    /* BOTÓN MENÚ MÓVIL */
+    .mobile-menu-btn {
+      display: flex;
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 8px 0;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    @media (min-width: 768px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+
+    /* OVERLAY MENÚ MÓVIL EN AZUL PROFUNDO */
+    .mobile-menu-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: #0e387a;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-menu-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .mobile-menu-close {
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 60px;
+    }
+
+    .mobile-menu-links .nav-link {
+      font-size: 24px;
+      font-weight: 500;
+      color: #ffffff;
+      text-shadow: none;
+    }
+
+    .mobile-menu-footer {
+      margin-top: auto;
+      padding-bottom: 24px;
+    }
+
+    .mobile-menu-footer .btn-talk {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+    }
+
+    /* CONTENIDO PRINCIPAL / TEXTOS HERO ESTILO KIDDOLEARN */
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      max-width: 800px;
+      margin-top: auto;
+      text-align: left;
+    }
+
+    /* Etiqueta / Tagline en Azul Profundo */
+    .tagline {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ffffff;
+      background: #0e387a;
+      padding: 8px 16px;
+      border-radius: 6px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(14, 56, 122, 0.4);
+    }
+
+    /* Título estilo KiddoLearn (Fredoka Bold) */
+    .hero-title {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 46px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      margin-bottom: 20px;
+      word-break: normal;
+      overflow-wrap: break-word;
+      text-shadow: 0 3px 12px rgba(14, 56, 122, 0.9);
+    }
+
+    @media (min-width: 600px) {
+      .hero-title {
+        font-size: 58px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .hero-title {
+        font-size: 70px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .hero-title {
+        font-size: 88px;
+      }
+    }
+
+    .hero-title-line1 {
+      display: block;
+      color: #ffffff;
+    }
+
+    .hero-title-line2 {
+      display: block;
+      color: #ffffff;
+      opacity: 0.9;
+    }
+
+    .hero-description {
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #ffffff;
+      max-width: 480px;
+      margin-bottom: 32px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+    }
+
+    @media (min-width: 768px) {
+      .hero-description {
+        font-size: 18px;
+      }
+    }
+
+    /* ACCIONES / BOTONES HERO EN AZUL PROFUNDO */
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #0e387a;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(14, 56, 122, 0.5);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #134693;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(14, 56, 122, 0.65);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(14, 56, 122, 0.9);
+      border-color: #ffffff;
+    }
+
+    /* FOCO VISIBLE PARA ACCESIBILIDAD */
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 4px;
+    }
+
+    /* ANIMACIONES DE REVELADO */
+    .reveal-item {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .reveal-delay-1 { animation-delay: 0ms; }
+    .reveal-delay-2 { animation-delay: 150ms; }
+    .reveal-delay-3 { animation-delay: 300ms; }
+    .reveal-delay-4 { animation-delay: 450ms; }
+    .reveal-delay-5 { animation-delay: 600ms; }
+
+    @keyframes revealUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* REDUCED MOTION PREFERENCE */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal-item {
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero-section">
+    <!-- CABECERA CON EL LOGO REAL DE LA ACADEMIA -->
+    <header class="header-nav">
+      <a href="#" class="brand-logo-link" aria-label="Academia Living English">
+        <img src="https://lh3.googleusercontent.com/d/1C0v1Ly7YB-5Rtbj1a7Bj4CCRo3OMHYS6" alt="Academia Living English Logo" class="brand-logo-img">
+      </a>
+
+      <!-- NAVEGACIÓN ESCRITORIO -->
+      <nav class="desktop-nav" aria-label="Navegación principal">
+        <a href="#" class="nav-link">Inicio</a>
+        <a href="cursos.html" class="nav-link">Cursos</a>
+        <a href="#" class="nav-link">Metodología</a>
+        <a href="#" class="nav-link">Sedes</a>
+        <a href="#" class="btn-talk">Inscríbete hoy</a>
+      </nav>
+
+      <!-- BOTÓN MENÚ MÓVIL -->
+      <button class="mobile-menu-btn" id="openMenuBtn" aria-label="Abrir menú de navegación">
+        Menú
+      </button>
+    </header>
+
+    <!-- CONTENIDO HERO -->
+    <div class="hero-content">
+      <span class="tagline reveal-item reveal-delay-1">#ConstruyeTuFuturoYa</span>
+      
+      <h1 class="hero-title">
+        <span class="hero-title-line1 reveal-item reveal-delay-2">Aprende inglés</span>
+        <span class="hero-title-line2 reveal-item reveal-delay-3">de forma fluida y real</span>
+      </h1>
+
+      <p class="hero-description reveal-item reveal-delay-4">
+        Sin guías aburridas ni ejercicios extensos. Descubre una metodología práctica para hablar desde tu primera clase.
+      </p>
+
+      <div class="hero-actions reveal-item reveal-delay-5">
+        <a href="cursos.html" class="btn-primary">Ver cursos</a>
+        <a href="#" class="btn-secondary">Nuestra metodología</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENÚ MÓVIL EN PANTALLA COMPLETA -->
+  <div class="mobile-menu-overlay" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-menu-header">
+      <a href="#" class="brand-logo-link" aria-label="Academia Living English">
+        <img src="https://lh3.googleusercontent.com/d/1C0v1Ly7YB-5Rtbj1a7Bj4CCRo3OMHYS6" alt="Academia Living English Logo" class="brand-logo-img">
+      </a>
+      <button class="mobile-menu-close" id="closeMenuBtn" aria-label="Cerrar menú">&times;</button>
+    </div>
+    
+    <nav class="mobile-menu-links">
+      <a href="#" class="nav-link">Inicio</a>
+      <a href="#" class="nav-link">Cursos</a>
+      <a href="#" class="nav-link">Metodología</a>
+      <a href="#" class="nav-link">Sedes</a>
+    </nav>
+
+    <div class="mobile-menu-footer">
+      <a href="#" class="btn-talk">Inscríbete hoy</a>
+    </div>
+  </div>
+
+  <script>
+    // MANEJO DEL MENÚ MÓVIL
+    const openMenuBtn = document.getElementById('openMenuBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    function toggleMenu(open) {
+      if (open) {
+        mobileMenu.classList.add('is-open');
+        mobileMenu.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      } else {
+        mobileMenu.classList.remove('is-open');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+    }
+
+    openMenuBtn.addEventListener('click', () => toggleMenu(true));
+    closeMenuBtn.addEventListener('click', () => toggleMenu(false));
+  </script>
+</body>
+</html>
